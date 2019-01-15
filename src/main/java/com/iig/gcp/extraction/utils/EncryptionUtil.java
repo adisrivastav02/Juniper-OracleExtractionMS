@@ -54,7 +54,6 @@ public class EncryptionUtil {
 			while (scanner.hasNextLine()) {
 				fileContents.append(lineSeparator + scanner.nextLine());
 			}
-			System.out.println("fileContents.toString()" + fileContents.toString());
 			return fileContents.toString();
 		} finally {
 			scanner.close();
@@ -67,10 +66,6 @@ public class EncryptionUtil {
 	public static  String decryptText(byte[] byteCipherText, SecretKey secKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
 		// AES defaults to AES/ECB/PKCS5Padding in Java 7
-		
-		
-
-		System.out.println(secKey.toString());
 
 		Cipher aesCipher = Cipher.getInstance("AES");
 

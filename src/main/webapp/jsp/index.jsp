@@ -1,20 +1,89 @@
 <jsp:include page="cdg_header.jsp" />
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-4 stretch-card grid-margin">
-              <div class="card bg-gradient-primary card-img-holder text-white">
-                <div class="card-body">
-                  <img src="${pageContext.request.contextPath}/assets/img/circle.svg" class="card-img-absolute" alt="circle-image"/>
-                  <h2 class="font-weight-normal mb-3">Data Extraction</h2>
-                  <h4>Add Metadata</h4>
-				  <h4>View Metadata</h4>
-				  <h4>Extract Metadata</h4>
-                </div>
-              </div>
-            </div>
-		
-          </div>
-          </div>
-
-<jsp:include page="cdg_footer.jsp" />
+<style>
+body {
+	  padding-top: 50px;
+	}
+	 
+	.thumbnail {
+	    position:relative;
+	    overflow:hidden;
+	}
+	 
+	.caption {
+	    position:absolute;
+	    top:0;
+	    right:0;
+	    background:rgba(90, 90, 90, 0.75);
+	    width:100%;
+	    height:100%;
+	    padding:2%;
+	    display: none;
+	    text-align: left;
+	    color:#fff !important;
+	    z-index:2;
+	}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("[rel='tooltip']").tooltip();    
+ 
+    $('.thumbnail').hover(
+        function(){
+            $(this).find('.caption').slideDown(250); //.fadeIn(250)
+        },
+        function(){
+            $(this).find('.caption').slideUp(250); //.fadeOut(205)
+        }
+    ); 	
+ });
+</script>
+<div class="main-panel">
+	<div class="content-wrapper">
+		<div class="row">
+			<div class="col-12 grid-margin stretch-card">
+				<div class="card">
+					<div class="card-body">
+						<div class="container">
+								  <div class="row text-center text-lg-left">
+									 <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      	<a class="d-block mb-4 h-100" href="#" onclick="pass('Oracle');">
+								      		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/src_details.png" >
+								      	</a>
+								    </div>
+								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      	<a class="d-block mb-4 h-100" href="#" onclick="pass('Teradata');">
+								      		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/tgt_details.png">
+								      	</a> 
+								    </div>
+								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Unix');">
+								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_details.png">
+								          </a>
+								    </div>
+								     <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Hadoop');">
+								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/data_details.png">
+								          </a>
+								    </div>
+								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								     	<a class="d-block mb-4 h-100" href="#">
+								     		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_chk.png">
+								     	</a> 
+								    </div>
+								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Mssql');">
+								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/extract_data.png">
+								          </a>
+								    </div>
+								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
+								      <a class="d-block mb-4 h-100" href="#"  onclick="pass('Hive');">
+								      	<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_runs.png">
+								      </a> 
+								    </div>
+								  </div>
+							</div>	
+					</div>
+				</div>
+			</div>
+		</div>
+		<jsp:include page="cdg_footer.jsp" />

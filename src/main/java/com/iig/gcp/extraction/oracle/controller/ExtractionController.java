@@ -38,28 +38,27 @@ import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
 import com.iig.gcp.extraction.oracle.service.ExtractionService;
 
 @Controller
+@SessionAttributes(value= {"user_name","project_name"})
 public class ExtractionController {
 
 	@Autowired
 	private ExtractionService es;
-	public String userId="";
-	public String project="";
 	public String src_val="";
-	public String jwt="";
-
+	
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
 	public ModelAndView extractionHome(@Valid @ModelAttribute("jsonObject") String jsonObject, ModelMap model, HttpServletRequest request) {
-		System.out.println("in extraction controller");
 		JSONObject jObj = new JSONObject(jsonObject);
-		userId=jObj.getString("userId");
-		project=jObj.getString("project");
-		jwt=jObj.getString("jwt");
+		String user_name=jObj.getString("userId");
+		String project_name=jObj.getString("project");
+		String jwt=jObj.getString("jwt");
 		src_val="Oracle";
 		
-		System.out.println("user->"+userId+" proj-->"+project+" jwt-->"+jwt);
-		request.getSession().setAttribute("userId", userId);
-		request.getSession().setAttribute("project", project);
-		request.getSession().setAttribute("src_val", src_val);
+		request.getSession().setAttribute("user_name", user_name);
+		request.getSession().setAttribute("project_name", project_name);
+		request.getSession().setAttribute("jwt", jwt);
+		
+		model.addAttribute("user_name",user_name);
+		model.addAttribute("project", project_name);
 		return new ModelAndView("/index");
 		}
 		
@@ -68,17 +67,20 @@ public class ExtractionController {
 		return new ModelAndView("extraction/Event");
 	}
 
-	@RequestMapping(value = "/extraction/ConnectionDetails", method = RequestMethod.POST)
+	@RequestMapping(value = "/extraction/ConnectionDetailsOracle", method = RequestMethod.GET)
 	public ModelAndView ConnectionDetails( ModelMap model, HttpServletRequest request) {
+		System.out.println("inside connection details");
 		model.addAttribute("src_val", "Oracle");
+		System.out.println("user name: "+(String)request.getSession().getAttribute("user_name"));
+		System.out.println("proj name: "+(String)request.getSession().getAttribute("project_name"));
 		model.addAttribute("usernm",(String)request.getSession().getAttribute("user"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
 		
 		ArrayList<String> system;
 		try {
-			system = es.getSystem(project);
+			system = es.getSystem((String)request.getSession().getAttribute("project_name"));
 			model.addAttribute("system", system);
-			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, project);
+			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String)request.getSession().getAttribute("project_name"));
 			model.addAttribute("conn_val", conn_val);
 			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
 			model.addAttribute("drive", drive);
@@ -95,7 +97,7 @@ public class ExtractionController {
 			HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String resp = null;
 		if (button_type.equalsIgnoreCase("add"))
-			resp = es.invokeRest(x, "addConnection");
+			resp = es.invokeRest(x, "addOracleConnection");
 		else if (button_type.equalsIgnoreCase("upd"))
 			resp = es.invokeRest(x, "updConnection");
 		else if (button_type.equalsIgnoreCase("del"))
@@ -142,15 +144,17 @@ public class ExtractionController {
 	public ModelAndView TargetDetails(@Valid ModelMap model, HttpServletRequest request) {
 		ArrayList<TargetMaster> tgt;
 		try {
-			tgt = es.getTargets((String) request.getSession().getAttribute("project"));
-			model.addAttribute("usernm", request.getSession().getAttribute("user"));
-			model.addAttribute("project", (String) request.getSession().getAttribute("project"));
-			ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project"));
+			System.out.println("proj name: "+(String) request.getSession().getAttribute("project_name"));
+			System.out.println("user_name name: "+(String) request.getSession().getAttribute("user_name"));
+			tgt = es.getTargets((String) request.getSession().getAttribute("project_name"));
+			model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
+			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+			ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("system", system);
 			model.addAttribute("tgt_val", tgt);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("drive", drive);
-			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project"));
+			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("tproj", tproj);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -238,14 +242,9 @@ public class ExtractionController {
 		return new ModelAndView("extraction/TargetDetailsEdit");
 	}
 
-	@RequestMapping(value = "/extraction/SystemHome", method = RequestMethod.GET)
-	public ModelAndView SystemHome() {
-		return new ModelAndView("extraction/SystemHome");
-	}
-
-	@RequestMapping(value = "/extraction/SystemDetails", method = RequestMethod.POST)
-	public ModelAndView SystemDetails(@Valid @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request) {
-		model.addAttribute("src_val", src_val);
+	@RequestMapping(value = "/extraction/SystemDetails", method = RequestMethod.GET)
+	public ModelAndView SystemDetails(ModelMap model, HttpServletRequest request) {
+		model.addAttribute("src_val", "Oracle");
 		ArrayList<SourceSystemMaster> src_sys_val;
 		try {
 			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
@@ -334,16 +333,11 @@ public class ExtractionController {
 		return new ModelAndView("extraction/SystemDetailsEdit");
 	}
 
-	@RequestMapping(value = "/extraction/DataHome", method = RequestMethod.GET)
-	public ModelAndView DataHome() {
-		return new ModelAndView("extraction/DataHome");
-	}
-
-	@RequestMapping(value = "/extraction/DataDetails", method = RequestMethod.POST)
-	public ModelAndView DataDetails(@Valid @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request) throws IOException {
+	@RequestMapping(value = "/extraction/DataDetails", method = RequestMethod.GET)
+	public ModelAndView DataDetails(ModelMap model, HttpServletRequest request) throws IOException {
 		try 
 		{
-			model.addAttribute("src_val", src_val);
+			model.addAttribute("src_val", "Oracle");
 			ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 			ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 			ArrayList<SourceSystemMaster> src_sys_val;
@@ -504,15 +498,11 @@ public class ExtractionController {
 		return new ModelAndView("extraction/DataDetailsEditOracle");
 	}
 
-	@RequestMapping(value = "/extraction/ExtractHome", method = RequestMethod.GET)
-	public ModelAndView ExtractHome() {
-		return new ModelAndView("extraction/ExtractHome");
-	}
 
-	@RequestMapping(value = "/extraction/ExtractData", method = RequestMethod.POST)
-	public ModelAndView ExtractData(@Valid @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request) throws IOException {
+	@RequestMapping(value = "/extraction/ExtractData", method = RequestMethod.GET)
+	public ModelAndView ExtractData(ModelMap model, HttpServletRequest request) throws IOException {
 		try {
-		model.addAttribute("src_val", src_val);
+		model.addAttribute("src_val", "Oracle");
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val;
 		src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
@@ -765,15 +755,11 @@ public class ExtractionController {
 		return new ModelAndView("extraction/DataDetails" + src_val);
 	}
 
-	@RequestMapping(value = "/extraction/FeedValidation", method = RequestMethod.GET)
-	public ModelAndView FeedValidation() {
-		return new ModelAndView("extraction/FeedValidation");
-	}
 
-	@RequestMapping(value = "/extraction/FeedDetails", method = RequestMethod.POST)
-	public ModelAndView FeedDetails(@Valid @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request) throws IOException {
+	@RequestMapping(value = "/extraction/FeedDetails", method = RequestMethod.GET)
+	public ModelAndView FeedDetails(ModelMap model, HttpServletRequest request) throws IOException {
 		try {
-		model.addAttribute("src_val", src_val);
+		model.addAttribute("src_val", "Oracle");
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		//ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val;

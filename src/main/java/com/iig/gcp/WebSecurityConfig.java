@@ -35,9 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 		
 		.authorizeRequests()
-		.antMatchers("/","/login","/hip/**","/hip","/hipmaster","/hipmaster/**","/feature","/register","/accessDenied","/fileconversion.*","/error").permitAll()
+		.antMatchers("/","/*","/login","/hip/**","/hip","/hipmaster","/hipmaster/**","/feature","/register","/accessDenied","/fileconversion.*","/error").permitAll()
 		
-		.antMatchers("/cdg_home").hasAnyAuthority(AppRole.GENERIC_USER)
+		/*.antMatchers("/cdg_home").hasAnyAuthority(AppRole.GENERIC_USER)
 		.antMatchers("/extraction/ConnectionHome").hasAnyAuthority(AppRole.Source_Details)
 		.antMatchers("/extraction/TargetDetails").hasAnyAuthority(AppRole.Target_Details)
 		.antMatchers("/extraction/SystemHome").hasAnyAuthority(AppRole.Feed_Details)
@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/bg/sbg").hasAnyAuthority(AppRole.Search_Business_Glossary)
 		.antMatchers("/publishing/addMetaDataHome").hasAnyAuthority(AppRole.Add_Metadata)
 		.antMatchers("/publishing/editMetadataHome").hasAnyAuthority(AppRole.Edit_DataType_Mapping)
-		.antMatchers("/publishing/reconDashboard").hasAnyAuthority(AppRole.Recon_Dashboard)
+		.antMatchers("/publishing/reconDashboard").hasAnyAuthority(AppRole.Recon_Dashboard)*/
 		
 		
 		
@@ -62,7 +62,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .exceptionHandling().accessDeniedPage("/accessDenied")
         .and()
         .formLogin()
-        .loginPage("/login").defaultSuccessUrl("/login/submit")
         .permitAll();
     }
  

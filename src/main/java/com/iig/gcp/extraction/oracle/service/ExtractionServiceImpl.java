@@ -32,6 +32,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.iig.gcp.constants.OracleConstants;
@@ -53,14 +54,23 @@ import com.iig.gcp.extraction.utils.EncryptionUtil;
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
 
+	private static String extraction_compute_url;
+	@Value("${extraction.compute.url}")
+	public void setExtractionUrl(String value) {
+		this.extraction_compute_url=value;
+	}
+	private static String extraction_compute_url1;
+	@Value("${extraction.compute.url1}")
+	public void setExtractionUrl1(String value) {
+		this.extraction_compute_url1=value;
+	}
 	private static String SCHEDULER_MASTER_TABLE = "JUNIPER_SCH_MASTER_JOB_DETAIL";
 
 	@Override
 	public String invokeRest(String json, String url) throws UnsupportedOperationException, Exception {
 		String resp = null;
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost postRequest = new HttpPost(OracleConstants.EXTRACTION_COMPUTE_URL + url);
-		System.out.println(OracleConstants.EXTRACTION_COMPUTE_URL + url);
+		HttpPost postRequest = new HttpPost(extraction_compute_url + url);
 		postRequest.setHeader("Content-Type", "application/json");
 		StringEntity input = new StringEntity(json);
 		postRequest.setEntity(input);
@@ -79,8 +89,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public String invokeRest1(String json, String url) throws UnsupportedOperationException, Exception {
 		String resp = null;
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost postRequest = new HttpPost(OracleConstants.EXTRACTION_COMPUTE_URL1 + url);
-		System.out.println(OracleConstants.EXTRACTION_COMPUTE_URL1 + url);
+		HttpPost postRequest = new HttpPost(extraction_compute_url1 + url);
 		postRequest.setHeader("Content-Type", "application/json");
 		StringEntity input = new StringEntity(json);
 		postRequest.setEntity(input);
