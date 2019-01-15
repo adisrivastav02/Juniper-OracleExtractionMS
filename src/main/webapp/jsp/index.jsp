@@ -46,37 +46,37 @@ $(document).ready(function() {
 						<div class="container">
 								  <div class="row text-center text-lg-left">
 									 <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      	<a class="d-block mb-4 h-100" href="#" onclick="pass('Oracle');">
+								      	<a class="d-block mb-4 h-100" href="/extraction/ConnectionDetailsOracle">
 								      		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/src_details.png" >
 								      	</a>
 								    </div>
 								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      	<a class="d-block mb-4 h-100" href="#" onclick="pass('Teradata');">
+								      	<a class="d-block mb-4 h-100" href="/extraction/TargetDetails">
 								      		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/tgt_details.png">
 								      	</a> 
 								    </div>
 								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Unix');">
+								      <a href="/extraction/SystemDetails" class="d-block mb-4 h-100" >
 								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_details.png">
 								          </a>
 								    </div>
 								     <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Hadoop');">
+								      <a href="/extraction/DataDetails" class="d-block mb-4 h-100">
 								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/data_details.png">
 								          </a>
 								    </div>
 								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								     	<a class="d-block mb-4 h-100" href="#">
+								     	<a class="d-block mb-4 h-100" href="/extraction/FeedDetails">
 								     		<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_chk.png">
 								     	</a> 
 								    </div>
 								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      <a href="#" class="d-block mb-4 h-100" onclick="pass('Mssql');">
+								      <a href="/extraction/ExtractData" class="d-block mb-4 h-100">
 								            <img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/extract_data.png">
 								          </a>
 								    </div>
 								    <div class="thumbnail col-lg-3 col-md-4 col-xs-6">
-								      <a class="d-block mb-4 h-100" href="#"  onclick="pass('Hive');">
+								      <a class="d-block mb-4 h-100" href="/extraction/ViewFeedRun">
 								      	<img class="img-fluid img-thumbnail" src="${pageContext.request.contextPath}/assets/img/feed_runs.png">
 								      </a> 
 								    </div>
