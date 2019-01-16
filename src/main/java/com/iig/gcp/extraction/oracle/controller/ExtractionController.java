@@ -14,8 +14,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +32,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.iig.gcp.CustomAuthenticationProvider;
 import com.iig.gcp.extraction.oracle.dto.ConnectionMaster;
 import com.iig.gcp.extraction.oracle.dto.CountryMaster;
 import com.iig.gcp.extraction.oracle.dto.DataDetailBean;
@@ -43,15 +50,42 @@ public class ExtractionController {
 
 	@Autowired
 	private ExtractionService es;
-	public String src_val="";
 	
-	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
-	public ModelAndView extractionHome(@Valid @ModelAttribute("jsonObject") String jsonObject, ModelMap model, HttpServletRequest request) {
+	@Autowired
+    private AuthenticationManager authenticationManager;
+	
+	
+	@Value( "${parent.front.micro.services}" )
+	private String parent_micro_services;
+	
+	
+	public String src_val="";	
+	
+	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
+	public ModelAndView extractionHome(@Valid @ModelAttribute("jsonObject") String jsonObject, ModelMap model, HttpServletRequest request) throws JSONException {
 		JSONObject jObj = new JSONObject(jsonObject);
 		String user_name=jObj.getString("userId");
 		String project_name=jObj.getString("project");
 		String jwt=jObj.getString("jwt");
 		src_val="Oracle";
+		
+		
+		//Validate the token at the first place
+				try {
+				JSONObject jsonModelObject = null;
+				if(jwt== null || jwt.equals("")) {
+					//TODO: Redirect to Access Denied Page
+					return new ModelAndView("/login");
+				}
+				authenticationByJWT(user_name, jwt);
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+					return new ModelAndView("/login");
+					//redirect to Login Page
+				}
+				
+				
 		
 		request.getSession().setAttribute("user_name", user_name);
 		request.getSession().setAttribute("project_name", project_name);
@@ -62,6 +96,30 @@ public class ExtractionController {
 		return new ModelAndView("/index");
 		}
 		
+	
+	private void authenticationByJWT(String name, String token) {
+		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(name, token);
+        Authentication authenticate = authenticationManager.authenticate(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+	}
+	
+	
+	@RequestMapping(value = {"/parent"}, method = RequestMethod.GET)
+	public ModelAndView parentHome(ModelMap modelMap,HttpServletRequest request, Authentication auth) throws JSONException {
+		CustomAuthenticationProvider.MyUser m = (CustomAuthenticationProvider.MyUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		JSONObject jsonObject= new JSONObject();
+		jsonObject.put("userId", m.getName());
+		jsonObject.put("project", m.getProject());
+		jsonObject.put("jwt", m.getJwt());
+		//response.getWriter().write(jsonObject.toString());
+		modelMap.addAttribute("jsonObject",jsonObject.toString());
+		return new ModelAndView("redirect:" + "//"+parent_micro_services+"/fromChild", modelMap);
+		//System.out.println(m.getJwt());
+		//return null;
+		
+	}
+	
+	
 	@RequestMapping(value = "/extraction/Event", method = RequestMethod.GET)
 	public ModelAndView Event() {
 		return new ModelAndView("extraction/Event");

@@ -10,6 +10,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.json.JSONException;
+
 import com.iig.gcp.extraction.oracle.dto.ConnectionMaster;
 import com.iig.gcp.extraction.oracle.dto.CountryMaster;
 import com.iig.gcp.extraction.oracle.dto.DataDetailBean;
@@ -59,6 +61,6 @@ public interface ExtractionService {
 	public ArrayList<String> getColList(String table_name) throws Exception;
 	public String getDatabaseData(String src_val, int src_sys_id) throws Exception;
 	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id);
-	public String getJsonFromFeedSequence(String project,String src_sys_id);
+	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException;
 	
 }

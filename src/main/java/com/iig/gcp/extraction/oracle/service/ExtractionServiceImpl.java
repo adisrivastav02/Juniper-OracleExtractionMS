@@ -31,6 +31,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -1269,7 +1270,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		return json_array_str;
 	}
 	@Override
-	public String getJsonFromFeedSequence(String project,String src_sys_id) {
+	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException {
 		JSONArray array_metadata = new JSONArray();
 		JSONObject item_metadata = new JSONObject();
 
