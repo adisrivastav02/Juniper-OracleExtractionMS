@@ -73,8 +73,8 @@ public class ExtractionController {
 		model.addAttribute("src_val", "Oracle");
 		System.out.println("user name: "+(String)request.getSession().getAttribute("user_name"));
 		System.out.println("proj name: "+(String)request.getSession().getAttribute("project_name"));
-		model.addAttribute("usernm",(String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		
 		ArrayList<String> system;
 		try {
@@ -82,7 +82,7 @@ public class ExtractionController {
 			model.addAttribute("system", system);
 			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String)request.getSession().getAttribute("project_name"));
 			model.addAttribute("conn_val", conn_val);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("drive", drive);
 		} 
 		catch (Exception e) {
@@ -99,9 +99,9 @@ public class ExtractionController {
 		if (button_type.equalsIgnoreCase("add"))
 			resp = es.invokeRest(x, "addOracleConnection");
 		else if (button_type.equalsIgnoreCase("upd"))
-			resp = es.invokeRest(x, "updConnection");
+			resp = es.invokeRest(x, "updOracleConnection");
 		else if (button_type.equalsIgnoreCase("del"))
-			resp = es.invokeRest(x, "delConnection");
+			resp = es.invokeRest(x, "delOracleConnection");
 		String status0[] = resp.toString().split(":");
 		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
@@ -118,13 +118,13 @@ public class ExtractionController {
 		}
 		model.addAttribute("src_val", src_val);
 		//UserAccount u = (UserAccount) request.getSession().getAttribute("user");
-		model.addAttribute("usernm",request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
-		ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+		ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("system", system);
-		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("drive", drive);
 		return new ModelAndView("extraction/ConnectionDetails");
 	}
@@ -132,10 +132,10 @@ public class ExtractionController {
 	@RequestMapping(value = "/extraction/ConnectionDetailsEdit", method = RequestMethod.POST)
 	public ModelAndView ConnectionDetailsEdit(@Valid @ModelAttribute("conn") int conn, @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request)
 			throws UnsupportedOperationException, Exception {
-		ConnectionMaster conn_val = es.getConnections2(src_val, conn, (String) request.getSession().getAttribute("project"));
+		ConnectionMaster conn_val = es.getConnections2(src_val, conn, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
 		model.addAttribute("src_val", src_val);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("drive", drive);
 		return new ModelAndView("extraction/ConnectionDetailsEditOracle");
 	}
@@ -167,7 +167,7 @@ public class ExtractionController {
 	public ModelAndView TargetDetails0(@Valid ModelMap model, @ModelAttribute("project1") String project1, HttpServletRequest request) {
 		ArrayList<String> str;
 		try {
-			str = es.getServiceBucket(project1, (String) request.getSession().getAttribute("project"));
+			str = es.getServiceBucket(project1, (String) request.getSession().getAttribute("project_name"));
 			
 			ArrayList<String> sa = new ArrayList<String>();
 			ArrayList<String> buck = new ArrayList<String>();
@@ -192,11 +192,11 @@ public class ExtractionController {
 		System.out.println(x);
 		String resp = null;
 		if (button_type.equalsIgnoreCase("add"))
-			resp = es.invokeRest(x, "addTarget");
+			resp = es.invokeRest1(x, "addTarget");
 		else if (button_type.equalsIgnoreCase("upd"))
-			resp = es.invokeRest(x, "updTarget");
+			resp = es.invokeRest1(x, "updTarget");
 		else if (button_type.equalsIgnoreCase("del"))
-			resp = es.invokeRest(x, "delTarget");
+			resp = es.invokeRest1(x, "delTarget");
 		String status0[] = resp.toString().split(":");
 		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
@@ -211,15 +211,15 @@ public class ExtractionController {
 			model.addAttribute("successString", final_message);
 			model.addAttribute("next_button_active", "active");
 		}
-		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project"));
-		model.addAttribute("usernm", request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
-		ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project"));
+		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project_name"));
+		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+		ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("system", system);
 		model.addAttribute("tgt_val", tgt);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("drive", drive);
-		ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project"));
+		ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("tproj", tproj);
 		return new ModelAndView("extraction/TargetDetails");
 	}
@@ -230,10 +230,10 @@ public class ExtractionController {
 		try {
 			tgtx = es.getTargets1(tgt);
 			model.addAttribute("tgtx", tgtx);
-			model.addAttribute("project", (String) request.getSession().getAttribute("project"));
-			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project"));
+			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("tproj", tproj);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project"));
+			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("drive", drive);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -247,14 +247,14 @@ public class ExtractionController {
 		model.addAttribute("src_val", "Oracle");
 		ArrayList<SourceSystemMaster> src_sys_val;
 		try {
-			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("src_sys_val", src_sys_val);
-			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project"));
+			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("conn_val", conn_val);
-			ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project"));
+			ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("tgt", tgt);
-			model.addAttribute("usernm",request.getSession().getAttribute("user"));
-			model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+			model.addAttribute("usernm",request.getSession().getAttribute("user_name"));
+			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 			ArrayList<CountryMaster> countries = es.getCountries();
 			model.addAttribute("countries", countries);
 		} catch (Exception e) {
@@ -282,8 +282,8 @@ public class ExtractionController {
 			resp = es.invokeRest(x, "updSystem");
 		else if (button_type.equalsIgnoreCase("del"))
 			resp = es.invokeRest(x, "delSystem");
-		model.addAttribute("usernm", request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		String status0[] = resp.toString().split(":");
 		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
@@ -299,11 +299,11 @@ public class ExtractionController {
 			model.addAttribute("next_button_active", "active");
 		}
 		model.addAttribute("src_val", src_val);
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("src_sys_val", src_sys_val);
-		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
-		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project"));
+		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("tgt", tgt);
 		/*
 		 * ArrayList<String> buckets = DBUtils.getBuckets();
@@ -323,9 +323,9 @@ public class ExtractionController {
 			throws UnsupportedOperationException, Exception {
 		ArrayList<SourceSystemDetailBean> ssm = es.getSources1(src_val, src_sys);
 		model.addAttribute("ssm", ssm);
-		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
-		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project"));
+		ArrayList<TargetMaster> tgt = es.getTargets((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("tgt", tgt);
 		ArrayList<CountryMaster> countries = es.getCountries();
 		model.addAttribute("countries", countries);
@@ -341,7 +341,7 @@ public class ExtractionController {
 			ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 			ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 			ArrayList<SourceSystemMaster> src_sys_val;
-			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 			
 		for (SourceSystemMaster ssm: src_sys_val) {
 			  if(ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) //3rd Added for Hive
@@ -353,12 +353,12 @@ public class ExtractionController {
 				  src_sys_val2.add(ssm);
 			  }
 		}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project"));
+		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val1);
 		model.addAttribute("src_sys_val2", src_sys_val2);
-		model.addAttribute("usernm", request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -372,9 +372,9 @@ public class ExtractionController {
 		String db_name=null;
 		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
 		model.addAttribute("conn_val", conn_val);
-		ArrayList<String> schema_name = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project"),db_name);
+		ArrayList<String> schema_name = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("schema_name", schema_name);
-		model.addAttribute("usernm", request.getSession().getAttribute("user"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
 		return new ModelAndView("extraction/DataDetailsOracle0");
 	}
@@ -390,7 +390,7 @@ public class ExtractionController {
 		model.addAttribute("conn_val", conn_val);
 		String ext_type = es.getExtType(src_sys_id);
 		model.addAttribute("ext_type", ext_type);
-		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project"),db_name);
+		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("tables", tables);
 		model.addAttribute("schema_name", schema_name);
 		model.addAttribute("src_sys_id", src_sys_id);
@@ -402,7 +402,7 @@ public class ExtractionController {
 			@ModelAttribute("connection_id") int connection_id, @ModelAttribute("schema_name") String schema_name, ModelMap model, HttpServletRequest request)
 			throws UnsupportedOperationException, Exception {
 		String db_name=null;
-		ArrayList<String> fields = es.getFields(id, src_val, table_name, connection_id, schema_name, (String) request.getSession().getAttribute("project"),db_name);
+		ArrayList<String> fields = es.getFields(id, src_val, table_name, connection_id, schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
 //		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
 //		ArrayList<String> src_tbl_sch = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project"));
 //		model.addAttribute("src_tbl_sch", src_tbl_sch);
@@ -417,7 +417,7 @@ public class ExtractionController {
 			throws UnsupportedOperationException, Exception {
 		String resp="";
 		String src_sys_id="";
-		String project=(String)request.getSession().getAttribute("project");
+		String project=(String)request.getSession().getAttribute("project_name");
 		
 		
 		if(x.contains("feed_id1")) {
@@ -467,12 +467,12 @@ public class ExtractionController {
 				  src_sys_val2.add(ssm);
 			  }
 			}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project"));
+		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val1);
 		model.addAttribute("src_sys_val2", src_sys_val2);
-		model.addAttribute("usernm", request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
 	}
 
@@ -493,8 +493,8 @@ public class ExtractionController {
 		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project"),db_name);
 		model.addAttribute("schem", schema_name);
 		model.addAttribute("arrddb", arrddb);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetailsEditOracle");
 	}
 
@@ -515,8 +515,8 @@ public class ExtractionController {
 			  }
 			}
 			model.addAttribute("src_sys_val", src_sys_val1);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String)request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String)request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -568,8 +568,8 @@ public class ExtractionController {
 		model.addAttribute("src_val", src_val);
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
 		model.addAttribute("src_sys_val", src_sys_val);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/ExtractData");
 	}
 	
@@ -597,8 +597,8 @@ public class ExtractionController {
 		model.addAttribute("src_val", src_val);
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
 		model.addAttribute("src_sys_val", src_sys_val);
-		model.addAttribute("usernm",(String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/ExtractData");
 	}
 
@@ -606,7 +606,7 @@ public class ExtractionController {
 	public ModelAndView ViewFeedRun(ModelMap model, HttpServletRequest request) {
 		ArrayList<String> feedarr;
 		try {
-			feedarr = es.getRunFeeds((String) request.getSession().getAttribute("project"));
+			feedarr = es.getRunFeeds((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("feedarr", feedarr);
 		} catch( Exception e) {
 			// TODO Auto-generated catch block
@@ -620,7 +620,7 @@ public class ExtractionController {
 	public ModelAndView FeedStatus(@Valid @ModelAttribute("feed_val") String feed_val, ModelMap model, HttpServletRequest request) throws IOException {
 		ArrayList<RunFeedsBean> runfeeds;
 		try {
-			runfeeds = es.getLastRunFeeds((String) request.getSession().getAttribute("project"), feed_val);
+			runfeeds = es.getLastRunFeeds((String) request.getSession().getAttribute("project_name"), feed_val);
 		model.addAttribute("runfeeds", runfeeds);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -647,8 +647,8 @@ public class ExtractionController {
 			Principal principal) throws UnsupportedOperationException, Exception {		
 	
 		String resp = null;
-		String usernm= (String)request.getSession().getAttribute("user");
-		String project=(String)request.getSession().getAttribute("project");
+		String usernm= (String)request.getSession().getAttribute("user_name");
+		String project=(String)request.getSession().getAttribute("project_name");
 		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
 		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
@@ -688,12 +688,12 @@ public class ExtractionController {
 				  src_sys_val2.add(ssm);
 			  }
 			}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project"));
+		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val1);
 		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
 	}
 	
@@ -705,8 +705,8 @@ public class ExtractionController {
 			Principal principal) throws UnsupportedOperationException, Exception {
 		
 		String resp = null;
-		String usernm= (String)request.getSession().getAttribute("user");
-		String project=(String)request.getSession().getAttribute("project");
+		String usernm= (String)request.getSession().getAttribute("user_name");
+		String project=(String)request.getSession().getAttribute("project_name");
 		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
 		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
@@ -746,12 +746,12 @@ public class ExtractionController {
 				  src_sys_val2.add(ssm);
 			  }
 			}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project"));
+		ArrayList<String> db_name = es.getHivedbList(project);
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val1);
 		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("project", project);
 		return new ModelAndView("extraction/DataDetails" + src_val);
 	}
 
@@ -763,17 +763,17 @@ public class ExtractionController {
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		//ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val;
-		src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		
 		for (SourceSystemMaster ssm: src_sys_val) {		  
 				  src_sys_val1.add(ssm);		  
 			}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project"));
+		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val1);
 //		model.addAttribute("src_sys_val1", src_sys_val2);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -789,7 +789,7 @@ public class ExtractionController {
 		System.out.println("Inside Controller src_val : "+src_val);
 		//String schema_name = es.getSchemaData(src_val, src_sys_id);
 		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
-		ArrayList<TempDataDetailBean> arrddb = es.getTempData(src_sys_id, src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project"));
+		ArrayList<TempDataDetailBean> arrddb = es.getTempData(src_sys_id, src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("arrddb", arrddb);
 		//model.addAttribute("schem", schema_name);
 		

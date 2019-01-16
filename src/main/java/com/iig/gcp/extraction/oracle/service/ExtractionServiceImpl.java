@@ -59,6 +59,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public void setExtractionUrl(String value) {
 		this.extraction_compute_url=value;
 	}
+	private static String extraction_tgt_compute_url;
+	@Value("${extraction.target.compute.url}")
+	public void setExtractionTgtUrl(String value) {
+		this.extraction_tgt_compute_url=value;
+	}
 	private static String extraction_compute_url1;
 	@Value("${extraction.compute.url1}")
 	public void setExtractionUrl1(String value) {
@@ -89,7 +94,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public String invokeRest1(String json, String url) throws UnsupportedOperationException, Exception {
 		String resp = null;
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost postRequest = new HttpPost(extraction_compute_url1 + url);
+		HttpPost postRequest = new HttpPost(extraction_tgt_compute_url + url);
 		postRequest.setHeader("Content-Type", "application/json");
 		StringEntity input = new StringEntity(json);
 		postRequest.setEntity(input);
