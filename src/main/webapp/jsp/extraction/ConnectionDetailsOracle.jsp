@@ -174,7 +174,7 @@
 										</select>
 									</div>
 								</fieldset>
-								<button onclick="jsonconstruct('add');"
+								<button onclick="jsonconstruct('addOracleConnection');"
 									class="btn btn-rounded btn-gradient-info mr-2">Test &
 									Save</button>
 							</div>

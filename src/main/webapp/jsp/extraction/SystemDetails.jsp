@@ -225,7 +225,7 @@
 									</div>-->
 								</div>
 							</fieldset>
-							<button onclick="jsonconstruct('add');"
+							<button onclick="jsonconstruct('onboardSystem');"
 								class="btn btn-rounded btn-gradient-info mr-2">Save</button>
 								</div>
 						</form>

@@ -45,7 +45,7 @@ import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
 import com.iig.gcp.extraction.oracle.service.ExtractionService;
 
 @Controller
-@SessionAttributes(value= {"user_name","project_name"})
+@SessionAttributes(value= {"user_name","project_name","jwt"})
 public class ExtractionController {
 
 	@Autowired
@@ -127,10 +127,7 @@ public class ExtractionController {
 
 	@RequestMapping(value = "/extraction/ConnectionDetailsOracle", method = RequestMethod.GET)
 	public ModelAndView ConnectionDetails( ModelMap model, HttpServletRequest request) {
-		System.out.println("inside connection details");
 		model.addAttribute("src_val", "Oracle");
-		System.out.println("user name: "+(String)request.getSession().getAttribute("user_name"));
-		System.out.println("proj name: "+(String)request.getSession().getAttribute("project_name"));
 		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		
@@ -154,20 +151,16 @@ public class ExtractionController {
 	public ModelAndView ConnectionDetails1(@Valid @ModelAttribute("x") String x, @ModelAttribute("src_val") String src_val, @ModelAttribute("button_type") String button_type, ModelMap model,
 			HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String resp = null;
-		if (button_type.equalsIgnoreCase("add"))
-			resp = es.invokeRest(x, "addOracleConnection");
-		else if (button_type.equalsIgnoreCase("upd"))
-			resp = es.invokeRest(x, "updOracleConnection");
-		else if (button_type.equalsIgnoreCase("del"))
-			resp = es.invokeRest(x, "delOracleConnection");
+		JSONObject jsonObject= new JSONObject(x);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		x=jsonObject.toString();
+		resp = es.invokeRest(x, button_type);
 		String status0[] = resp.toString().split(":");
-		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
 		String status = status1[0].replaceAll("\'", "").trim();
 		String message0 = status0[2];
 		String message = message0.replaceAll("[\'}]", "").trim();
 		String final_message = status + ": " + message;
-		System.out.println("final: " + final_message);
 		if (status.equalsIgnoreCase("Failed")) {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
@@ -332,24 +325,19 @@ public class ExtractionController {
 	@RequestMapping(value = "/extraction/SystemDetails2", method = RequestMethod.POST)
 	public ModelAndView SystemDetails2(@Valid @ModelAttribute("src_val") String src_val, @ModelAttribute("x") String x, @ModelAttribute("button_type") String button_type, ModelMap model,
 			HttpServletRequest request) throws UnsupportedOperationException, Exception {
-//		System.out.println(x);
 		String resp = null;
-		if (button_type.equalsIgnoreCase("add"))
-			resp = es.invokeRest(x, "onboardSystem");
-		else if (button_type.equalsIgnoreCase("upd"))
-			resp = es.invokeRest(x, "updSystem");
-		else if (button_type.equalsIgnoreCase("del"))
-			resp = es.invokeRest(x, "delSystem");
+		JSONObject jsonObject= new JSONObject(x);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		x=jsonObject.toString();
+		resp = es.invokeRest(x, button_type);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		String status0[] = resp.toString().split(":");
-		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
 		String status = status1[0].replaceAll("\'", "").trim();
 		String message0 = status0[2];
 		String message = message0.replaceAll("[\'}]", "").trim();
 		String final_message = status + ": " + message;
-		System.out.println("final: " + final_message);
 		if (status.equalsIgnoreCase("Failed")) {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
@@ -476,7 +464,9 @@ public class ExtractionController {
 		String resp="";
 		String src_sys_id="";
 		String project=(String)request.getSession().getAttribute("project_name");
-		
+		JSONObject jsonObject= new JSONObject(x);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		x=jsonObject.toString();
 		
 		if(x.contains("feed_id1")) {
 			x = x.replace("feed_id1", "feed_id");
@@ -499,9 +489,8 @@ public class ExtractionController {
 		if (status.equalsIgnoreCase("Failed")) {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
-			JSONObject jsonObject = new JSONObject(x);
-			 src_sys_id= jsonObject.getJSONObject("body").getJSONObject("data").getString("feed_id");
-			 System.out.println("src_sys_id is"+src_sys_id);
+			JSONObject jsonObject1 = new JSONObject(x);
+			 src_sys_id= jsonObject1.getJSONObject("body").getJSONObject("data").getString("feed_id");
 			String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 			System.out.println(json_array_metadata_str);
 			resp = es.invokeRest(json_array_metadata_str, "metaDataValidation");
@@ -512,23 +501,10 @@ public class ExtractionController {
 				model.addAttribute("errorString", resp);
 			}	
 		}
-		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
-		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
-		for (SourceSystemMaster ssm: src_sys_val) {
-			  if(ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) //3rd Added for Hive
-			  {
-				  src_sys_val1.add(ssm);
-			  }
-			  else
-			  {
-				  src_sys_val2.add(ssm);
-			  }
-			}
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val1);
-		model.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val1", src_sys_val);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -602,7 +578,9 @@ public class ExtractionController {
 	public ModelAndView ExtractData2(@Valid @ModelAttribute("feed_name") String feed_name, @ModelAttribute("src_val") String src_val, @ModelAttribute("x") String x,
 			@ModelAttribute("ext_type") String ext_type, ModelMap model, HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String resp = null;
-		System.out.println(x);
+		JSONObject jsonObject= new JSONObject(x);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		x=jsonObject.toString();
 		//if (ext_type.equalsIgnoreCase("Batch")) {
 			resp = es.invokeRest(x, "createDag");
 			es.updateLoggerTable(feed_name);
@@ -635,7 +613,9 @@ public class ExtractionController {
 	public ModelAndView ExtractData3(@Valid @ModelAttribute("feed_name") String feed_name, @ModelAttribute("src_val") String src_val, @ModelAttribute("x") String x,
 			@ModelAttribute("ext_type") String ext_type, ModelMap model, HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String final_message=null;
-		System.out.println(x);
+		JSONObject jsonObject= new JSONObject(x);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		x=jsonObject.toString();
 		final_message = es.invokeRest1(x, "feednm/extractData");
 		model.addAttribute("successString", final_message);
 /*		String status0[] = resp.toString().split(":");
@@ -710,17 +690,17 @@ public class ExtractionController {
 		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
 		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		JSONObject jsonObject= new JSONObject(json_array_str);
+		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
+		json_array_str=jsonObject.toString();
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
-					System.out.println(json_array_str);
 					resp = es.invokeRest(json_array_str, "addTempTableInfo");
 					String status0[] = resp.toString().split(":");
-					System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 					String status1[] = status0[1].split(",");
 					String status = status1[0].replaceAll("\'", "").trim();
 					String message0 = status0[2];
 					String message = message0.replaceAll("[\'}]", "").trim();
 					String final_message = status + ": " + message;
-					System.out.println("final: " + final_message);
 					if (status.equalsIgnoreCase("Failed")) {
 						model.addAttribute("errorString", final_message);
 					} else if (status.equalsIgnoreCase("Success")) {	
@@ -768,6 +748,7 @@ public class ExtractionController {
 		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
 		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 					System.out.println(json_array_str);
 					resp = es.invokeRest(json_array_str, "editTempTableInfo");

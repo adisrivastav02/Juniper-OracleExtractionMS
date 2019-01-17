@@ -87,9 +87,9 @@
 		</div>
 		<div id="scheduling_div" style="display: none;"></div>
 	</fieldset>
-	<button onclick="jsonconstruct('upd');"
+	<button onclick="jsonconstruct('updSystem');"
 		class="btn btn-rounded btn-gradient-info mr-2">Update</button>
-	<button onclick="jsonconstruct('del');"
+	<button onclick="jsonconstruct('delSystem');"
 		class="btn btn-rounded btn-gradient-info mr-2">Delete</button>
 </c:forEach>
 

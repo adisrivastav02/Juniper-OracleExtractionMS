@@ -1,7 +1,7 @@
 <jsp:include page="cdg_header.jsp" />
 <style>
 body {
-	  padding-top: 50px;
+	  
 	}
 	 
 	.thumbnail {
