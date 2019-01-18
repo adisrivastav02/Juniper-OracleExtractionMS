@@ -72,7 +72,8 @@
 		}	
 	function funccheck(val) {
 		if (val == 'create') {
-			window.location.reload();
+			//window.location.reload();
+			window.location.href="${pageContext.request.contextPath}/extraction/SystemDetails";
 		} else {
 			document.getElementById('sysfunc').style.display = "block";
 		}

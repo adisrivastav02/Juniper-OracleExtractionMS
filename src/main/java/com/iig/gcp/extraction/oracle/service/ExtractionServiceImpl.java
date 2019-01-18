@@ -55,21 +55,6 @@ import com.iig.gcp.extraction.utils.EncryptionUtil;
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
 
-	private static String extraction_compute_url;
-	@Value("${extraction.compute.url}")
-	public void setExtractionUrl(String value) {
-		this.extraction_compute_url=value;
-	}
-	private static String extraction_tgt_compute_url;
-	@Value("${extraction.target.compute.url}")
-	public void setExtractionTgtUrl(String value) {
-		this.extraction_tgt_compute_url=value;
-	}
-	private static String extraction_compute_url1;
-	@Value("${extraction.compute.url1}")
-	public void setExtractionUrl1(String value) {
-		this.extraction_compute_url1=value;
-	}
 	private static String SCHEDULER_MASTER_TABLE = "JUNIPER_SCH_MASTER_JOB_DETAIL";
 
 	@Override

@@ -1,5 +1,15 @@
 <jsp:include page="../cdg_header.jsp" />
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<style>
+.drop-down {
+	position: relative;
+}
+</style>
+<link href="../../assets/css/jquery-ui.css" rel="stylesheet">
+<link href="../../assets/css/bootstrap.min2.css" rel="stylesheet">
+<link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
 <script>
 	function jsonconstruct() {
 		var schema = document.getElementById("schema_name").value;
@@ -164,7 +174,7 @@
 	}
 	$(document).ready(function() {
 		$("#feed_id").change(function() {
-			document.getElementById('load_type').style.display="block";
+			document.getElementById('load_type').style.display="inline-flex";
 		});
 		$("#success-alert").hide();
         $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
@@ -176,7 +186,8 @@
 
 	function funccheck(val) {
 		if (val == 'create') {
-			window.location.reload();
+			//window.location.reload();
+			window.location.href="${pageContext.request.contextPath}/extraction/DataDetails";
 		} else if(val=='edit') {
 			document.getElementById('datdyn').innerHTML="";
 			document.getElementById('schdyn').innerHTML="";
@@ -278,9 +289,9 @@
 								</div>
 							</div>
 
-							<div class="form-group">
+							<div class="row text-center text-lg-left">
 								<label>Source Feed Name *</label> <select name="feed_id"
-									id="feed_id" class="form-control">
+									id="feed_id" class="form-control selectpicker" data-live-search="true">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
 									<c:forEach items="${src_sys_val}" var="src_sys_val">
@@ -288,7 +299,7 @@
 									</c:forEach>
 								</select>
 							</div>
-							<div class="form-group row" id="load_type" style="display:none;">
+							<div class="form-group row" id="load_type" style="display:none;width:100%;">
 								<label class="col-sm-3 col-form-label">Load Type</label>
 								<div class="col-sm-4">
 									<div class="form-check form-check-info">
@@ -316,3 +327,7 @@
 			</div>
 		</div>
 <jsp:include page="../cdg_footer.jsp" />
+
+<script src="../../assets/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+		 

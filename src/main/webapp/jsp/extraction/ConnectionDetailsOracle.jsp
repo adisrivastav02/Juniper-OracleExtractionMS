@@ -35,7 +35,8 @@
 
 	function funccheck(val) {
 		if (val == 'create') {
-			window.location.reload();
+			//window.location.reload();
+			window.location.href="${pageContext.request.contextPath}/extraction/ConnectionDetailsOracle";
 		} else {
 			document.getElementById('connfunc').style.display = "block";
 			document.getElementById('cud').innerHTML = "";
