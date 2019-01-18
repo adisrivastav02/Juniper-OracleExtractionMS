@@ -55,21 +55,7 @@ import com.iig.gcp.extraction.utils.EncryptionUtil;
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
 
-	private static String extraction_compute_url;
-	@Value("${extraction.compute.url}")
-	public void setExtractionUrl(String value) {
-		this.extraction_compute_url=value;
-	}
-	private static String extraction_tgt_compute_url;
-	@Value("${extraction.target.compute.url}")
-	public void setExtractionTgtUrl(String value) {
-		this.extraction_tgt_compute_url=value;
-	}
-	private static String extraction_compute_url1;
-	@Value("${extraction.compute.url1}")
-	public void setExtractionUrl1(String value) {
-		this.extraction_compute_url1=value;
-	}
+	
 	private static String SCHEDULER_MASTER_TABLE = "JUNIPER_SCH_MASTER_JOB_DETAIL";
 
 	@Override
@@ -653,7 +639,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 				ddb.setCols(cols);
 				arrddb.add(ddb);
 			}
-			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
 			System.out.println("Exception occured "+e);
 			throw e;
@@ -896,7 +881,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			query="SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n" + 
 					"INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.SRC_CONN_SEQUENCE=L.SRC_CONN_SEQUENCE \r\n" + 
 					"INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE="+src_id;
-			System.out.println("2: "+query);
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -905,7 +889,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Source','Type','"+rs.getString(2)+"')\r\n" + 
 						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Source','EIM','"+rs.getString(3)+"')\r\n" + 
 						"SELECT * FROM dual";
-				System.out.println("3: "+query);
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
@@ -914,7 +897,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			query="SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n" + 
 					"INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.TARGET_CONN_SEQUENCE=L.TARGET_SEQUENCE \r\n" + 
 					"INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
-			System.out.println("3: "+query);
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -923,7 +905,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Target','Type','"+rs.getString(2)+"')\r\n" + 
 						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Target','EIM','"+rs.getString(3)+"')\r\n" + 
 						"SELECT * FROM dual";
-				System.out.println("4: "+query);
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
@@ -941,7 +922,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"					END AS \"FREQUENCY\",\r\n" + 
 					"					JOB_SCHEDULE_TIME \r\n" + 
 					"					from JUNIPER_SCH_MASTER_JOB_DETAIL where LOWER(BATCH_ID)='"+src_unique_name.toLowerCase()+"'";
-			System.out.println("5: "+query);
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
