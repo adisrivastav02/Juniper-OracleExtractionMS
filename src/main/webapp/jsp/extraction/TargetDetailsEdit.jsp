@@ -178,7 +178,7 @@
 										onclick="return dup_div();">+</button>
 								</div>-->
 </fieldset>
-<button onclick="jsonconstruct('upd');"
+<button onclick="jsonconstruct('updTarget');"
 	class="btn btn-rounded btn-gradient-info mr-2">Update</button>
-<button onclick="jsonconstruct('del');"
+<button onclick="jsonconstruct('delTarget');"
 	class="btn btn-rounded btn-gradient-info mr-2">Delete</button>

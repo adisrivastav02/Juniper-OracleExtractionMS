@@ -26,7 +26,6 @@ import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
 public interface ExtractionService {
 
 	public String invokeRest(String json,String url) throws UnsupportedOperationException, Exception ;
-	public String invokeRest1(String json,String url) throws UnsupportedOperationException, Exception ;
 	public ArrayList<ConnectionMaster> getConnections(String src_val, String project_id) throws Exception;
 	public ArrayList<TargetMaster> getTargets(String project_id) throws Exception;
 	public TargetMaster getTargets1(int tgt) throws Exception;
@@ -40,7 +39,7 @@ public interface ExtractionService {
 	public ArrayList<String> getFields(String id,String src_val,String table_name,int conn_id, String schema_name, String project_id,String db_name) throws Exception;
 	public ArrayList<CountryMaster> getCountries() throws Exception;
 	public ArrayList<ReservoirMaster> getReservoirs() throws Exception;
-	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String db_name,String schema_name, String project_id) throws Exception;
+	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String schema_name, String project_id,String db_name) throws Exception;
 	public int checkNames(String sun) throws Exception;
 	public ArrayList<String> getSchema(String src_val,int conn_id, String project_id,String db_name) throws Exception;
 	public ArrayList<String> getSystem(String project) throws Exception, Exception;

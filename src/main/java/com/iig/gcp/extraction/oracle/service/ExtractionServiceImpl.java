@@ -76,7 +76,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public String invokeRest(String json, String url) throws UnsupportedOperationException, Exception {
 		String resp = null;
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost postRequest = new HttpPost(extraction_compute_url + url);
+		HttpPost postRequest = new HttpPost(url);
 		postRequest.setHeader("Content-Type", "application/json");
 		StringEntity input = new StringEntity(json);
 		postRequest.setEntity(input);
@@ -91,24 +91,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 		return resp;
 	}
 
-	@Override
-	public String invokeRest1(String json, String url) throws UnsupportedOperationException, Exception {
-		String resp = null;
-		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost postRequest = new HttpPost(extraction_tgt_compute_url + url);
-		postRequest.setHeader("Content-Type", "application/json");
-		StringEntity input = new StringEntity(json);
-		postRequest.setEntity(input);
-		HttpResponse response = httpClient.execute(postRequest);
-		String response_string = EntityUtils.toString(response.getEntity(), "UTF-8");
-		if (response.getStatusLine().getStatusCode() != 200) {
-			resp = "Error" + response_string;
-			throw new Exception("Error" + response_string);
-		} else {
-			resp = response_string;
-		}
-		return resp;
-	}
 
 	@Override
 	public ArrayList<String> getRunFeeds(String project_id) throws Exception  {
@@ -356,7 +338,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 	@Override
 	public String getExtType(int src_sys_id) throws Exception {
-		// TODO Auto-generated method stub
 		String val=null;
 		Connection connection = null;
 		try {
@@ -430,7 +411,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 				port = cm.getPort_no();
 				username = cm.getUsername();
 				password = cm.getPassword();
-				db = cm.getDatabase_name();
 				service = cm.getService_name();
 				encrypt = cm.getEncrypt();
 			}
@@ -475,14 +455,19 @@ public class ExtractionServiceImpl implements ExtractionService {
 				port = cm.getPort_no();
 				username = cm.getUsername();
 				password = cm.getPassword();
-				db = cm.getDatabase_name();
 				service = cm.getService_name();
 				encrypt = cm.getEncrypt();
 			}
 		}
+		
+		
 		String tbls[] = table_name.split(",");
 		for (int i = 0; i < tbls.length; i++) {
 			try {
+				String tblsx[] = tbls[i].split("\\.");
+				query = "SELECT column_name FROM all_tab_cols where table_name='" + tblsx[1] + "' and owner='"+schema_name+"' order by column_name";
+				Class.forName("oracle.jdbc.driver.OracleDriver");
+				connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";
 				String pass = EncryptionUtil.decyptPassword(encrypt, password);
 				serverConnection = DriverManager.getConnection(connectionUrl, username, pass);
 				st = serverConnection.createStatement();
@@ -511,7 +496,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			PreparedStatement pstm = connection.prepareStatement("select feed_sequence,feed_unique_name, " + 
+			String query="select feed_sequence,feed_unique_name, " + 
 					"listagg(table_sequence, ',' ) within group (order by feed_unique_name) " + 
 					"from " + 
 					"(" + 
@@ -525,7 +510,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"where a.project_sequence=(select project_sequence from juniper_project_master where project_id = '"+project_id+"') " + 
 					"and b.src_conn_sequence in (select src_conn_sequence from JUNIPER_EXT_SRC_CONN_MASTER where src_conn_type='"+src_val+"') " + 
 					") " + 
-					"group by feed_sequence,feed_unique_name order by feed_sequence,feed_unique_name");
+					"group by feed_sequence,feed_unique_name order by feed_sequence,feed_unique_name";
+			PreparedStatement pstm = connection.prepareStatement(query);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				ssm = new SourceSystemMaster();
@@ -632,7 +618,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String db_name,String schema_name, String project_id) throws Exception {
+	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String schema_name, String project_id,String db_name) throws Exception {
 		DataDetailBean ddb = null;
 		ArrayList<DataDetailBean> arrddb = new ArrayList<DataDetailBean>();
 		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
@@ -724,8 +710,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			String pass = EncryptionUtil.decyptPassword(encrypt, password);
 			serverConnection = DriverManager.getConnection(connectionUrl, username, pass);
 			st = serverConnection.createStatement();
-			System.out.println("Statement : "+st);
-			System.out.println("Query : "+query);
 			ResultSet rs2 = st.executeQuery(query);
 			while (rs2.next()) {
 				arrTbl.add(rs2.getString(1));
@@ -754,11 +738,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"select table_name from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				if(src_val.equalsIgnoreCase("Mssql")) {
-					sch=rs.getString(1).split("\\.")[1];
-				}else {
 					sch=rs.getString(1).split("\\.")[0];
-				}
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
@@ -825,7 +805,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			//PreparedStatement pstm = connection.prepareStatement("select drive_sequence,drive_name,mounted_path,project_sequence from JUNIPER_EXT_DRIVE_MASTER");
 
 			PreparedStatement pstm = connection.prepareStatement("select drive_sequence,drive_name,mounted_path,project_sequence from JUNIPER_EXT_DRIVE_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')");
-			System.out.println(pstm);
 
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -908,7 +887,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 			//Get Source ID from Src Name
 			pstm = connection.prepareStatement("select FEED_SEQUENCE from JUNIPER_EXT_FEED_MASTER where FEED_UNIQUE_NAME='"+src_unique_name+"'");
-			System.out.println("1: "+query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
 				src_id=rs.getString(1);
@@ -977,18 +955,15 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 			//Get Table List Information
 			query="select TABLE_NAME from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_id+" UNION ALL select FILE_NAME from JUNIPER_EXT_FILE_MASTER where FEED_SEQUENCE="+src_id ;
-			System.out.println("7: "+query);
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
 				query="INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Table','Name','"+rs.getString(1)+"')";
-				System.out.println("8: "+query);
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
 			//Insert Platform Information
 			query="INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Transfer','Platform','JUNIPER')";
-			System.out.println("9: "+query);
 			statement = connection.createStatement();
 			statement.execute(query);
 		} catch (ClassNotFoundException | SQLException e) {
@@ -1051,7 +1026,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement feed_seq = null;
 
-			System.out.println("feed_sequenc is "+src_sys_id);
 			PreparedStatement pstm = connection.prepareStatement("select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER where feed_sequence="+src_sys_id
 					+" union select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,VALIDATION_FLAG,ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence="+src_sys_id);
 			ResultSet rs = pstm.executeQuery();
@@ -1069,8 +1043,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 			int i = 1;
 			while (rs.next()){
-				System.out.println(rs.getString("TABLE_NAME"));
-				System.out.println(rs.getString("COLUMNS"));
 				HSSFRow row = sheet.createRow((short) i);
 				row.createCell((short) 0).setCellValue(rs.getString("TABLE_NAME"));
 				row.createCell((short) 1).setCellValue(rs.getString("COLUMNS"));
@@ -1111,7 +1083,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			PreparedStatement pstm = connection.prepareStatement(query);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				System.out.println("Inside the while loop");
 				ddb = new TempDataDetailBean();
 				ddb.setTable_name(rs.getString(1));
 				//ddb.setTable_name_short(rs.getString(1).split("\\.")[1]);
@@ -1224,7 +1195,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) {
 		String json_array_str="";
 		if(file!=null) {
-			System.out.println("Inside Field Flow");
 			String[] col_val = new String[20];
 			try {
 				POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));

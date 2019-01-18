@@ -48,6 +48,30 @@ import com.iig.gcp.extraction.oracle.service.ExtractionService;
 @SessionAttributes(value= {"user_name","project_name","jwt"})
 public class ExtractionController {
 
+	private static String oracle_compute_url;
+	@Value("${oracle.create.micro.service.url}")
+	public void setOrclUrl(String value) {
+		this.oracle_compute_url=value;
+	}
+	
+	private static String target_compute_url;
+	@Value("${target.micro.service.url}")
+	public void setTgtComputeUrl(String value) {
+		this.target_compute_url=value;
+	}
+	
+	private static String feed_compute_url;
+	@Value("${feed.micro.service.url}")
+	public void setFeedComputeUrl(String value) {
+		this.feed_compute_url=value;
+	}
+	
+	private static String scheular_compute_url;
+	@Value("${schedular.micro.service.url}")
+	public void setSchedularUrl(String value) {
+		this.scheular_compute_url=value;
+	}
+	
 	@Autowired
 	private ExtractionService es;
 	
@@ -154,7 +178,7 @@ public class ExtractionController {
 		JSONObject jsonObject= new JSONObject(x);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		x=jsonObject.toString();
-		resp = es.invokeRest(x, button_type);
+		resp = es.invokeRest(x, oracle_compute_url+button_type);
 		String status0[] = resp.toString().split(":");
 		String status1[] = status0[1].split(",");
 		String status = status1[0].replaceAll("\'", "").trim();
@@ -165,7 +189,6 @@ public class ExtractionController {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
 			model.addAttribute("successString", final_message);
-			model.addAttribute("next_button_active", "active");
 		}
 		model.addAttribute("src_val", src_val);
 		//UserAccount u = (UserAccount) request.getSession().getAttribute("user");
@@ -240,22 +263,14 @@ public class ExtractionController {
 	@RequestMapping(value = "/extraction/TargetDetails1", method = RequestMethod.POST)
 	public ModelAndView TargetDetails1(@Valid @ModelAttribute("x") String x, @ModelAttribute("button_type") String button_type, ModelMap model, HttpServletRequest request)
 			throws UnsupportedOperationException, Exception {
-		System.out.println(x);
 		String resp = null;
-		if (button_type.equalsIgnoreCase("add"))
-			resp = es.invokeRest1(x, "addTarget");
-		else if (button_type.equalsIgnoreCase("upd"))
-			resp = es.invokeRest1(x, "updTarget");
-		else if (button_type.equalsIgnoreCase("del"))
-			resp = es.invokeRest1(x, "delTarget");
+		resp = es.invokeRest( x, target_compute_url+button_type);
 		String status0[] = resp.toString().split(":");
-		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
 		String status = status1[0].replaceAll("\'", "").trim();
 		String message0 = status0[2];
 		String message = message0.replaceAll("[\'}]", "").trim();
 		String final_message = status + ": " + message;
-		System.out.println("final: " + final_message);
 		if (status.equalsIgnoreCase("Failed")) {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
@@ -329,7 +344,7 @@ public class ExtractionController {
 		JSONObject jsonObject= new JSONObject(x);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		x=jsonObject.toString();
-		resp = es.invokeRest(x, button_type);
+		resp = es.invokeRest(x, feed_compute_url+button_type);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		String status0[] = resp.toString().split(":");
@@ -383,26 +398,14 @@ public class ExtractionController {
 	public ModelAndView DataDetails(ModelMap model, HttpServletRequest request) throws IOException {
 		try 
 		{
-			model.addAttribute("src_val", "Oracle");
-			ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
-			ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
+			String src_val="Oracle";
+			model.addAttribute("src_val", src_val);
 			ArrayList<SourceSystemMaster> src_sys_val;
 			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 			
-		for (SourceSystemMaster ssm: src_sys_val) {
-			  if(ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) //3rd Added for Hive
-			  {
-				  src_sys_val1.add(ssm);
-			  }
-			  else
-			  {
-				  src_sys_val2.add(ssm);
-			  }
-		}
-		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
-		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val1);
-		model.addAttribute("src_sys_val2", src_sys_val2);
+		//ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
+		//model.addAttribute("db_name", db_name);
+		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
@@ -421,7 +424,7 @@ public class ExtractionController {
 		ArrayList<String> schema_name = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("schema_name", schema_name);
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project"));
+		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetailsOracle0");
 	}
 
@@ -450,7 +453,7 @@ public class ExtractionController {
 		String db_name=null;
 		ArrayList<String> fields = es.getFields(id, src_val, table_name, connection_id, schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
 //		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
-//		ArrayList<String> src_tbl_sch = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project"));
+//		ArrayList<String> src_tbl_sch = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"));
 //		model.addAttribute("src_tbl_sch", src_tbl_sch);
 		model.addAttribute("fields", fields);
 		model.addAttribute("id", id);
@@ -470,12 +473,10 @@ public class ExtractionController {
 		
 		if(x.contains("feed_id1")) {
 			x = x.replace("feed_id1", "feed_id");
-			System.out.println(x);
 			 
-			 resp = es.invokeRest(x, "editTempTableInfo");
+			 resp = es.invokeRest(x, oracle_compute_url+"editTempTableInfo");
 		}else {
-			System.out.println(x);
-			resp = es.invokeRest(x, "addTempTableInfo");
+			resp = es.invokeRest(x, oracle_compute_url+"addTempTableInfo");
 		}
 		
 		String status0[] = resp.toString().split(":");
@@ -492,8 +493,7 @@ public class ExtractionController {
 			JSONObject jsonObject1 = new JSONObject(x);
 			 src_sys_id= jsonObject1.getJSONObject("body").getJSONObject("data").getString("feed_id");
 			String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
-			System.out.println(json_array_metadata_str);
-			resp = es.invokeRest(json_array_metadata_str, "metaDataValidation");
+			resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
 			if (resp.contains("success")) {
 				model.addAttribute("successString", resp);
 				model.addAttribute("next_button_active", "active");
@@ -501,7 +501,7 @@ public class ExtractionController {
 				model.addAttribute("errorString", resp);
 			}	
 		}
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val1", src_sys_val);
@@ -522,9 +522,9 @@ public class ExtractionController {
 		String ext_type = es.getExtType(src_sys_id);
 		model.addAttribute("ext_type", ext_type);
 		String schema_name = es.getSchemaData(src_val, src_sys_id);
-		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project"),db_name);
+		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("tables", tables);
-		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project"),db_name);
+		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("schem", schema_name);
 		model.addAttribute("arrddb", arrddb);
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
@@ -539,7 +539,7 @@ public class ExtractionController {
 		model.addAttribute("src_val", "Oracle");
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val;
-		src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		
 		for (SourceSystemMaster ssm: src_sys_val) {
 			  if(ssm.getFile_list() == null && ssm.getTable_list() == null && ssm.getDb_name() == null); //3rd Added for Hive
@@ -582,7 +582,7 @@ public class ExtractionController {
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		x=jsonObject.toString();
 		//if (ext_type.equalsIgnoreCase("Batch")) {
-			resp = es.invokeRest(x, "createDag");
+			resp = es.invokeRest(x, scheular_compute_url+"createDag");
 			es.updateLoggerTable(feed_name);
 		//} else {
 		//	resp = es.invokeRest(x, "extractData");
@@ -602,7 +602,7 @@ public class ExtractionController {
 			model.addAttribute("next_button_active", "active");
 		}
 		model.addAttribute("src_val", src_val);
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
@@ -616,7 +616,7 @@ public class ExtractionController {
 		JSONObject jsonObject= new JSONObject(x);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		x=jsonObject.toString();
-		final_message = es.invokeRest1(x, "feednm/extractData");
+		final_message = es.invokeRest(x, scheular_compute_url+"feednm/extractData");
 		model.addAttribute("successString", final_message);
 /*		String status0[] = resp.toString().split(":");
 		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
@@ -633,7 +633,7 @@ public class ExtractionController {
 			model.addAttribute("next_button_active", "active");
 		}*/
 		model.addAttribute("src_val", src_val);
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm",(String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
@@ -694,7 +694,7 @@ public class ExtractionController {
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		json_array_str=jsonObject.toString();
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
-					resp = es.invokeRest(json_array_str, "addTempTableInfo");
+					resp = es.invokeRest(json_array_str, oracle_compute_url+"addTempTableInfo");
 					String status0[] = resp.toString().split(":");
 					String status1[] = status0[1].split(",");
 					String status = status1[0].replaceAll("\'", "").trim();
@@ -704,7 +704,7 @@ public class ExtractionController {
 					if (status.equalsIgnoreCase("Failed")) {
 						model.addAttribute("errorString", final_message);
 					} else if (status.equalsIgnoreCase("Success")) {	
-						resp = es.invokeRest(json_array_metadata_str, "metaDataValidation");
+						resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
 						if (resp.contains("success")) {
 							model.addAttribute("successString", resp);
 							model.addAttribute("next_button_active", "active");
@@ -715,7 +715,7 @@ public class ExtractionController {
 		//model.addAttribute("successString", resp);
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		for (SourceSystemMaster ssm: src_sys_val) {
 			  if(ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) //3rd Added for Hive
 			  {
@@ -750,8 +750,7 @@ public class ExtractionController {
 		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
 		
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
-					System.out.println(json_array_str);
-					resp = es.invokeRest(json_array_str, "editTempTableInfo");
+					resp = es.invokeRest(json_array_str, oracle_compute_url+"editTempTableInfo");
 					String status0[] = resp.toString().split(":");
 					System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 					String status1[] = status0[1].split(",");
@@ -763,7 +762,7 @@ public class ExtractionController {
 					if (status.equalsIgnoreCase("Failed")) {
 						model.addAttribute("errorString", final_message);
 					} else if (status.equalsIgnoreCase("Success")) {	
-						resp = es.invokeRest(json_array_metadata_str, "metaDataValidation");
+						resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
 						if (resp.contains("success")) {
 							model.addAttribute("successString", resp);
 							model.addAttribute("next_button_active", "active");
@@ -774,7 +773,7 @@ public class ExtractionController {
 		//model.addAttribute("successString", resp);
 		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
-		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project"));
+		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		for (SourceSystemMaster ssm: src_sys_val) {
 			  if(ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) //3rd Added for Hive
 			  {

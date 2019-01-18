@@ -180,7 +180,7 @@
 		} else if(val=='edit') {
 			document.getElementById('datdyn').innerHTML="";
 			document.getElementById('schdyn').innerHTML="";
-			document.getElementById('feed_id').style.display="none";
+			
 		}
 	}
 	function loadcheck(val) {
