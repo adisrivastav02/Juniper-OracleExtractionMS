@@ -101,7 +101,7 @@ public class ExtractionController {
 					//TODO: Redirect to Access Denied Page
 					return new ModelAndView("/login");
 				}
-				authenticationByJWT(user_name, jwt);
+				authenticationByJWT(user_name+":"+project_name, jwt);
 				}
 				catch(Exception e) {
 					e.printStackTrace();

@@ -33,6 +33,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,8 @@ import com.iig.gcp.extraction.utils.EncryptionUtil;
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
 
-	
+	@Autowired
+	private ConnectionUtils ConnectionUtils;
 	private static String SCHEDULER_MASTER_TABLE = "JUNIPER_SCH_MASTER_JOB_DETAIL";
 
 	@Override
