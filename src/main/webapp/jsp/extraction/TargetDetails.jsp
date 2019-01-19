@@ -88,7 +88,8 @@
 
 	function funccheck(val) {
 		if (val == 'create') {
-			window.location.reload();
+			//window.location.reload();
+			window.location.href="${pageContext.request.contextPath}/extraction/TargetDetails";
 		} else {
 			document.getElementById('tgtfunc').style.display = "block";
 		}
