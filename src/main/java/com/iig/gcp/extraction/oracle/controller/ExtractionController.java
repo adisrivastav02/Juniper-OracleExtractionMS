@@ -72,6 +72,13 @@ public class ExtractionController {
 		this.scheular_compute_url=value;
 	}
 	
+	
+	private static String parent_ms;
+	@Value("${parent.front.micro.services}")
+	public void setParent_ms(String value) {
+		this.parent_ms=value;
+	}
+	
 	@Autowired
 	private ExtractionService es;
 	
@@ -101,7 +108,7 @@ public class ExtractionController {
 					//TODO: Redirect to Access Denied Page
 					return new ModelAndView("/login");
 				}
-				authenticationByJWT(user_name, jwt);
+				authenticationByJWT(user_name+":"+project_name, jwt);
 				}
 				catch(Exception e) {
 					e.printStackTrace();
@@ -200,7 +207,7 @@ public class ExtractionController {
 		model.addAttribute("conn_val", conn_val);
 		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("drive", drive);
-		return new ModelAndView("extraction/ConnectionDetails");
+		return new ModelAndView("extraction/ConnectionDetailsOracle");
 	}
 
 	@RequestMapping(value = "/extraction/ConnectionDetailsEdit", method = RequestMethod.POST)
@@ -402,12 +409,9 @@ public class ExtractionController {
 			model.addAttribute("src_val", src_val);
 			ArrayList<SourceSystemMaster> src_sys_val;
 			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
-			
-		//ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
-		//model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val", src_sys_val);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+			model.addAttribute("src_sys_val", src_sys_val);
+			model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -480,13 +484,11 @@ public class ExtractionController {
 		}
 		
 		String status0[] = resp.toString().split(":");
-		System.out.println(status0[0] + " value " + status0[1] + " value3: " + status0[2]);
 		String status1[] = status0[1].split(",");
 		String status = status1[0].replaceAll("\'", "").trim();
 		String message0 = status0[2];
 		String message = message0.replaceAll("[\'}]", "").trim();
 		String final_message = status + ": " + message;
-		System.out.println("final: " + final_message);
 		if (status.equalsIgnoreCase("Failed")) {
 			model.addAttribute("errorString", final_message);
 		} else if (status.equalsIgnoreCase("Success")) {
@@ -494,17 +496,23 @@ public class ExtractionController {
 			 src_sys_id= jsonObject1.getJSONObject("body").getJSONObject("data").getString("feed_id");
 			String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 			resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
-			if (resp.contains("success")) {
-				model.addAttribute("successString", resp);
-				model.addAttribute("next_button_active", "active");
-			}else {
-				model.addAttribute("errorString", resp);
+			//added code
+			 String statusNew0[] = resp.toString().split(":");
+			 String statusNew1[] = statusNew0[1].split(",");
+			 status = statusNew1[0].replaceAll("\'", "").trim();
+			 message0 = statusNew0[2];
+			 message = message0.replaceAll("[\'}]", "").trim();
+			 final_message = status + ": " + message;
+			if (status.equalsIgnoreCase("Success")) {
+				model.addAttribute("successString", final_message);
+			}else if (status.equalsIgnoreCase("Failed")) {
+				model.addAttribute("errorString", final_message);
 			}	
 		}
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val);
+		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -822,10 +830,6 @@ public class ExtractionController {
 	@RequestMapping(value = { "/extraction/FeedValidationDashboard"}, method = RequestMethod.POST)
 	public ModelAndView FeedValidationDashboard(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request)
 			throws Exception {
-		System.out.println("Reached inside the controller");
-		System.out.println("Inside Controller : "+src_sys_id);
-		System.out.println("Inside Controller src_val : "+src_val);
-		//String schema_name = es.getSchemaData(src_val, src_sys_id);
 		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
 		ArrayList<TempDataDetailBean> arrddb = es.getTempData(src_sys_id, src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("arrddb", arrddb);
@@ -844,5 +848,17 @@ public class ExtractionController {
 		model.addAttribute("src_val", src_val);
 		model.addAttribute("selection", selection);
 		return new ModelAndView("extraction/BulkLoadTest");
+	}
+	
+	@RequestMapping(value = { "/extraction/error"}, method = RequestMethod.GET)
+	public ModelAndView error(ModelMap modelMap,HttpServletRequest request) {
+		
+		return new ModelAndView("/index");
+	}
+	
+	@RequestMapping(value = { "/extraction/logout"}, method = RequestMethod.GET)
+	public ModelAndView logout(ModelMap modelMap,HttpServletRequest request) {
+		request.getSession().invalidate();
+		return new ModelAndView("redirect:" + parent_ms);
 	}
 }

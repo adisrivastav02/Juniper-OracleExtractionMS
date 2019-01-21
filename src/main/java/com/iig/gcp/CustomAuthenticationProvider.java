@@ -49,9 +49,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
-        String name = authentication.getName();
+        String name = authentication.getName().split(":")[0];
+        String project= authentication.getName().split(":")[1];
         Object credentials = authentication.getCredentials();
-        System.out.println("credentials class: " + credentials.getClass());
         if (!(credentials instanceof String)) {
             return null;
         }
@@ -62,7 +62,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 		DecodedJWT decodedToken = JWT.decode(token);
         JWTVerifier verifier = selectVerifier(decodedToken);
         DecodedJWT decodedJWT = verifier.verify(token);
-	    System.out.println("User" + decodedJWT.getSubject());
 
         if (decodedJWT.getSubject()== null) {
             throw new BadCredentialsException("Authentication failed for " + name);
@@ -73,7 +72,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         MyUser m = new MyUser();
         m.setName(name);
         m.setJwt(password);
-        m.setProject("FCRDR");
+        m.setProject(project);
         Authentication auth = new
                 UsernamePasswordAuthenticationToken(m, password, grantedAuthorities);
         return auth;
