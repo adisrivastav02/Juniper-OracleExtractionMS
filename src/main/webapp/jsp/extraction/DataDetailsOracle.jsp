@@ -1,16 +1,17 @@
 <jsp:include page="../cdg_header.jsp" />
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-<style>
-.drop-down {
-	position: relative;
-}
-</style>
-<link href="../../assets/css/jquery-ui.css" rel="stylesheet">
-<link href="../../assets/css/bootstrap.min2.css" rel="stylesheet">
-<link rel="stylesheet"
-	href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
 <script>
+$(document).ready(function() {
+	$("#feed_id").change(function() {
+		document.getElementById('load_type').style.display="inline-flex";
+	});
+	$("#success-alert").hide();
+    $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
+    });   
+	$("#error-alert").hide();
+    $("#error-alert").fadeTo(10000,10).slideUp(2000, function(){
+     });
+});
 	function jsonconstruct() {
 		var schema = document.getElementById("schema_name").value;
 		for (var y = 1; y <= document.getElementById("counter").value; y++) {
@@ -172,18 +173,6 @@
 			$("#fldd" + id).html(data);
 		});
 	}
-	$(document).ready(function() {
-		$("#feed_id").change(function() {
-			document.getElementById('load_type').style.display="inline-flex";
-		});
-		$("#success-alert").hide();
-        $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
-        });   
-		$("#error-alert").hide();
-        $("#error-alert").fadeTo(10000,10).slideUp(2000, function(){
-         });
-	});
-
 	function funccheck(val) {
 		if (val == 'create') {
 			//window.location.reload();
@@ -289,9 +278,9 @@
 								</div>
 							</div>
 
-							<div class="row text-center text-lg-left">
+							<div class="form-group row">
 								<label>Source Feed Name *</label> <select name="feed_id"
-									id="feed_id" class="form-control selectpicker" data-live-search="true">
+									id="feed_id" class="form-control">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
 									<c:forEach items="${src_sys_val}" var="src_sys_val">
@@ -327,7 +316,3 @@
 			</div>
 		</div>
 <jsp:include page="../cdg_footer.jsp" />
-
-<script src="../../assets/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
-		 
