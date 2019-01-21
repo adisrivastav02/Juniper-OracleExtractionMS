@@ -1,17 +1,17 @@
 package com.iig.gcp.extraction.oracle.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.security.Principal;
 import java.util.ArrayList;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.json.JSONException;
@@ -24,7 +24,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -713,11 +715,16 @@ public class ExtractionController {
 						model.addAttribute("errorString", final_message);
 					} else if (status.equalsIgnoreCase("Success")) {	
 						resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
-						if (resp.contains("success")) {
-							model.addAttribute("successString", resp);
-							model.addAttribute("next_button_active", "active");
-						}else {
-							model.addAttribute("errorString", resp);
+						 String statusNew0[] = resp.toString().split(":");
+						 String statusNew1[] = statusNew0[1].split(",");
+						 status = statusNew1[0].replaceAll("\'", "").trim();
+						 message0 = statusNew0[2];
+						 message = message0.replaceAll("[\'}]", "").trim();
+						 final_message = status + ": " + message;
+						if (status.equalsIgnoreCase("Success")) {
+							model.addAttribute("successString", final_message);
+						}else if (status.equalsIgnoreCase("Failed")) {
+							model.addAttribute("errorString", final_message);
 						}	
 					}
 		//model.addAttribute("successString", resp);
@@ -736,8 +743,9 @@ public class ExtractionController {
 			}
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val1);
-		model.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val", src_sys_val);
+		//model.addAttribute("src_sys_val1", src_sys_val1);
+		//model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -771,11 +779,16 @@ public class ExtractionController {
 						model.addAttribute("errorString", final_message);
 					} else if (status.equalsIgnoreCase("Success")) {	
 						resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
-						if (resp.contains("success")) {
-							model.addAttribute("successString", resp);
-							model.addAttribute("next_button_active", "active");
-						}else {
-							model.addAttribute("errorString", resp);
+						String statusNew0[] = resp.toString().split(":");
+						 String statusNew1[] = statusNew0[1].split(",");
+						 status = statusNew1[0].replaceAll("\'", "").trim();
+						 message0 = statusNew0[2];
+						 message = message0.replaceAll("[\'}]", "").trim();
+						 final_message = status + ": " + message;
+						if (status.equalsIgnoreCase("Success")) {
+							model.addAttribute("successString", final_message);
+						}else if (status.equalsIgnoreCase("Failed")) {
+							model.addAttribute("errorString", final_message);
 						}	
 					}
 		//model.addAttribute("successString", resp);
@@ -794,8 +807,9 @@ public class ExtractionController {
 			}
 		ArrayList<String> db_name = es.getHivedbList(project);
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val1);
-		model.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val", src_sys_val);
+		//model.addAttribute("src_sys_val1", src_sys_val1);
+		//.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", project);
 		return new ModelAndView("extraction/DataDetails" + src_val);
@@ -849,6 +863,47 @@ public class ExtractionController {
 		model.addAttribute("selection", selection);
 		return new ModelAndView("extraction/BulkLoadTest");
 	}
+	
+	@RequestMapping("/{fileName:.+}")
+	public void downloadfile(HttpServletRequest request, HttpServletResponse response,
+				@PathVariable("fileName") String fileName) throws IOException {
+			//System.out.println("Ye hain file name :"+fileName);
+			File file = new File(fileName);
+			if (file.exists()) {
+
+				//get the mimetype
+				String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+				if (mimeType == null) {
+					//unknown mimetype so set the mimetype to application/octet-stream
+					mimeType = "application/octet-stream";
+				}
+
+				response.setContentType(mimeType);
+
+				/**
+				 * In a regular HTTP response, the Content-Disposition response header is a
+				 * header indicating if the content is expected to be displayed inline in the
+				 * browser, that is, as a Web page or as part of a Web page, or as an
+				 * attachment, that is downloaded and saved locally.
+				 * 
+				 */
+
+				/**
+				 * Here we have mentioned it to show inline
+				 */
+				//response.setHeader("Content-Disposition", String.format("inline; filename=\"" + file.getName() + "\""));
+
+				 //Here we have mentioned it to show as attachment
+				 response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + file.getName() + "\""));
+
+				response.setContentLength((int) file.length());
+
+				InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+
+				FileCopyUtils.copy(inputStream, response.getOutputStream());
+			}
+		
+		}
 	
 	@RequestMapping(value = { "/extraction/error"}, method = RequestMethod.GET)
 	public ModelAndView error(ModelMap modelMap,HttpServletRequest request) {
