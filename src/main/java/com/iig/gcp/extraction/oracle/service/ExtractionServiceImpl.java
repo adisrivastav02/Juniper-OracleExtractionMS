@@ -663,9 +663,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 				stat=1;break;
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.out.println("Exception occured "+e);
+			throw e;
 		}
-		ConnectionUtils.closeQuietly(connection);
+		finally {
+			connection.close();
+		}
 		return stat;
 	}
 
@@ -702,15 +705,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrTbl.add(rs2.getString(1));
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
-		} finally {
-			try {
-				st.close();
-				serverConnection.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			System.out.println("Exception occured "+e1);
+			throw e1;
+		}
+		finally {
+			serverConnection.close();
 		}
 		return arrTbl;
 	}
@@ -815,7 +814,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public ArrayList<DriveMaster> getDrives1(int src_sys_id) throws Exception {
 		DriveMaster dm = null;
 		ArrayList<DriveMaster> arrdm = new ArrayList<DriveMaster>();
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement pstm = connection.prepareStatement("select c.drive_name,c.mounted_path from JUNIPER_EXT_FEED_SRC_TGT_LINK a, JUNIPER_EXT_SRC_CONN_MASTER b, JUNIPER_EXT_DRIVE_MASTER c where a.SRC_CONN_SEQUENCE=b.SRC_CONN_SEQUENCE and b.DRIVE_SEQUENCE=c.DRIVE_SEQUENCE and a.FEED_SEQUENCE="+src_sys_id);
@@ -827,7 +826,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrdm.add(dm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 		return arrdm;
 	}
@@ -878,7 +881,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				src_id=rs.getString(1);
 			}
-			System.out.println("unique name: "+src_unique_name+" src id: "+src_id);
 			//Get Source Details from Src Id
 			query="SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n" + 
 					"INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.SRC_CONN_SEQUENCE=L.SRC_CONN_SEQUENCE \r\n" + 
@@ -1055,7 +1057,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		String db_name=null;
 		ArrayList<TempDataDetailBean> arrddb = new ArrayList<TempDataDetailBean>();
 		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			String query="select table_name, columns, where_clause, fetch_type, incr_col,validation_flag,error_message from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence="+src_sys_id
@@ -1067,7 +1069,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				ddb = new TempDataDetailBean();
 				ddb.setTable_name(rs.getString(1));
-				//ddb.setTable_name_short(rs.getString(1).split("\\.")[1]);
 				ddb.setSchema(rs.getString(1).split("\\.")[0]);
 
 
@@ -1092,8 +1093,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 			connection.close();
 			System.out.println("Extracted the complete data");
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			//connection.close();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 
 		return arrddb;
@@ -1103,7 +1107,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public ArrayList<String> getHivedbList(String project_id) throws Exception
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement pstm = connection.prepareStatement("SELECT DISTINCT db_name FROM  juniper_ext_hive_table_list");
@@ -1112,7 +1116,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 		return arr;
 	}
@@ -1121,7 +1129,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public ArrayList<String> getKafkaTopic() throws Exception
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement pstm = connection.prepareStatement("SELECT kafka_topic FROM  juniper_ext_kafka_topic_master");
@@ -1130,7 +1138,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 		return arr;
 	}
@@ -1138,7 +1150,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	@Override
 	public ArrayList<String> getColList(String table_name) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement pstm = connection.prepareStatement("SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p ON n.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=?");
@@ -1148,7 +1160,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 		return arr;
 	}
@@ -1156,7 +1172,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public String getDatabaseData(String src_val,int src_sys_id) throws Exception
 	{
 		String sch="";
-		Connection connection;
+		Connection connection = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			PreparedStatement pstm = connection.prepareStatement(
@@ -1167,14 +1183,17 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-			//connection.close();
+			System.out.println("Exception occured "+e);
+			throw e;
+		}
+		finally {
+			connection.close();
 		}
 		return sch;
 	}
 
 	@Override
-	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) {
+	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) throws Exception {
 		String json_array_str="";
 		if(file!=null) {
 			String[] col_val = new String[20];
@@ -1207,8 +1226,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 				item.put("counter",counter);
 				item.put("schema_name",schema_name);
 				item.put("load_type","bulk_load");
-
-
 
 
 				int cols = 0;
@@ -1269,15 +1286,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				item_first.put("body", array_pre);
 				array_first.put(item_first);
 				json_array_str = array_first.toString().replace("[", "").replace("]", "");
-				System.out.println(json_array_str);
 				wb.close();
 			}catch(Exception ioe) {
-				ioe.printStackTrace();
+				System.out.println("Exception occured "+ioe);
+				throw ioe;
 			}
-		}
-		else {
-
-			System.out.println("No file details file");
 		}
 		return json_array_str;
 	}
