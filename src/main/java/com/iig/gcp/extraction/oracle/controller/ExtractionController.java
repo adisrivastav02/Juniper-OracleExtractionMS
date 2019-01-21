@@ -72,6 +72,13 @@ public class ExtractionController {
 		this.scheular_compute_url=value;
 	}
 	
+	
+	private static String parent_ms;
+	@Value("${parent.front.micro.services}")
+	public void setParent_ms(String value) {
+		this.parent_ms=value;
+	}
+	
 	@Autowired
 	private ExtractionService es;
 	
@@ -200,7 +207,7 @@ public class ExtractionController {
 		model.addAttribute("conn_val", conn_val);
 		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("drive", drive);
-		return new ModelAndView("extraction/ConnectionDetails");
+		return new ModelAndView("extraction/ConnectionDetailsOracle");
 	}
 
 	@RequestMapping(value = "/extraction/ConnectionDetailsEdit", method = RequestMethod.POST)
@@ -402,12 +409,9 @@ public class ExtractionController {
 			model.addAttribute("src_val", src_val);
 			ArrayList<SourceSystemMaster> src_sys_val;
 			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
-			
-		//ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
-		//model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val", src_sys_val);
-		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
-		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
+			model.addAttribute("src_sys_val", src_sys_val);
+			model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
+			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -496,7 +500,6 @@ public class ExtractionController {
 			resp = es.invokeRest(json_array_metadata_str, oracle_compute_url+"metaDataValidation");
 			if (resp.contains("success")) {
 				model.addAttribute("successString", resp);
-				model.addAttribute("next_button_active", "active");
 			}else {
 				model.addAttribute("errorString", resp);
 			}	
@@ -504,7 +507,7 @@ public class ExtractionController {
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val1", src_sys_val);
+		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -844,5 +847,17 @@ public class ExtractionController {
 		model.addAttribute("src_val", src_val);
 		model.addAttribute("selection", selection);
 		return new ModelAndView("extraction/BulkLoadTest");
+	}
+	
+	@RequestMapping(value = { "/extraction/error"}, method = RequestMethod.GET)
+	public ModelAndView error(ModelMap modelMap,HttpServletRequest request) {
+		
+		return new ModelAndView("/index");
+	}
+	
+	@RequestMapping(value = { "/extraction/logout"}, method = RequestMethod.GET)
+	public ModelAndView logout(ModelMap modelMap,HttpServletRequest request) {
+		request.getSession().invalidate();
+		return new ModelAndView("redirect:" + parent_ms);
 	}
 }

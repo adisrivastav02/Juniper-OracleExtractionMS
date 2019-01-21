@@ -62,7 +62,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 		DecodedJWT decodedToken = JWT.decode(token);
         JWTVerifier verifier = selectVerifier(decodedToken);
         DecodedJWT decodedJWT = verifier.verify(token);
-	    System.out.println("User" + decodedJWT.getSubject());
 
         if (decodedJWT.getSubject()== null) {
             throw new BadCredentialsException("Authentication failed for " + name);
