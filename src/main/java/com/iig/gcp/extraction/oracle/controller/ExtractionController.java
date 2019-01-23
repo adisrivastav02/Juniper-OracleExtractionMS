@@ -911,9 +911,4 @@ public class ExtractionController {
 		return new ModelAndView("/index");
 	}
 	
-	@RequestMapping(value = { "/extraction/logout"}, method = RequestMethod.GET)
-	public ModelAndView logout(ModelMap modelMap,HttpServletRequest request) {
-		request.getSession().invalidate();
-		return new ModelAndView("redirect:" + parent_ms);
-	}
 }
