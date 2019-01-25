@@ -1,22 +1,17 @@
 package com.iig.gcp.extraction.utils;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
  
 @Component
+@Transactional
 public class ConnectionUtils {
  
 	@Autowired
@@ -28,15 +23,13 @@ public class ConnectionUtils {
     	return dataSource.getConnection();
     }
     
- 
-     
-    public static void closeQuietly(Connection conn) {
+   /* public static void closeQuietly(Connection conn) {
         try {
         	conn.commit();
             conn.close();
         } catch (Exception e) {
         }
-    }
+    }*/
  
     public static void rollbackQuietly(Connection conn) {
         try {
