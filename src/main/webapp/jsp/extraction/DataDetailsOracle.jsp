@@ -5,6 +5,19 @@ $(document).ready(function() {
 	$("#feed_id").change(function() {
 		document.getElementById('load_type').style.display="inline-flex";
 	});
+	$("#feed_id1").change(function() {
+		document.getElementById('load_type').style.display="none";
+		document.getElementById('bulk1').checked = "checked";
+		document.getElementById('datdyn').innerHTML = "";
+		var src_sys_id = document.getElementById("feed_id1").value;
+		var src_val = document.getElementById("src_val").value;
+		$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle', {
+			src_sys_id : src_sys_id,
+			src_val : src_val
+		}, function(data) {
+			$('#datdyn').html(data)
+		});
+	});
 	$("#success-alert").hide();
     $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
     });   
@@ -180,6 +193,8 @@ $(document).ready(function() {
 		} else if(val=='edit') {
 			document.getElementById('datdyn').innerHTML="";
 			document.getElementById('schdyn').innerHTML="";
+			document.getElementById('feed_id').style.display="none";
+			document.getElementById('feed_id1').style.display="block";
 			
 		}
 	}
@@ -196,7 +211,7 @@ $(document).ready(function() {
 					$('#schdyn').html(data)
 				});
 			}else if (selection == 'edit'){
-				var src_sys_id = document.getElementById("feed_id").value;
+				var src_sys_id = document.getElementById("feed_id1").value;
 				var src_val = document.getElementById("src_val").value;
 				$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle', {
 					src_sys_id : src_sys_id,
@@ -278,13 +293,21 @@ $(document).ready(function() {
 								</div>
 							</div>
 
-							<div class="form-group row">
+							<div class="form-group">
 								<label>Source Feed Name *</label> <select name="feed_id"
 									id="feed_id" class="form-control">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
-									<c:forEach items="${src_sys_val}" var="src_sys_val">
-										<option value="${src_sys_val.src_sys_id}">${src_sys_val.src_unique_name}</option>
+									<c:forEach items="${src_sys_val1}" var="src_sys_val1">
+										<option value="${src_sys_val1.src_sys_id}">${src_sys_val1.src_unique_name}</option>
+									</c:forEach>
+								</select>
+								<select name="feed_id1"
+									id="feed_id1" class="form-control" style="display:none;">
+									<option value="" selected disabled>Source Feed Name
+										...</option>
+									<c:forEach items="${src_sys_val2}" var="src_sys_val2">
+										<option value="${src_sys_val2.src_sys_id}">${src_sys_val2.src_unique_name}</option>
 									</c:forEach>
 								</select>
 							</div>

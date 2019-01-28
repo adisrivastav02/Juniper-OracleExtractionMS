@@ -409,9 +409,21 @@ public class ExtractionController {
 		{
 			String src_val="Oracle";
 			model.addAttribute("src_val", src_val);
-			ArrayList<SourceSystemMaster> src_sys_val;
-			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
-			model.addAttribute("src_sys_val", src_sys_val);
+			ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
+			ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
+			ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
+			for (SourceSystemMaster ssm: src_sys_val) {
+				  if(ssm.getFile_list() == null && ssm.getTable_list() == null)
+				  {
+					  src_sys_val1.add(ssm);
+				  }
+				  else
+				  {
+					  src_sys_val2.add(ssm);
+				  }
+				}
+			model.addAttribute("src_sys_val1", src_sys_val1);
+			model.addAttribute("src_sys_val2", src_sys_val2);
 			model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		} catch (Exception e) {
@@ -511,10 +523,23 @@ public class ExtractionController {
 				model.addAttribute("errorString", final_message);
 			}	
 		}
+		ArrayList<SourceSystemMaster> src_sys_val1 = new ArrayList<SourceSystemMaster>();
+		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
+		for (SourceSystemMaster ssm: src_sys_val) {
+			  if(ssm.getFile_list() == null && ssm.getTable_list() == null)
+			  {
+				  src_sys_val1.add(ssm);
+			  }
+			  else
+			  {
+				  src_sys_val2.add(ssm);
+			  }
+			}
+		model.addAttribute("src_sys_val1", src_sys_val1);
+		model.addAttribute("src_sys_val2", src_sys_val2);
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
-		model.addAttribute("src_sys_val", src_sys_val);
 		model.addAttribute("usernm", request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
