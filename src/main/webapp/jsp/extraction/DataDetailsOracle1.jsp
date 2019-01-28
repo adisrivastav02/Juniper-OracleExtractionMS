@@ -1,11 +1,4 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<link href="${pageContext.request.contextPath}/assets/css/select2.min.css" rel="stylesheet" />
-<script src="${pageContext.request.contextPath}/assets/js/select2.min.js"></script>
-<script>
-$(document).ready(function() {
-	$('.js-example-basic-single').select2();
-});
-</script>
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
 <input type="hidden" name="counter" id="counter" class="form-control"
@@ -16,7 +9,7 @@ $(document).ready(function() {
 	<div id="tbl_fld">
 		<div class="form-group row">
 			<div class="col-sm-6">
-				<label>Select Table *</label> <select class="js-example-basic-single form-control"
+				<label>Select Table *</label> <select class="form-control"
 					id="table_name1" name="table_name1"
 					onchange="getcols(this.id,this.value)">
 					<option value="" selected disabled>Table...</option>
