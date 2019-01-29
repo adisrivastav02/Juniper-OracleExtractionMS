@@ -3,25 +3,27 @@
 <script>
 function validate()
 {
-	var cname = document.getElementById("connection_name").value;
+	var connection_name = document.getElementById("connection_name").value;
+	var host_name = document.getElementById("host_name").value;
 	var port = document.getElementById("port").value;
+	var user_name = document.getElementById("user_name").value;
+	var password = document.getElementById("password").value;
+	var service_name = document.getElementById("service_name").value;
+	var system = document.getElementById("system").value;
 	var errors = [];
 
-	if (!checkLength(cname)) 
-	{
-		errors[errors.length] = "Connection Name";
-	}
-	if(!checkLength(port) || !checkNumber(port))
-	{
-		errors[errors.length] = "Port Number";
-	}
+	if (!checkLength(connection_name)) 	{errors[errors.length] = "Connection Name";}
+	if (!checkLength(host_name)) 	{errors[errors.length] = "Host Name";}
+	if(!checkLength(port) || !checkNumber(port)) {errors[errors.length] = "Port Number";}
+	if (!checkLength(user_name)) 	{errors[errors.length] = "User Name";}
+	if (!checkLength(password)) 	{errors[errors.length] = "Password";}
+	if (!checkLength(service_name)) 	{errors[errors.length] = "Service Name";}
+	if (!checkLength(system)) 	{errors[errors.length] = "System";}	
+	
 	if (errors.length > 0) 
-	{
-		reportErrors(errors);
-		return false;
-	}
-	return true;
+	{	reportErrors(errors); return false;  } return true;
 }
+
 	function jsonconstruct(val) {
 		validate();
 		var data = {};
