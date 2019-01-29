@@ -1,66 +1,88 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:include page="../cdg_header.jsp" />
 <script>
-function validate()
-{
-	var connection_name = document.getElementById("connection_name").value;
-	var host_name = document.getElementById("host_name").value;
-	var port = document.getElementById("port").value;
-	var user_name = document.getElementById("user_name").value;
-	var password = document.getElementById("password").value;
-	var service_name = document.getElementById("service_name").value;
-	var system = document.getElementById("system").value;
-	var errors = [];
-
-	if (!checkLength(connection_name)) 	{errors[errors.length] = "Connection Name";}
-	if (!checkLength(host_name)) 	{errors[errors.length] = "Host Name";}
-	if(!checkLength(port) || !checkNumber(port)) {errors[errors.length] = "Port Number";}
-	if (!checkLength(user_name)) 	{errors[errors.length] = "User Name";}
-	if (!checkLength(password)) 	{errors[errors.length] = "Password";}
-	if (!checkLength(service_name)) 	{errors[errors.length] = "Service Name";}
-	if (!checkLength(system)) 	{errors[errors.length] = "System";}	
-	
-	if (errors.length > 0) 
-	{	reportErrors(errors); return false;  } return true;
-}
-
 	function jsonconstruct(val) {
-		validate();
+		var connection_name = document.getElementById("connection_name").value;
+		var host_name = document.getElementById("host_name").value;
+		var port = document.getElementById("port").value;
+		var user_name = document.getElementById("user_name").value;
+		var password = document.getElementById("password").value;
+		var service_name = document.getElementById("service_name").value;
+		var system = document.getElementById("system").value;
+		var errors = [];
+
+		if (!checkLength(connection_name)) {
+			errors[errors.length] = "Connection Name";
+		}
+		if (!checkLength(host_name)) {
+			errors[errors.length] = "Host Name";
+		}
+		if (!checkLength(port) || !checkNumber(port)) {
+			errors[errors.length] = "Port Number";
+		}
+		if (!checkLength(user_name)) {
+			errors[errors.length] = "User Name";
+		}
+		if (!checkLength(password)) {
+			errors[errors.length] = "Password";
+		}
+		if (!checkLength(service_name)) {
+			errors[errors.length] = "Service Name";
+		}
+		if (!checkLength(system)) {
+			errors[errors.length] = "System";
+		}
+
+		if (errors.length > 0) {
+			reportErrors(errors);
+			return false;
+		}
+
 		var data = {};
 		document.getElementById('button_type').value = val;
 		$(".form-control").serializeArray().map(function(x) {
 			data[x.name] = x.value;
 		});
-		var x = '{"header":{},"body":{"data":'
-				+ JSON.stringify(data) + '}}';
+		var x = '{"header":{},"body":{"data":' + JSON.stringify(data) + '}}';
 		document.getElementById('x').value = x;
 		//console.log(x);
 		//alert(x);
 		document.getElementById('ConnectionDetails').submit();
 	}
-	$(document).ready(function() {
-		$("#conn").change(function() {
-			var conn = $(this).val();
-			var src_val = document.getElementById("src_val").value;
-			$.post('${pageContext.request.contextPath}/extraction/ConnectionDetailsEdit', {
-				conn : conn,
-				src_val : src_val
-			}, function(data) {
-				$('#cud').html(data)
-			});
-		});
-		$("#success-alert").hide();
-        $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
-        });   
- $("#error-alert").hide();
-        $("#error-alert").fadeTo(10000,10).slideUp(2000, function(){
-         });
-	});
+	$(document)
+			.ready(
+					function() {
+						$("#conn")
+								.change(
+										function() {
+											var conn = $(this).val();
+											var src_val = document
+													.getElementById("src_val").value;
+											$
+													.post(
+															'${pageContext.request.contextPath}/extraction/ConnectionDetailsEdit',
+															{
+																conn : conn,
+																src_val : src_val
+															}, function(data) {
+																$('#cud').html(
+																		data)
+															});
+										});
+						$("#success-alert").hide();
+						$("#success-alert").fadeTo(10000, 10).slideUp(2000,
+								function() {
+								});
+						$("#error-alert").hide();
+						$("#error-alert").fadeTo(10000, 10).slideUp(2000,
+								function() {
+								});
+					});
 
 	function funccheck(val) {
 		if (val == 'create') {
 			//window.location.reload();
-			window.location.href="${pageContext.request.contextPath}/extraction/ConnectionDetailsOracle";
+			window.location.href = "${pageContext.request.contextPath}/extraction/ConnectionDetailsOracle";
 		} else {
 			document.getElementById('connfunc').style.display = "block";
 			document.getElementById('cud').innerHTML = "";
@@ -76,32 +98,32 @@ function validate()
 						<h4 class="card-title">Data Extraction</h4>
 						<p class="card-description">Connection Details</p>
 						<%
-               if(request.getAttribute("successString") != null) {
-               %>
-            <div class="alert alert-success" id="success-alert">
-               <button type="button" class="close" data-dismiss="alert">x</button>
-               ${successString}
-            </div>
-            <%
-               }
-               %>
-            <%
-               if(request.getAttribute("errorString") != null) {
-               %>
-            <div class="alert alert-danger" id="error-alert">
-               <button type="button" class="close" data-dismiss="alert">x</button>
-               ${errorString}
-            </div>
-            <%
-               }
-               %>
+							if (request.getAttribute("successString") != null) {
+						%>
+						<div class="alert alert-success" id="success-alert">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							${successString}
+						</div>
+						<%
+							}
+						%>
+						<%
+							if (request.getAttribute("errorString") != null) {
+						%>
+						<div class="alert alert-danger" id="error-alert">
+							<button type="button" class="close" data-dismiss="alert">x</button>
+							${errorString}
+						</div>
+						<%
+							}
+						%>
 						<script type="text/javascript">
 							window.onload = function() {
-									document.getElementById("host_name").value = "35.227.48.30";
-									document.getElementById("port").value = "1521";
-									document.getElementById("user_name").value = "arg_loans_db";
-									document.getElementById("password").value = "cdc1";
-									document.getElementById("service_name").value = "orcl.c.dazzling-byway-184414.internal";
+								document.getElementById("host_name").value = "35.227.48.30";
+								document.getElementById("port").value = "1521";
+								document.getElementById("user_name").value = "arg_loans_db";
+								document.getElementById("password").value = "cdc1";
+								document.getElementById("service_name").value = "orcl.c.dazzling-byway-184414.internal";
 							}
 						</script>
 						<form class="forms-sample" id="ConnectionDetails"
@@ -131,7 +153,8 @@ function validate()
 									<div class="form-check form-check-info">
 										<label class="form-check-label"> <input type="radio"
 											class="form-check-input" name="radio" id="radio2"
-											value="edit" onclick="funccheck(this.value)"> Edit/View
+											value="edit" onclick="funccheck(this.value)">
+											Edit/View
 										</label>
 									</div>
 								</div>
@@ -199,7 +222,7 @@ function validate()
 										</select>
 									</div>
 								</fieldset>
-								<button onclick="jsonconstruct('addOracleConnection');"
+								<button onclick="return jsonconstruct('addOracleConnection');"
 									class="btn btn-rounded btn-gradient-info mr-2">Test &
 									Save</button>
 							</div>
@@ -208,4 +231,4 @@ function validate()
 				</div>
 			</div>
 		</div>
-<jsp:include page="../cdg_footer.jsp" />
+		<jsp:include page="../cdg_footer.jsp" />
