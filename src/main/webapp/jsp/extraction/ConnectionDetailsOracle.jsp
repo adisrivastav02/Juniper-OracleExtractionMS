@@ -1,7 +1,29 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:include page="../cdg_header.jsp" />
 <script>
+function validate()
+{
+	var cname = document.getElementById("connection_name").value;
+	var port = document.getElementById("port").value;
+	var errors = [];
+
+	if (!checkLength(cname)) 
+	{
+		errors[errors.length] = "Connection Name";
+	}
+	if(!checkLength(port) || !checkNumber(port))
+	{
+		errors[errors.length] = "Port Number";
+	}
+	if (errors.length > 0) 
+	{
+		reportErrors(errors);
+		return false;
+	}
+	return true;
+}
 	function jsonconstruct(val) {
+		validate();
 		var data = {};
 		document.getElementById('button_type').value = val;
 		$(".form-control").serializeArray().map(function(x) {

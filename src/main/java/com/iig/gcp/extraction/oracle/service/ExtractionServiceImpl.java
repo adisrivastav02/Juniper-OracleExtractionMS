@@ -87,7 +87,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 		PreparedStatement pstm =null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p ON n.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=?");
+			pstm = connection.prepareStatement("SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p"
+					+ " ON n.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=? AND UPPER(n.PG_TYPE)='ORACLE'");
 			pstm.setString(1, project_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
