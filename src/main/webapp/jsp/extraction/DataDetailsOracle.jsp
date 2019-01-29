@@ -117,7 +117,7 @@
 		document.getElementById('x').value = x;
 		//alert(x);
 		//console.log(x);
-		//document.getElementById('DataDetails').submit();
+		document.getElementById('DataDetails').submit();
 	}
 	var i = 1;
 	function dup_div() {
