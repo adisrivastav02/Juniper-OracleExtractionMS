@@ -545,10 +545,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 		SourceSystemDetailBean ssm = null;
 		ArrayList<SourceSystemDetailBean> arrssm = new ArrayList<SourceSystemDetailBean>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		Statement stat =null;
+		ResultSet rs = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, " + 
+			String query = "select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, " + 
 					"listagg(target_unique_name,',') within group (order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence) " + 
 					"from (" + 
 					"select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,a.FEED_DESC,a.COUNTRY_CODE,a.EXTRACTION_TYPE,c.target_unique_name,b.SRC_CONN_SEQUENCE " + 
@@ -557,8 +558,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"left outer join JUNIPER_EXT_TARGET_CONN_MASTER c on b.target_sequence=c.target_conn_sequence " + 
 					"where a.FEED_SEQUENCE=" +src_sys_id+ ") " + 
 					"group by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence " +
-					"order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence");
-			ResultSet rs = pstm.executeQuery();
+					"order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence";
+			rs = stat.executeQuery(query);
 			while (rs.next()) {
 				ssm = new SourceSystemDetailBean();
 				ssm.setSrc_sys_id(rs.getInt(1));
@@ -575,7 +576,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 			System.out.println("Exception occured "+e);
 			throw e;
 		} finally {
-			pstm.close();
+			stat.close();
+			rs.close();
 			connection.close();
 		}
 		return arrssm;
@@ -1253,7 +1255,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) throws Exception {
+	public String getJsonFromFile(File file,String user,String project,String src_sys_id) throws Exception {
 		String json_array_str="";
 		if(file!=null) {
 			String[] col_val = new String[20];
@@ -1284,7 +1286,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 				item.put("user",user);
 				item.put("feed_id",src_sys_id);
 				item.put("counter",counter);
-				item.put("schema_name",schema_name);
 				item.put("load_type","bulk_load");
 
 
@@ -1314,8 +1315,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 								String WHERE_CLAUSE="where_clause"+r;
 								String FETCH_TYPE="fetch_type"+r;
 								String INCR_COL="incr_col"+r;
+								String schema_name="schema_name"+r;
 
 								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
+								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
 								if ( c == 1) item.put(COLUMNS,col_val[c] );
 								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
 								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
@@ -1329,8 +1332,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 								String WHERE_CLAUSE="where_clause"+r;
 								String FETCH_TYPE="fetch_type"+r;
 								String INCR_COL="incr_col"+r;
+								String schema_name="schema_name"+r;
 
 								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
+								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
 								if ( c == 1) item.put(COLUMNS,col_val[c] );
 								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
 								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
@@ -1354,6 +1359,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		}
 		return json_array_str;
 	}
+	
 	@Override
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException {
 		JSONArray array_metadata = new JSONArray();

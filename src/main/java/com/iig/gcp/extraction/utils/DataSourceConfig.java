@@ -62,6 +62,9 @@ class DataSourceConfig {
         jdbcConfig.setPoolName(poolName);
         jdbcConfig.setMaximumPoolSize(maximumPoolSize);
         jdbcConfig.setMinimumIdle(minimumIdle);
+        jdbcConfig.setLeakDetectionThreshold(10000);
+        jdbcConfig.setValidationTimeout(10000);
+        jdbcConfig.setConnectionTestQuery("select sysdate from dual");
         jdbcConfig.setJdbcUrl(dataSourceUrl);
         jdbcConfig.setUsername(user);
         jdbcConfig.setPassword(orcl_decoded_pwd);

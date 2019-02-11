@@ -447,7 +447,7 @@ public class ExtractionController {
 	}
 
 	@RequestMapping(value = "/extraction/DataDetailsOracle1", method = RequestMethod.POST)
-	public ModelAndView DataDetails1(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, @ModelAttribute("schema_name") String schema_name, ModelMap model,
+	public ModelAndView DataDetails1(@Valid @ModelAttribute("id") String id, @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, @ModelAttribute("schema_name") String schema_name, ModelMap model,
 		HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String href1=es.getBulkDataTemplate(src_sys_id);
 		String db_name=null;
@@ -461,6 +461,7 @@ public class ExtractionController {
 		model.addAttribute("tables", tables);
 		model.addAttribute("schema_name", schema_name);
 		model.addAttribute("src_sys_id", src_sys_id);
+		model.addAttribute("id", id);
 		return new ModelAndView("extraction/DataDetailsOracle1");
 	}
 
@@ -722,9 +723,8 @@ public class ExtractionController {
 		String resp = null;
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
-		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
 		JSONObject jsonObject= new JSONObject(json_array_str);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		json_array_str=jsonObject.toString();
@@ -769,8 +769,8 @@ public class ExtractionController {
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val", src_sys_val);
-		//model.addAttribute("src_sys_val1", src_sys_val1);
-		//model.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val1", src_sys_val1);
+		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -786,9 +786,8 @@ public class ExtractionController {
 		String resp = null;
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
-		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
 		
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 					resp = es.invokeRest(json_array_str, oracle_compute_url+"editTempTableInfo");
@@ -833,8 +832,8 @@ public class ExtractionController {
 		ArrayList<String> db_name = es.getHivedbList(project);
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val", src_sys_val);
-		//model.addAttribute("src_sys_val1", src_sys_val1);
-		//.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val1", src_sys_val1);
+		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", project);
 		return new ModelAndView("extraction/DataDetails" + src_val);
