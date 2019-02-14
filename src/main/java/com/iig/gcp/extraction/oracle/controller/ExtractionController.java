@@ -549,25 +549,23 @@ public class ExtractionController {
 		@RequestMapping(value = "/extraction/DataDetailsEditOracle", method = RequestMethod.POST)
 		public ModelAndView DataDetailsEdit(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request)
 			throws UnsupportedOperationException, Exception {
-		String href1=es.getBulkDataTemplate(src_sys_id);
+		/*String href1=es.getBulkDataTemplate(src_sys_id);
 		href1="field.xls";
+		model.addAttribute("href1", href1);*/
 		String db_name=null;
-		model.addAttribute("href1", href1);
 		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
 		model.addAttribute("conn_val", conn_val);
 		String ext_type = es.getExtType(src_sys_id);
 		model.addAttribute("ext_type", ext_type);
-		String schema_name = es.getSchemaData(src_val, src_sys_id);
-		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
-		model.addAttribute("tables", tables);
-		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
-		model.addAttribute("schem", schema_name);
+		ArrayList<String> schema_name = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"),db_name);
+		model.addAttribute("schema_name", schema_name);
+		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(),(String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("arrddb", arrddb);
+		model.addAttribute("counter_val",arrddb.size());
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetailsEditOracle");
 	}
-
 
 	@RequestMapping(value = "/extraction/ExtractData", method = RequestMethod.GET)
 	public ModelAndView ExtractData(ModelMap model, HttpServletRequest request) throws IOException {

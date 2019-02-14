@@ -11,7 +11,6 @@ $(document).ready(function() {
 		document.getElementById('load_type').style.display = "none";
 		document.getElementById('schdiv').innerHTML = "";
 		document.getElementById('datadiv').innerHTML = "";
-		document.getElementById('bord').style.display = "block";
 		var src_sys_id = document.getElementById("feed_id1").value;
 		var src_val = document.getElementById("src_val").value;
 		$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
@@ -20,6 +19,7 @@ $(document).ready(function() {
 			src_val : src_val
 		},
 		function(data) {
+			document.getElementById('bord').style.display = "block";
 			$('#datadiv').html(data)
 		});
 	});
@@ -82,6 +82,221 @@ function loadcheck(val) {
 			$('#datadiv').html(data)
 		});
 	}
+}
+
+function dup_div() {
+	var i = document.getElementById('counter').value;
+	i++;
+	$(function() {
+		$('<hr />').insertBefore('#schm_div'+i);
+	});
+	var clone = $("#schm_div1").clone().attr('id', 'schm_div' + i)
+			.insertAfter("#schm_div1");
+	/*clone.find("select").each(function() {
+		$(this).attr({
+			'id': function(_, id) { return id.slice(0,-1) + i },
+		    'name': function(_, name) { return name.slice(0,-1) + i },
+		    'value': ''               
+		});
+	}).end().appendTo("#datadiv");*/
+	clone.find("input[id!=schema_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("input[id=schema_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'list' : function(_, list) {
+				return list.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("datalist[id=schemas1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			}
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("button[id=del1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			}
+		});
+	}).end().appendTo("#datadiv");
+	var clone1 = $("#datdiv1").clone().attr('id', 'datdiv' + i)
+			.insertAfter("#datdiv1");
+	clone1.find("input[id!=table_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("input[id=table_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'list' : function(_, list) {
+				return list.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("datalist[id=tables1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			}
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("textarea[id=where_clause1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("select[id=fetch_type1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("select[id=incr_col1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("div").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				if (id)
+					return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				if (name)
+					return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			}
+		});
+	}).end().appendTo("#datadiv");
+	$('#schema_name' + i).find('option').remove().end().append(
+			'<option value="">Schema ...</option>').val('');
+	$('#table_name' + i).find('option').remove().end().append(
+			'<option value="">Table ...</option>').val('');
+	$('#col_name' + i).find('option').remove().end().append(
+			'<option value="">Columns ...</option>').val('');
+	$('#avl' + i).empty();
+	$('#sel' + i).empty();
+	$('#tok' + i).empty();
+	document.getElementById('counter').value = i;
+}
+function allowDrop(ev) {
+	ev.preventDefault();
+}
+function drag(ev) {
+	ev.dataTransfer.setData("text", ev.target.id);
+}
+function drop(ev, el) {
+	ev.preventDefault();
+	var data = ev.dataTransfer.getData("text");
+	el.appendChild(document.getElementById(data));
+}
+
+function delblock(id)
+{
+	var i=document.getElementById('counter').value;
+	if(i==1)
+		return false;
+	id = (isNaN(id.slice(-2, -1)) ? (id.slice(-1)) : (id.slice(-2)));
+	$('#schm_div'+id).remove();
+	$('#datdiv'+id).remove();
+	
+	if(id===i);
+	else
+	{	//sort order by element inspection to be maintained
+		$("#schm_div"+i).attr("id","schm_div"+id);
+		$("#schema_name"+i).attr("name","schema_name"+id);
+		$("#schema_name"+i).attr("list","schemas"+id);
+		$("#schema_name"+i).attr("id","schema_name"+id);
+		$("#schemas"+i).attr("id","schemas"+id);
+		$("#del"+i).attr("id","del"+id);
+		$("#datdiv"+i).attr("id","datdiv"+id);
+		$("#ind_load"+i).attr("id","ind_load"+id);
+		$("#tbl_fld"+i).attr("id","tbl_fld"+id);
+		$("#table_name"+i).attr("name","table_name"+id);
+		$("#table_name"+i).attr("list","table_name"+id);
+		$("#table_name"+i).attr("id","table_name"+id);
+		$("#tables"+i).attr("id","tables"+id);
+		$("#fetch_type"+i).attr("name","fetch_type"+id);
+		$("#fetch_type"+i).attr("id","fetch_type"+id);
+		$("#fldd"+i).attr("id","fldd"+id);
+		$("#incc"+i).attr("id","incc"+id);
+		$("#incr_col"+i).attr("name","incr_col"+id);
+		$("#incr_col"+i).attr("id","incr_col"+id);
+		$("#avl"+i).attr("id","avl"+id);
+		$("#sel"+i).attr("id","sel"+id);
+		$("#tok"+i).attr("id","tok"+id);
+		$("#col_name"+i).attr("name","col_name"+id);
+		$("#col_name"+i).attr("id","col_name"+id);
+		$("#columns_name"+i).attr("name","columns_name"+id);
+		$("#columns_name"+i).attr("id","columns_name"+id);
+		$("#token"+i).attr("name","token"+id);
+		$("#token"+i).attr("id","token"+id);
+		$("#where_clause"+i).attr("name","where_clause"+id);
+		$("#where_clause"+i).attr("id","where_clause"+id);
+		$('#avl'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+		$('#sel'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+		$('#tok'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+	}
+	i--;
+	document.getElementById('counter').value=i;
 }
 
 function jsonconstruct() {
