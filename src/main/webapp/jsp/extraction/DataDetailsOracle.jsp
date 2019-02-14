@@ -406,8 +406,8 @@ function jsonconstruct() {
 	});
 	var x = '{"header":{},"body":{"data":' + JSON.stringify(data) + '}}';
 	document.getElementById('x').value = x;
-	alert(x);
-	console.log(x);
+	//alert(x);
+	//console.log(x);
 	document.getElementById('DataDetails').submit();
 }
 </script>
