@@ -5,6 +5,7 @@ $(document).ready(function() {
 	document.getElementById('counter').value="${counter_val}";
 	document.getElementById('but').style.display = "block";
 });
+document.getElementById('bord').style.display = "block";
 </script>
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">

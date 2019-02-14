@@ -1,47 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<script>
-function getcols(id, val) {
-	var in1 = id.slice(-1);
-	var in2 = id.slice(-2, -1);
-	if (in2 === "e")
-		;
-	else {
-		in1 = id.slice(-2);
-	}
-	var id = in1;
-	var table_name = val;
-	var src_val = document.getElementById("src_val").value;
-	var connection_id = document.getElementById("connection_id").value;
-	var schema_name = document.getElementById("schema_name"+id).value;
-	$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
-	{
-		id : id,
-		src_val : src_val,
-		table_name : table_name,
-		connection_id : connection_id,
-		schema_name : schema_name
-	}, function(data) {
-		$("#fldd"+id).html(data);
-	});
-}
-function incr(id, val) {
-	var in1 = id.slice(-1);
-	var in2 = id.slice(-2, -1);
-	if (in2 === "e")
-		;
-	else {
-		in1 = id.slice(-2);
-	}
-	var in3 = 'incc' + in1;
-	if (val == "incr") {
-		document.getElementById(in3).style.display = "block";
-	} else if (val == "full") {
-		document.getElementById(in3).style.display = "none";
-	}
-}
-</script>
-
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
 
