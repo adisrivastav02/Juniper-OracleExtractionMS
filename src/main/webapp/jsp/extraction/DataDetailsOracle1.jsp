@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
 <input type="hidden" name="counter" id="counter" class="form-control"
