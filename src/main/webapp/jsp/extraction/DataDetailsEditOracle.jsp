@@ -1,13 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 
-<script>
-$(document).ready(function() {
-	document.getElementById('counter').value="${counter_val}";
-	document.getElementById('but').style.display = "block";
-});
-document.getElementById('bord').style.display = "block";
-</script>
+
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
 <input type="hidden" name="counter" id="counter" class="form-control"
