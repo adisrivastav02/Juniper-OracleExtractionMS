@@ -2,65 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script>
 	function jsonconstruct(val) {
-		var errors = [];
-		var target_unique_name = document.getElementById("target_unique_name").value;
-		var target_type = document.getElementById("target_type").value;
-		var system = document.getElementById("system").value;
-		if (target_type == 'GCS') {
-			var target_project = document.getElementById("target_project").value;
-			var service_account = document.getElementById("service_account").value;
-			var target_bucket = document.getElementById("target_bucket").value;
-			if (!checkLength(target_project)) {
-				errors[errors.length] = "Target Project";
-			}
-			if (!checkLength(service_account)) {
-				errors[errors.length] = "Service Account";
-			}
-			if (!checkLength(target_bucket)) {
-				errors[errors.length] = "Target Bucket";
-			}
-		}
-		if (target_type == 'HDFS') {
-			var knox_host = document.getElementById("knox_host").value;
-			var knox_port = document.getElementById("knox_port").value;
-			var username = document.getElementById("username").value;
-			var password = document.getElementById("password").value;
-			var hdfs_gateway = document.getElementById("hdfs_gateway").value;
-			var hadoop_path = document.getElementById("hadoop_path").value;
-			if (!checkLength(knox_host)) {
-				errors[errors.length] = "Knox Host";
-			}
-			if (!checkLength(knox_port) || !checkNumber(knox_port)) {
-				errors[errors.length] = "Knox Port";
-			}
-			if (!checkLength(username)) {
-				errors[errors.length] = "Username";
-			}
-			if (!checkLength(password)) {
-				errors[errors.length] = "Password";
-			}
-			if (!checkLength(hdfs_gateway)) {
-				errors[errors.length] = "HDFS Gateway";
-			}
-			if (!checkLength(hadoop_path)) {
-				errors[errors.length] = "HDFS Path";
-			}
-		}
-		if (!checkLength(target_unique_name)) {
-			errors[errors.length] = "Target Name";
-		}
-		if (!checkLength(target_type)) {
-			errors[errors.length] = "Target Type";
-		}
-		if (!checkLength(system)) {
-			errors[errors.length] = "System";
-		}
-
-		if (errors.length > 0) {
-			reportErrors(errors);
-			return false;
-		}
-
 		var data = {};
 		if (document.getElementById("materialization_flag").value == "")
 			document.getElementById("materialization_flag").value = 'N';
@@ -148,7 +89,7 @@
 	function funccheck(val) {
 		if (val == 'create') {
 			//window.location.reload();
-			window.location.href = "${pageContext.request.contextPath}/extraction/TargetDetails";
+			window.location.href="${pageContext.request.contextPath}/extraction/TargetDetails";
 		} else {
 			document.getElementById('tgtfunc').style.display = "block";
 		}
@@ -159,10 +100,10 @@
 		var text = document.getElementById("materialization_flag");
 		if (checkBox.checked == true) {
 			text.value = 'Y';
-			document.getElementById("hivediv").style.display = "block";
+			document.getElementById("hivediv").style.display="block";
 		} else {
 			text.value = 'N';
-			document.getElementById("hivediv").style.display = "none";
+			document.getElementById("hivediv").style.display="none";
 		}
 	}
 
@@ -172,8 +113,7 @@
 						$("#target_project")
 								.change(
 										function() {
-											var project1 = document
-													.getElementById('target_project').value;
+											var project1 = document.getElementById('target_project').value;
 											$
 													.post(
 															'${pageContext.request.contextPath}/extraction/TargetDetails0',
@@ -187,13 +127,11 @@
 															});
 										});
 						$("#success-alert").hide();
-						$("#success-alert").fadeTo(10000, 10).slideUp(2000,
-								function() {
-								});
-						$("#error-alert").hide();
-						$("#error-alert").fadeTo(10000, 10).slideUp(2000,
-								function() {
-								});
+			              $("#success-alert").fadeTo(10000,10).slideUp(2000, function(){
+			              });   
+			       $("#error-alert").hide();
+			              $("#error-alert").fadeTo(10000,10).slideUp(2000, function(){
+			               });
 					});
 </script>
 
@@ -206,25 +144,25 @@
 						<h4 class="card-title">Data Extraction</h4>
 						<p class="card-description">Target Details</p>
 						<%
-							if (request.getAttribute("successString") != null) {
-						%>
-						<div class="alert alert-success" id="success-alert">
-							<button type="button" class="close" data-dismiss="alert">x</button>
-							${successString}
-						</div>
-						<%
-							}
-						%>
-						<%
-							if (request.getAttribute("errorString") != null) {
-						%>
-						<div class="alert alert-danger" id="error-alert">
-							<button type="button" class="close" data-dismiss="alert">x</button>
-							${errorString}
-						</div>
-						<%
-							}
-						%>
+               if(request.getAttribute("successString") != null) {
+               %>
+            <div class="alert alert-success" id="success-alert">
+               <button type="button" class="close" data-dismiss="alert">x</button>
+               ${successString}
+            </div>
+            <%
+               }
+               %>
+            <%
+               if(request.getAttribute("errorString") != null) {
+               %>
+            <div class="alert alert-danger" id="error-alert">
+               <button type="button" class="close" data-dismiss="alert">x</button>
+               ${errorString}
+            </div>
+            <%
+               }
+               %>
 						<form class="forms-sample" id="TargetDetails" name="TargetDetails"
 							method="POST"
 							action="${pageContext.request.contextPath}/extraction/TargetDetails1"
@@ -233,11 +171,11 @@
 								type="hidden" name="counter" id="counter" class="form-control"
 								value="1"> <input type="hidden" name="button_type"
 								id="button_type" value=""> <input type="hidden"
-								name="materialization_flag" id="materialization_flag" value=""
-								class="form-control"> <input type="hidden"
-								name="project" id="project" class="form-control"
-								value="${project}"> <input type="hidden" name="user"
-								id="user" class="form-control" value="${usernm}">
+								name="materialization_flag" id="materialization_flag" value="" class="form-control">
+							<input type="hidden" name="project" id="project"
+								class="form-control" value="${project}"> <input
+								type="hidden" name="user" id="user" class="form-control"
+								value="${usernm}">
 
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Target</label>
@@ -345,8 +283,9 @@
 												<div class="form-group row">
 													<div class="col-sm-6">
 														<label>HDFS Gateway *</label> <input type="text"
-															class="form-control" id="hdfs_gateway"
-															name="hdfs_gateway" placeholder="HDFS Gateway" value="">
+															class="form-control" id="hdfs_gateway" name="hdfs_gateway"
+															placeholder="HDFS Gateway"
+															value="">
 													</div>
 													<div class="col-sm-6">
 														<label>HDFS Path *</label> <input type="text"
@@ -363,21 +302,23 @@
 															Materialization <i class="input-helper"></i></label>
 													</div>
 												</div>
-												<div id="hivediv" style="display: none;">
-													<div class="form-group row">
-														<div class="col-sm-6">
-															<label>Hive JDBC URL *</label> <input type="text"
-																class="form-control" id="hive_gateway"
-																name="hive_gateway" placeholder="Hive JDBC URL" value="">
-														</div>
-														<div class="col-sm-6">
-															<label>Load Type *</label> <select name="partition_flag"
-																id="partition_flag" class="form-control">
+												<div id="hivediv" style="display:none;">
+												<div class="form-group row">
+												<div class="col-sm-6">
+														<label>Hive JDBC URL *</label> <input type="text"
+															class="form-control" id="hive_gateway" name="hive_gateway"
+															placeholder="Hive JDBC URL"
+															value="">
+													</div>
+													<div class="col-sm-6">
+														<label>Load Type *</label> <select
+															name="partition_flag" id="partition_flag"
+															class="form-control">
 																<option value="Y">Partitioned Data</option>
 																<option value="N">New Database</option>
-															</select>
-														</div>
+														</select>
 													</div>
+												</div>
 												</div>
 											</div>
 											<div id="u1" class="ux" style="display: none;">
@@ -418,7 +359,7 @@
 										onclick="return dup_div();">+</button>
 								</div>-->
 								</fieldset>
-								<button onclick="return jsonconstruct('addTarget');"
+								<button onclick="jsonconstruct('addTarget');"
 									class="btn btn-rounded btn-gradient-info mr-2">Save</button>
 							</div>
 						</form>

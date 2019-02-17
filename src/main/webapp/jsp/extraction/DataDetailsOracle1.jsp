@@ -48,6 +48,6 @@
 			class="btn btn-rounded btn-gradient-info mr-2"
 			onclick="return dup_div();">+</button>
 	</div>
-	<button onclick="return jsonconstruct();"
+	<button onclick="jsonconstruct();"
 		class="btn btn-rounded btn-gradient-info mr-2">Save</button>
 </div>

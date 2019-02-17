@@ -69,7 +69,7 @@
 				</select>
 			</div>
 			<div class="col-sm-6">
-				<label>Country *</label> <select class="form-control"
+				<label>Country</label> <select class="form-control"
 					id="country_code" name="country_code">
 					<option value="" selected disabled>Country ...</option>
 					<c:forEach items="${countries}" var="countries">
@@ -87,9 +87,9 @@
 		</div>
 		<div id="scheduling_div" style="display: none;"></div>
 	</fieldset>
-	<button onclick="return jsonconstruct('updSystem');"
+	<button onclick="jsonconstruct('updSystem');"
 		class="btn btn-rounded btn-gradient-info mr-2">Update</button>
-	<button onclick="return jsonconstruct('delSystem');"
+	<button onclick="jsonconstruct('delSystem');"
 		class="btn btn-rounded btn-gradient-info mr-2">Delete</button>
 </c:forEach>
 

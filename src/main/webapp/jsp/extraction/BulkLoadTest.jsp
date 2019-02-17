@@ -7,32 +7,24 @@
 
 <script>
 	function bulkjsonconstruct() {
-		var errors = [];
-		var selection = $("input[name='radio']:checked").val();
-		if (selection == 'create') {
-			var feed_id = document.getElementById("feed_id").value;
-			var src_val = document.getElementById("src_val").value;
-			var file = document.getElementById("file").value;
-			if (document.getElementById("file").files.length == 0) {
-				errors[errors.length] = "Upload File Details";
-			}
-			if (errors.length > 0) {
-				reportErrors(errors);
-				return false;
-			}
-			$('#DataDetails')
-					.attr('action',
-							'${pageContext.request.contextPath}/extraction/CreateBulkLoadDetails')
-					.attr('enctype', "multipart/form-data");
-		} else if (selection == 'edit') {
+		var selection=$("input[name='radio']:checked").val();	
+			if(selection == 'create'){
 			var feed_id = document.getElementById("feed_id").value;
 			var src_val = document.getElementById("src_val").value;
 			var file = document.getElementById("file").value;
 			$('#DataDetails')
-					.attr('action',
-							'${pageContext.request.contextPath}/extraction/EditBulkLoadDetails')
-					.attr('enctype', "multipart/form-data");
-		}
+				.attr('action',
+						'${pageContext.request.contextPath}/extraction/CreateBulkLoadDetails')
+				.attr('enctype', "multipart/form-data");
+			}else if (selection == 'edit'){
+			var feed_id = document.getElementById("feed_id").value;
+			var src_val = document.getElementById("src_val").value;
+			var file = document.getElementById("file").value;
+			$('#DataDetails')
+				.attr('action',
+						'${pageContext.request.contextPath}/extraction/EditBulkLoadDetails')
+				.attr('enctype', "multipart/form-data");
+			}
 	}
 </script>
 <div id="bulk_load">
@@ -50,7 +42,7 @@
 			</span>
 		</div>
 	</div>
-	<button onclick="return bulkjsonconstruct();" id="upload"
+	<button onclick="bulkjsonconstruct();" id="upload"
 		class="btn btn-rounded btn-gradient-info mr-2">Upload</button>
 </div>
 <script src="../../assets/js/file-upload.js"></script>

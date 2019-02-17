@@ -147,5 +147,5 @@
 			onclick="return dup_div();">+</button>
 	</div>
 </div>
-<button onclick="return jsonconstruct();"
+<button onclick="jsonconstruct();"
 	class="btn btn-rounded btn-gradient-info mr-2">Update</button>

@@ -2,37 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script>
 	function jsonconstruct(val) {
-		var feed_name = document.getElementById("feed_name").value;
-		var feed_desc = document.getElementById("feed_desc").value;
-		var src_connection_id = document.getElementById("src_connection_id").value;
-		var targetx = document.getElementById("targetx").value;
-		var feed_extract_type = document.getElementById("feed_extract_type").value;
-		var country_code = document.getElementById("country_code").value;
-		var errors = [];
-
-		if (!checkLength(feed_name)) {
-			errors[errors.length] = "Feed Name";
-		}
-		if (!checkLength(feed_desc)) {
-			errors[errors.length] = "Feed Description";
-		}
-		if (!checkLength(src_connection_id)) {
-			errors[errors.length] = "Source";
-		}
-		if (!checkLength(targetx)) {
-			errors[errors.length] = "Target";
-		}
-		if (!checkLength(feed_extract_type)) {
-			errors[errors.length] = "Extraction Type";
-		}
-		if (!checkLength(country_code)) {
-			errors[errors.length] = "Country";
-		}
-		if (errors.length > 0) {
-			reportErrors(errors);
-			return false;
-		}
-		
 		multisel('targetx', 'target');
 		var data = {};
 		document.getElementById('button_type').value = val;
@@ -228,7 +197,7 @@
 										</select>
 									</div>
 									<div class="col-sm-6">
-										<label>Country *</label> <select class="form-control"
+										<label>Country</label> <select class="form-control"
 											id="country_code" name="country_code">
 											<option value="" selected disabled>Country ...</option>
 											<c:forEach items="${countries}" var="countries">
@@ -257,7 +226,7 @@
 									</div>-->
 								</div>
 							</fieldset>
-							<button onclick="return jsonconstruct('onboardSystem');"
+							<button onclick="jsonconstruct('onboardSystem');"
 								class="btn btn-rounded btn-gradient-info mr-2">Save</button>
 								</div>
 						</form>
