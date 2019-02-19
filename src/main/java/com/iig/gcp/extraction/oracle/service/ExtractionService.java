@@ -39,7 +39,7 @@ public interface ExtractionService {
 	public ArrayList<String> getFields(String id,String src_val,String table_name,int conn_id, String schema_name, String project_id,String db_name) throws Exception;
 	public ArrayList<CountryMaster> getCountries() throws Exception;
 	public ArrayList<ReservoirMaster> getReservoirs() throws Exception;
-	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String schema_name, String project_id,String db_name) throws Exception;
+	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String project_id,String db_name) throws Exception;
 	public int checkNames(String sun) throws Exception;
 	public ArrayList<String> getSchema(String src_val,int conn_id, String project_id,String db_name) throws Exception;
 	public ArrayList<String> getSystem(String project) throws Exception, Exception;
@@ -47,7 +47,7 @@ public interface ExtractionService {
 	public ArrayList<DriveMaster> getDrives(String project_id) throws Exception;
 	public ArrayList<DriveMaster> getDrives1(int src_sys_id) throws Exception;
 	public DriveMaster getDrivesDetails(int drive_id) throws Exception;
-	public String getSchemaData(String src_val,int src_sys_id) throws Exception;
+	public ArrayList<String> getSchemaData(String src_val,int src_sys_id) throws Exception;
 	public void updateLoggerTable(String src_unique_name) throws Exception;
 	public ArrayList<String> getGoogleProject(String project_id) throws Exception;
 	public ArrayList<String> getServiceBucket(String project, String project_id) throws Exception;
@@ -59,7 +59,7 @@ public interface ExtractionService {
 	public ArrayList<String> getKafkaTopic() throws Exception;
 	public ArrayList<String> getColList(String table_name) throws Exception;
 	public String getDatabaseData(String src_val, int src_sys_id) throws Exception;
-	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) throws Exception;
+	public String getJsonFromFile(File file,String user,String project,String src_sys_id) throws Exception;
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException;
 	
 }

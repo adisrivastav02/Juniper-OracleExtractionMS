@@ -8,19 +8,57 @@
 		</c:forEach>
 	</select>
 </div>
-<div class="form-group">
-	<label>Select Columns *</label> <select class="form-control"
-		id="col_name${id}" name="col_name${id}" multiple="multiple">
-		<option value="*">Select All</option>
-		<c:forEach var="fields" items="${fields}">
-			<option value="${fields}">${fields}</option>
-		</c:forEach>
-	</select>
-</div>
-<input type="hidden" name="columns_name${id}" id="columns_name${id}" class="form-control">
 
-<script> 
-	var cnt = document.getElementById('counter').value;
-	var select = document.getElementById('col_name'+cnt);
-	multi(select, {});
+<div>
+	<div
+		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Available
+		Fields</div>
+	<div
+		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Selected
+		Fields</div>
+	<div
+		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Tokenized
+		Fields</div>
+</div>
+<div>
+	<div
+		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		id="avl${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)">
+		<button id="but${id}" name="but${id}" value="*" class="btn btn-dark"
+			draggable="true" ondragstart="drag(event)"
+			style="width: 90%; margin: 5px; padding: 10px 0px;"
+			onclick="return false;">Select All</button>
+		<c:forEach var="fields" items="${fields}">
+			<button id="${fields}${id}" name="${fields}${id}" value="${fields}"
+				class="btn btn-dark" draggable="true" ondragstart="drag(event)"
+				style="width: 90%; margin: 5px; padding: 10px 0px;"
+				onclick="return false;">${fields}</button>
+		</c:forEach>
+	</div>
+	<div
+		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		id="sel${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)"></div>
+	<div
+		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		id="tok${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)"></div>
+</div>
+
+<input type="hidden" name="col_name${id}" id="col_name${id}"
+	class="form-control">
+<input type="hidden" name="columns_name${id}" id="columns_name${id}"
+	class="form-control">
+<input type="hidden" name="token${id}" id="token${id}"
+	class="form-control">
+<div class="form-group">
+	<label>Where Condition *</label>
+	<textarea class="form-control" id="where_clause${id}"
+		name="where_clause${id}" style="width: 100%;"
+		placeholder="column1='filter1' and (column2>'filter2' or column3<'filter3')"></textarea>
+</div>
+
+<script>
+	/*var cnt = document.getElementById('counter').value;
+	var	select = document.getElementById('col_name' + cnt);
+	multi(select, {});*/
+	document.getElementById('but').style.display = "block";
 </script>

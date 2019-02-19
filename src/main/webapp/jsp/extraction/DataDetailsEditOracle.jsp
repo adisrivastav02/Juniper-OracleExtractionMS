@@ -1,151 +1,174 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
-
-
+<script>
+$(document).ready(function() {
+	document.getElementById('counter').value="${counter_val}";
+	document.getElementById('but').style.display = "block";
+});
+document.getElementById('bord').style.display = "block";
+</script>
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
-<input type="hidden" name="counter" id="counter" class="form-control"
-	value="1">
-<div class="form-group">
-	<label>Schema Name *</label> <select name="schema_name"
-		id="schema_name" class="form-control" readonly="readonly">
-		<option value="${schem}">${schem}</option>
-	</select>
-</div>
-<div id="ind_load"
-	style="border: 1px groove #DCDCDC; border-radius: 10px; padding: 10px;"
-	style.display="none";>
-	<div id="tbl_fld">
-		<c:forEach items="${arrddb}" var="arrddb" varStatus="theCount">
-			<div id="delete${theCount.count}" style="float: right;">
-				<button id="del${theCount.count}" type="button"
-					class="btn btn-rounded btn-gradient-danger mr-2"
-					onclick="delblock(this.id.slice(-1))">X</button>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-6">
-					<label>Select Table *</label> <select class="form-control"
-						id="table_name${theCount.count}"
-						name="table_name${theCount.count}"
-						onchange="getcols(this.id,this.value)">
-						<c:forEach items="${tables}" var="tables">
+<c:forEach items="${arrddb}" var="arrddb" varStatus="theCount">
+	<div class="form-group row" id="schm_div${theCount.count}">
+		<div class="col-sm-10">
+			<label>Schema Name *</label> <input list="schemas${theCount.count}"
+				name="schema_name${theCount.count}" value="${arrddb.schema_name}"
+				id="schema_name${theCount.count}" class="form-control"
+				onchange="getsch(this.id,this.value)">
+			<datalist id="schemas${theCount.count}">
+			<c:forEach items="${schema_name}" var="schema_name">
+				<option value="${schema_name}">
+			</c:forEach>
+			</datalist>
+		</div>
+		<div class="col-sm-2">
+			<button id="del${theCount.count}" type="button"
+				class="btn btn-rounded btn-gradient-danger mr-2"
+				onclick="delblock(this.id)">X</button>
+		</div>
+	</div>
+	<div id="datdiv${theCount.count}">
+		<div id="ind_load${theCount.count}">
+			<div id="tbl_fld${theCount.count}">
+				<div class="form-group row">
+					<div class="col-sm-6">
+						<label>Select Table *</label> <input
+							list="tables${theCount.count}" name="table_name${theCount.count}" 
+							id="table_name${theCount.count}" value="${arrddb.schema_name}.${arrddb.table_name}" class="form-control"
+							onchange="getcols(this.id,this.value)">
+						<datalist id="tables${theCount.count}">
+							<option value="${arrddb.schema_name}.${arrddb.table_name}">
+						</datalist>
+					</div>
+					<div class="col-sm-6">
+						<label>Load Type *</label> <select class="form-control"
+							id="fetch_type${theCount.count}"
+							name="fetch_type${theCount.count}"
+							onchange="incr(this.id,this.value)">
 							<c:choose>
-								<c:when test="${arrddb.table_name_short==tables}">
-									<option value="${schem}.${tables}" selected>${tables}</option>
+								<c:when test="${ext_type=='Real'}">
+									<option value="full" selected>Full Load</option>
 								</c:when>
 								<c:otherwise>
-									<option value="${schem}.${tables}">${tables}</option>
+									<c:choose>
+										<c:when test="${arrddb.fetch_type=='full'}">
+											<option value="full" selected>Full Load</option>
+										</c:when>
+										<c:when test="${arrddb.fetch_type=='incr'}">
+											<option value="incr" selected>Incremental Load</option>
+										</c:when>
+										<c:otherwise>
+											<option value="full">Full Load</option>
+											<option value="incr">Incremental Load</option>
+										</c:otherwise>
+									</c:choose>
 								</c:otherwise>
 							</c:choose>
-						</c:forEach>
-					</select>
+						</select>
+					</div>
 				</div>
-				<div class="col-sm-6">
-					<label>Load Type *</label> <select class="form-control"
-						id="fetch_type${theCount.count}"
-						name="fetch_type${theCount.count}"
-						onchange="incr(this.id,this.value)">
-						<c:choose>
-							<c:when test="${arrddb.fetch_type=='full'}">
-								<option value="full" selected>Full Load</option>
-								<option value="incr">Incremental Load</option>
-							</c:when>
-							<c:otherwise>
-								<option value="full">Full Load</option>
-								<option value="incr" selected>Incremental Load</option>
-							</c:otherwise>
-						</c:choose>
-					</select>
-				</div>
-			</div>
-			<div id="fldd${theCount.count}">
-				<c:choose>
-					<c:when test="${arrddb.fetch_type=='incr'}">
-						<div class="form-group" id="incc${theCount.count}"
-							style="display: block;">
-							<label>Select Incremental Column *</label> <select
-								class="form-control" id="incr_col${theCount.count}"
-								name="incr_col${theCount.count}">
-								<c:forTokens items="${arrddb.cols}" delims="," var="mySplitx">
-									<c:choose>
-										<c:when test="${arrddb.incremental_column==mySplitx}">
-											<option value="${mySplitx}" selected>${mySplitx}</option>
-										</c:when>
-										<c:otherwise>
-											<option value="${mySplitx}">${mySplitx}</option>
-										</c:otherwise>
-									</c:choose>
-								</c:forTokens>
-							</select>
-						</div>
-					</c:when>
-					<c:otherwise>
-						<div class="form-group" id="incc${theCount.count}"
-							style="display: none;">
-							<label>Select Incremental Column *</label> <select
-								class="form-control" id="incr_col${theCount.count}"
-								name="incr_col${theCount.count}">
-								<c:forTokens items="${arrddb.cols}" delims="," var="mySplitx">
-									<c:choose>
-										<c:when test="${arrddb.incremental_column==mySplitx}">
-											<option value="${mySplitx}" selected>${mySplitx}</option>
-										</c:when>
-										<c:otherwise>
-											<option value="${mySplitx}">${mySplitx}</option>
-										</c:otherwise>
-									</c:choose>
-								</c:forTokens>
-							</select>
-						</div>
-					</c:otherwise>
-				</c:choose>
-				<div class="form-group">
-					<label>Select Columns *</label> <select class="form-control"
-						id="col_name${theCount.count}" name="col_name${theCount.count}"
-						multiple="multiple">
-						<option value="*">Select All</option>
-						<c:forTokens items="${arrddb.cols}" delims="," var="mySplit">
-							<c:set var="val" scope="session" value="0" />
-							<c:forTokens items="${arrddb.column_name}" delims=","
-								var="mySplit1">
-								<c:choose>
-									<c:when test="${mySplit1==mySplit}">
-										<option value="${mySplit}" selected>${mySplit}</option>
-										<c:set var="val" scope="session" value="1" />
-									</c:when>
-									<c:otherwise>
-									</c:otherwise>
-								</c:choose>
+				<div id="fldd${theCount.count}">
+					<c:choose>
+						<c:when test="${arrddb.fetch_type=='incr'}">
+							<div class="form-group" id="incc${theCount.count}"
+								style="display: block;">
+								<label>Select Incremental Column *</label> <select
+									class="form-control" id="incr_col${theCount.count}"
+									name="incr_col${theCount.count}">
+									<c:forTokens items="${arrddb.cols}" delims="," var="mySplitx">
+										<c:choose>
+											<c:when test="${arrddb.incr_column==mySplitx}">
+												<option value="${mySplitx}" selected>${mySplitx}</option>
+											</c:when>
+											<c:otherwise>
+												<option value="${mySplitx}">${mySplitx}</option>
+											</c:otherwise>
+										</c:choose>
+									</c:forTokens>
+								</select>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="form-group" id="incc${theCount.count}"
+								style="display: none;">
+								<label>Select Incremental Column *</label> <select
+									class="form-control" id="incr_col${theCount.count}"
+									name="incr_col${theCount.count}">
+									<c:forTokens items="${arrddb.cols}" delims="," var="mySplitx">
+										<c:choose>
+											<c:when test="${arrddb.incr_column==mySplitx}">
+												<option value="${mySplitx}" selected>${mySplitx}</option>
+											</c:when>
+											<c:otherwise>
+												<option value="${mySplitx}">${mySplitx}</option>
+											</c:otherwise>
+										</c:choose>
+									</c:forTokens>
+								</select>
+							</div>
+						</c:otherwise>
+					</c:choose>
+
+					<div>
+						<div
+							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Available
+							Fields</div>
+						<div
+							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Selected
+							Fields</div>
+						<div
+							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Tokenized
+							Fields</div>
+					</div>
+					<div>
+						<div
+							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							id="avl${theCount.count}" ondrop="drop(event,this)"
+							ondragover="allowDrop(event)">
+							<button id="but${theCount.count}" name="but${theCount.count}"
+								value="*" class="btn btn-dark" draggable="true"
+								ondragstart="drag(event)"
+								style="width: 90%; margin: 5px; padding: 10px 0px;"
+								onclick="return false;">Select All</button>
+							<c:forTokens items="${arrddb.unsel_cols}" delims="," var="mySplit">
+								<button id="${mySplit}${theCount.count}" name="${mySplit}${theCount.count}" value="${mySplit}"
+									class="btn btn-dark" draggable="true" ondragstart="drag(event)"
+									style="width: 90%; margin: 5px; padding: 10px 0px;"
+									onclick="return false;">${mySplit}</button>
 							</c:forTokens>
-							<c:if test="${val==0}">
-								<option value="${mySplit}">${mySplit}</option>
-							</c:if>
-						</c:forTokens>
-					</select>
+						</div>
+						<div
+							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							id="sel${theCount.count}" ondrop="drop(event,this)"
+							ondragover="allowDrop(event)">
+							<c:forTokens items="${arrddb.column_name}" delims="," var="mySplit">
+								<button id="${mySplit}${theCount.count}" name="${mySplit}${theCount.count}" value="${mySplit}"
+									class="btn btn-dark" draggable="true" ondragstart="drag(event)"
+									style="width: 90%; margin: 5px; padding: 10px 0px;"
+									onclick="return false;">${mySplit}</button>
+							</c:forTokens>
+							</div>
+						<div
+							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							id="tok${theCount.count}" ondrop="drop(event,this)"
+							ondragover="allowDrop(event)"></div>
+					</div>
+
+					<input type="hidden" name="col_name${theCount.count}"
+						id="col_name${theCount.count}" class="form-control"> <input
+						type="hidden" name="columns_name${theCount.count}"
+						id="columns_name${theCount.count}" class="form-control"> <input
+						type="hidden" name="token${theCount.count}"
+						id="token${theCount.count}" class="form-control">
+					<div class="form-group">
+						<label>Where Condition *</label>
+						<textarea class="form-control" id="where_clause${theCount.count}"
+							name="where_clause${theCount.count}" style="width: 100%;"
+							placeholder="column1='filter1' and (column2>'filter2' or column3<'filter3')">${arrddb.where_clause}</textarea>
+					</div>
 				</div>
-				<input type="hidden" name="columns_name${theCount.count}"
-					id="columns_name${theCount.count}" class="form-control">
-				<script>
-					document.getElementById('counter').value = '${theCount.count}';
-					var cnt = document.getElementById('counter').value;
-					var select = document.getElementById('col_name' + cnt);
-					multi(select, {});
-				</script>
 			</div>
-			<div class="form-group">
-				<label>Where Condition *</label>
-				<textarea class="form-control" id="where_clause${theCount.count}"
-					name="where_clause${theCount.count}" style="width: 100%;"
-					placeholder="column1='filter1' and (column2>'filter2' or column3<'filter3')">${arrddb.where_clause}</textarea>
-			</div>
-		</c:forEach>
+		</div>
 	</div>
-	<div class="form-group"
-		style="float: right; margin: 5px; margin-top: 10px;">
-		<button id="upd" type="button"
-			class="btn btn-rounded btn-gradient-info mr-2"
-			onclick="return dup_div();">+</button>
-	</div>
-</div>
-<button onclick="return jsonconstruct();"
-	class="btn btn-rounded btn-gradient-info mr-2">Update</button>
+</c:forEach>

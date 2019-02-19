@@ -474,7 +474,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		for (int i = 0; i < tbls.length; i++) {
 			try {
 				String tblsx[] = tbls[i].split("\\.");
-				query = "SELECT column_name FROM all_tab_cols where table_name='" + tblsx[1] + "' and owner='"+schema_name+"' order by column_name";
+				query = "SELECT column_name FROM all_tab_cols where table_name='" + tblsx[1] + "' and owner='"+schema_name+"' and column_id is not null order by column_name";
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";
 				String pass = EncryptionUtil.decyptPassword(encrypt, password);
@@ -520,7 +520,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"where a.project_sequence=(select project_sequence from juniper_project_master where project_id = '"+project_id+"') " + 
 					"and b.src_conn_sequence in (select src_conn_sequence from JUNIPER_EXT_SRC_CONN_MASTER where src_conn_type='"+src_val+"') " + 
 					") " + 
-					"group by feed_sequence,feed_unique_name order by feed_sequence,feed_unique_name";
+					"group by feed_sequence,feed_unique_name order by feed_unique_name,feed_sequence";
 			pstm = connection.prepareStatement(query);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -545,10 +545,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 		SourceSystemDetailBean ssm = null;
 		ArrayList<SourceSystemDetailBean> arrssm = new ArrayList<SourceSystemDetailBean>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		Statement stat =null;
+		ResultSet rs = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, " + 
+			String query = "select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, " + 
 					"listagg(target_unique_name,',') within group (order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence) " + 
 					"from (" + 
 					"select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,a.FEED_DESC,a.COUNTRY_CODE,a.EXTRACTION_TYPE,c.target_unique_name,b.SRC_CONN_SEQUENCE " + 
@@ -557,8 +558,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 					"left outer join JUNIPER_EXT_TARGET_CONN_MASTER c on b.target_sequence=c.target_conn_sequence " + 
 					"where a.FEED_SEQUENCE=" +src_sys_id+ ") " + 
 					"group by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence " +
-					"order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence");
-			ResultSet rs = pstm.executeQuery();
+					"order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence";
+			rs = stat.executeQuery(query);
 			while (rs.next()) {
 				ssm = new SourceSystemDetailBean();
 				ssm.setSrc_sys_id(rs.getInt(1));
@@ -575,7 +576,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 			System.out.println("Exception occured "+e);
 			throw e;
 		} finally {
-			pstm.close();
+			stat.close();
+			rs.close();
 			connection.close();
 		}
 		return arrssm;
@@ -635,7 +637,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String schema_name, String project_id,String db_name) throws Exception {
+	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String project_id,String db_name) throws Exception {
 		DataDetailBean ddb = null;
 		ArrayList<DataDetailBean> arrddb = new ArrayList<DataDetailBean>();
 		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
@@ -644,31 +646,37 @@ public class ExtractionServiceImpl implements ExtractionService {
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement(
-					"select table_name, columns, where_clause, fetch_type, incr_col from JUNIPER_EXT_TABLE_MASTER where feed_sequence="+src_sys_id);
+					"select regexp_substr(table_name, '[^.]+', 1, 1) as schema_name,regexp_substr(table_name, '[^.]+$', 1, 1) as table_name,"
+					+ "columns,where_clause,fetch_type,incr_col from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				ddb = new DataDetailBean();
-				ddb.setTable_name(rs.getString(1));
-				ddb.setTable_name_short(rs.getString(1).split("\\.")[1]);
-				ddb.setSchema(rs.getString(1).split("\\.")[0]);
-				if(rs.getString(2).equalsIgnoreCase("all"))
+				ddb.setSchema_name(rs.getString(1));
+				ddb.setTable_name(rs.getString(2));
+				ArrayList<String> arrs = new ArrayList<String>();
+				if(rs.getString(3).equalsIgnoreCase("all"))
 				{
-					ArrayList<String> arrs = new ArrayList<String>();
-					arrs = getFields("1", src_val, rs.getString(1), conn_id, rs.getString(1).split("\\.")[0], project_id,db_name);
+					arrs = getFields("1", src_val, rs.getString(1)+"."+rs.getString(2),conn_id,rs.getString(1),project_id,db_name);
 					String fieldString = String.join(",", arrs);
 					ddb.setColumn_name(fieldString);
 				}
 				else
 				{
-					ddb.setColumn_name(rs.getString(2));
+					ddb.setColumn_name(rs.getString(3));
 				}
-				ddb.setWhere_clause(rs.getString(3));
-				ddb.setFetch_type(rs.getString(4));
-				ddb.setIncremental_column(rs.getString(5));
-				ArrayList<String> agf=getFields("1", src_val, rs.getString(1), conn.getConnection_id(),schema_name, project_id,db_name);
+				ddb.setWhere_clause(rs.getString(4));
+				ddb.setFetch_type(rs.getString(5));
+				ddb.setIncr_column(rs.getString(6));
+				ArrayList<String> agf=getFields("1", src_val, rs.getString(1)+"."+rs.getString(2),conn.getConnection_id(),rs.getString(1),project_id,db_name);
 				String cols = agf.toString();
 				cols = cols.substring(1, cols.length() - 1).replace(", ", ",");
 				ddb.setCols(cols);
+				for(String temp : arrs) {
+					agf.remove(temp);
+				}
+				String unsel_cols = agf.toString();
+				unsel_cols = unsel_cols.substring(1, unsel_cols.length() - 1).replace(", ", ",");
+				ddb.setUnsel_cols(unsel_cols);
 				arrddb.add(ddb);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
@@ -746,11 +754,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 		}
 		return arrTbl;
 	}
-	public String getSchemaData(String src_val,int src_sys_id) throws Exception
+	public ArrayList<String> getSchemaData(String src_val,int src_sys_id) throws Exception
 	{
 		String sch="";
 		Connection connection = null;
 		PreparedStatement pstm =null;
+		ArrayList<String> sch1=new ArrayList<String>();
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement(
@@ -758,6 +767,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 					sch=rs.getString(1).split("\\.")[0];
+					sch1.add(sch);
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
@@ -767,7 +777,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			pstm.close();
 			connection.close();
 		}
-		return sch;
+		return sch1;
 	}
 
 	public ArrayList<String> getSystem(String project) throws Exception
@@ -1253,7 +1263,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public String getJsonFromFile(File file,String user,String schema_name,String project,String src_sys_id) throws Exception {
+	public String getJsonFromFile(File file,String user,String project,String src_sys_id) throws Exception {
 		String json_array_str="";
 		if(file!=null) {
 			String[] col_val = new String[20];
@@ -1284,7 +1294,6 @@ public class ExtractionServiceImpl implements ExtractionService {
 				item.put("user",user);
 				item.put("feed_id",src_sys_id);
 				item.put("counter",counter);
-				item.put("schema_name",schema_name);
 				item.put("load_type","bulk_load");
 
 
@@ -1314,8 +1323,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 								String WHERE_CLAUSE="where_clause"+r;
 								String FETCH_TYPE="fetch_type"+r;
 								String INCR_COL="incr_col"+r;
+								String schema_name="schema_name"+r;
 
 								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
+								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
 								if ( c == 1) item.put(COLUMNS,col_val[c] );
 								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
 								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
@@ -1329,8 +1340,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 								String WHERE_CLAUSE="where_clause"+r;
 								String FETCH_TYPE="fetch_type"+r;
 								String INCR_COL="incr_col"+r;
+								String schema_name="schema_name"+r;
 
 								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
+								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
 								if ( c == 1) item.put(COLUMNS,col_val[c] );
 								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
 								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
@@ -1354,6 +1367,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		}
 		return json_array_str;
 	}
+	
 	@Override
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException {
 		JSONArray array_metadata = new JSONArray();

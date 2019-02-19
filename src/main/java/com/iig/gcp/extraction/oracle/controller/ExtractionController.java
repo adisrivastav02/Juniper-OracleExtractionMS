@@ -170,8 +170,8 @@ public class ExtractionController {
 			model.addAttribute("system", system);
 			ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String)request.getSession().getAttribute("project_name"));
 			model.addAttribute("conn_val", conn_val);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-			model.addAttribute("drive", drive);
+			//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+			//model.addAttribute("drive", drive);
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -207,8 +207,8 @@ public class ExtractionController {
 		model.addAttribute("system", system);
 		ArrayList<ConnectionMaster> conn_val = es.getConnections(src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-		model.addAttribute("drive", drive);
+		//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+		//model.addAttribute("drive", drive);
 		return new ModelAndView("extraction/ConnectionDetailsOracle");
 	}
 
@@ -218,8 +218,8 @@ public class ExtractionController {
 		ConnectionMaster conn_val = es.getConnections2(src_val, conn, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("conn_val", conn_val);
 		model.addAttribute("src_val", src_val);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-		model.addAttribute("drive", drive);
+		//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+		//model.addAttribute("drive", drive);
 		return new ModelAndView("extraction/ConnectionDetailsEditOracle");
 	}
 
@@ -235,8 +235,8 @@ public class ExtractionController {
 			ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("system", system);
 			model.addAttribute("tgt_val", tgt);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-			model.addAttribute("drive", drive);
+			//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+			//model.addAttribute("drive", drive);
 			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("tproj", tproj);
 		} catch (Exception e) {
@@ -292,8 +292,8 @@ public class ExtractionController {
 		ArrayList<String> system = es.getSystem((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("system", system);
 		model.addAttribute("tgt_val", tgt);
-		ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-		model.addAttribute("drive", drive);
+		//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+		//model.addAttribute("drive", drive);
 		ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("tproj", tproj);
 		return new ModelAndView("extraction/TargetDetails");
@@ -308,8 +308,8 @@ public class ExtractionController {
 			model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 			ArrayList<String> tproj = es.getGoogleProject((String) request.getSession().getAttribute("project_name"));
 			model.addAttribute("tproj", tproj);
-			ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
-			model.addAttribute("drive", drive);
+			//ArrayList<DriveMaster> drive = es.getDrives((String) request.getSession().getAttribute("project_name"));
+			//model.addAttribute("drive", drive);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -447,7 +447,7 @@ public class ExtractionController {
 	}
 
 	@RequestMapping(value = "/extraction/DataDetailsOracle1", method = RequestMethod.POST)
-	public ModelAndView DataDetails1(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, @ModelAttribute("schema_name") String schema_name, ModelMap model,
+	public ModelAndView DataDetails1(@Valid @ModelAttribute("id") String id, @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, @ModelAttribute("schema_name") String schema_name, ModelMap model,
 		HttpServletRequest request) throws UnsupportedOperationException, Exception {
 		String href1=es.getBulkDataTemplate(src_sys_id);
 		String db_name=null;
@@ -461,6 +461,7 @@ public class ExtractionController {
 		model.addAttribute("tables", tables);
 		model.addAttribute("schema_name", schema_name);
 		model.addAttribute("src_sys_id", src_sys_id);
+		model.addAttribute("id", id);
 		return new ModelAndView("extraction/DataDetailsOracle1");
 	}
 
@@ -548,25 +549,23 @@ public class ExtractionController {
 		@RequestMapping(value = "/extraction/DataDetailsEditOracle", method = RequestMethod.POST)
 		public ModelAndView DataDetailsEdit(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request)
 			throws UnsupportedOperationException, Exception {
-		String href1=es.getBulkDataTemplate(src_sys_id);
+		/*String href1=es.getBulkDataTemplate(src_sys_id);
 		href1="field.xls";
+		model.addAttribute("href1", href1);*/
 		String db_name=null;
-		model.addAttribute("href1", href1);
 		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
 		model.addAttribute("conn_val", conn_val);
 		String ext_type = es.getExtType(src_sys_id);
 		model.addAttribute("ext_type", ext_type);
-		String schema_name = es.getSchemaData(src_val, src_sys_id);
-		ArrayList<String> tables = es.getTables(src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
-		model.addAttribute("tables", tables);
-		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(), schema_name, (String) request.getSession().getAttribute("project_name"),db_name);
-		model.addAttribute("schem", schema_name);
+		ArrayList<String> schema_name = es.getSchema(src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"),db_name);
+		model.addAttribute("schema_name", schema_name);
+		ArrayList<DataDetailBean> arrddb = es.getData(src_sys_id, src_val, conn_val.getConnection_id(),(String) request.getSession().getAttribute("project_name"),db_name);
 		model.addAttribute("arrddb", arrddb);
+		model.addAttribute("counter_val",arrddb.size());
 		model.addAttribute("usernm", (String)request.getSession().getAttribute("user_name"));
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetailsEditOracle");
 	}
-
 
 	@RequestMapping(value = "/extraction/ExtractData", method = RequestMethod.GET)
 	public ModelAndView ExtractData(ModelMap model, HttpServletRequest request) throws IOException {
@@ -722,9 +721,8 @@ public class ExtractionController {
 		String resp = null;
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
-		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
 		JSONObject jsonObject= new JSONObject(json_array_str);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		json_array_str=jsonObject.toString();
@@ -769,8 +767,8 @@ public class ExtractionController {
 		ArrayList<String> db_name = es.getHivedbList((String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val", src_sys_val);
-		//model.addAttribute("src_sys_val1", src_sys_val1);
-		//model.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val1", src_sys_val1);
+		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", (String) request.getSession().getAttribute("project_name"));
 		return new ModelAndView("extraction/DataDetails" + src_val);	
@@ -786,9 +784,8 @@ public class ExtractionController {
 		String resp = null;
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
-		String schema_name=(String)request.getSession().getAttribute("schema_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,schema_name,project,src_sys_id);
+		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
 		
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 					resp = es.invokeRest(json_array_str, oracle_compute_url+"editTempTableInfo");
@@ -833,8 +830,8 @@ public class ExtractionController {
 		ArrayList<String> db_name = es.getHivedbList(project);
 		model.addAttribute("db_name", db_name);
 		model.addAttribute("src_sys_val", src_sys_val);
-		//model.addAttribute("src_sys_val1", src_sys_val1);
-		//.addAttribute("src_sys_val2", src_sys_val2);
+		model.addAttribute("src_sys_val1", src_sys_val1);
+		model.addAttribute("src_sys_val2", src_sys_val2);
 		model.addAttribute("usernm", usernm);
 		model.addAttribute("project", project);
 		return new ModelAndView("extraction/DataDetails" + src_val);

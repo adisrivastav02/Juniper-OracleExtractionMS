@@ -1,33 +1,28 @@
 package com.iig.gcp.extraction.oracle.dto;
 
+import java.util.ArrayList;
+
 public class DataDetailBean {
 	
+	private String schema_name ;
 	private String table_name ;
-	private String table_name_short ;
-	private String schema ;
-	private String dbName;
 	private String column_name;
 	private String where_clause;
 	private String fetch_type;
-	private String incremental_column;
+	private String incr_column;
 	private String cols;
+	private String unsel_cols;
+	public String getSchema_name() {
+		return schema_name;
+	}
+	public void setSchema_name(String schema_name) {
+		this.schema_name = schema_name;
+	}
 	public String getTable_name() {
 		return table_name;
 	}
 	public void setTable_name(String table_name) {
 		this.table_name = table_name;
-	}
-	public String getTable_name_short() {
-		return table_name_short;
-	}
-	public void setTable_name_short(String table_name_short) {
-		this.table_name_short = table_name_short;
-	}
-	public String getSchema() {
-		return schema;
-	}
-	public void setSchema(String schema) {
-		this.schema = schema;
 	}
 	public String getColumn_name() {
 		return column_name;
@@ -47,11 +42,11 @@ public class DataDetailBean {
 	public void setFetch_type(String fetch_type) {
 		this.fetch_type = fetch_type;
 	}
-	public String getIncremental_column() {
-		return incremental_column;
+	public String getIncr_column() {
+		return incr_column;
 	}
-	public void setIncremental_column(String incremental_column) {
-		this.incremental_column = incremental_column;
+	public void setIncr_column(String incr_column) {
+		this.incr_column = incr_column;
 	}
 	public String getCols() {
 		return cols;
@@ -59,10 +54,10 @@ public class DataDetailBean {
 	public void setCols(String cols) {
 		this.cols = cols;
 	}
-	public String getDbName() {
-		return dbName;
+	public String getUnsel_cols() {
+		return unsel_cols;
 	}
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
+	public void setUnsel_cols(String unsel_cols) {
+		this.unsel_cols = unsel_cols;
 	}
 }

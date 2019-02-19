@@ -1,91 +1,451 @@
 <jsp:include page="../cdg_header.jsp" />
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <script>
-	$(document)
-			.ready(
-					function() {
-						$("#feed_id")
-								.change(
-										function() {
-											document
-													.getElementById('load_type').style.display = "inline-flex";
-										});
-						$("#feed_id1")
-								.change(
-										function() {
-											document
-													.getElementById('load_type').style.display = "none";
-											document.getElementById('bulk1').checked = "checked";
-											document.getElementById('datdyn').innerHTML = "";
-											var src_sys_id = document
-													.getElementById("feed_id1").value;
-											var src_val = document
-													.getElementById("src_val").value;
-											$
-													.post(
-															'${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
-															{
-																src_sys_id : src_sys_id,
-																src_val : src_val
-															},
-															function(data) {
-																$('#datdyn')
-																		.html(
-																				data)
-															});
-										});
-						$("#success-alert").hide();
-						$("#success-alert").fadeTo(10000, 10).slideUp(2000,
-								function() {
-								});
-						$("#error-alert").hide();
-						$("#error-alert").fadeTo(10000, 10).slideUp(2000,
-								function() {
-								});
-					});
-	function jsonconstruct() {
-		var errors = [];
+$(document).ready(function() {
+	$("#feed_id").change(function() {
+		document.getElementById('load_type').style.display = "inline-flex";
+		document.getElementById('schdiv').innerHTML = "";
+		document.getElementById('datadiv').innerHTML = "";
+	});
+	$("#feed_id1").change(function() {
+		document.getElementById('load_type').style.display = "none";
+		document.getElementById('schdiv').innerHTML = "";
+		document.getElementById('datadiv').innerHTML = "";
+		var src_sys_id = document.getElementById("feed_id1").value;
+		var src_val = document.getElementById("src_val").value;
+		$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
+		{
+			src_sys_id : src_sys_id,
+			src_val : src_val
+		},
+		function(data) {
+			document.getElementById('bord').style.display = "block";
+			$('#datadiv').html(data)
+		});
+	});
+	$("#success-alert").hide();
+	$("#success-alert").fadeTo(10000, 10).slideUp(2000,
+		function() {
+		
+	});
+	$("#error-alert").hide();
+		$("#error-alert").fadeTo(10000, 10).slideUp(2000,
+		function() {
+	});
+});
+
+function funccheck(val) {
+	if (val == 'create') {
+		//window.location.reload();
+		window.location.href = "${pageContext.request.contextPath}/extraction/DataDetails";
+	} else if (val == 'edit') {
+		document.getElementById('feed_id').style.display = "none";
+		document.getElementById('feed_id1').style.display = "block";
+		document.getElementById('load_type').style.display = "none";
+		document.getElementById('bord').style.display = "none";
+		document.getElementById('schdiv').innerHTML = "";
+		document.getElementById('datadiv').innerHTML = "";
+	}
+}
+function loadcheck(val) {
+	if (val == 'ind_load') {
 		var selection = $("input[name='radio']:checked").val();
+		var src_val = document.getElementById("src_val").value;
 		if (selection == 'create') {
-			var feed_id = document.getElementById("feed_id").value;
-			var upload_type = $("input[name='bulk']:checked").val();
-			if (!checkLength(feed_id)) {
-				errors[errors.length] = "Feed Name";
+			var src_sys_id = document.getElementById("feed_id").value;
+			$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle0',
+			{
+				src_sys_id : src_sys_id,
+				src_val : src_val
+			}, function(data) {
+				$('#schdiv').html(data)
+			});
+		} else if (selection == 'edit') {
+			var src_sys_id = document.getElementById("feed_id1").value;
+			$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
+			{
+				src_sys_id : src_sys_id,
+				src_val : src_val
+			}, function(data) {
+				$('#datadiv').html(data)
+			});
+		}
+	} else if (val == 'bulk_load') {
+		var selection = $("input[name='radio']:checked").val();
+		var src_sys_id = document.getElementById("feed_id").value;
+		$.post('${pageContext.request.contextPath}/extraction/BulkLoadTest',
+		{
+			src_sys_id : src_sys_id,
+			src_val : src_val,
+			selection : selection
+		}, function(data) {
+			$('#datadiv').html(data)
+		});
+	}
+}
+function getsch(id, val) {
+	var in1 = id.slice(-1);
+	var in2 = id.slice(-2, -1);
+	if (in2 === "e")
+		;
+	else {
+		in1 = id.slice(-2);
+	}
+	var id = in1;
+	var schema_name = val;
+	var src_val = document.getElementById("src_val").value;
+	var src_sys_id = document.getElementById("feed_id").value;
+	$
+			.post(
+					'${pageContext.request.contextPath}/extraction/DataDetailsOracle1',
+					{
+						id : id,
+						src_sys_id : src_sys_id,
+						src_val : src_val,
+						schema_name : schema_name
+					}, function(data) {
+						$('#datdiv' + id).html(data)
+					});
+}
+function getcols(id, val) {
+	var in1 = id.slice(-1);
+	var in2 = id.slice(-2, -1);
+	if (in2 === "e")
+		;
+	else {
+		in1 = id.slice(-2);
+	}
+	var id = in1;
+	var table_name = val;
+	var src_val = document.getElementById("src_val").value;
+	var connection_id = document.getElementById("connection_id").value;
+	var schema_name = document.getElementById("schema_name"+id).value;
+	$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
+	{
+		id : id,
+		src_val : src_val,
+		table_name : table_name,
+		connection_id : connection_id,
+		schema_name : schema_name
+	}, function(data) {
+		$("#fldd"+id).html(data);
+	});
+}
+function incr(id, val) {
+	var in1 = id.slice(-1);
+	var in2 = id.slice(-2, -1);
+	if (in2 === "e")
+		;
+	else {
+		in1 = id.slice(-2);
+	}
+	var in3 = 'incc' + in1;
+	if (val == "incr") {
+		document.getElementById(in3).style.display = "block";
+	} else if (val == "full") {
+		document.getElementById(in3).style.display = "none";
+	}
+}
+
+function dup_div() {
+	var i = document.getElementById('counter').value;
+	i++;
+	$(function() {
+		$('<hr />').insertBefore('#schm_div'+i);
+	});
+	var clone = $("#schm_div1").clone().attr('id', 'schm_div' + i)
+			.insertAfter("#schm_div1");
+	/*clone.find("select").each(function() {
+		$(this).attr({
+			'id': function(_, id) { return id.slice(0,-1) + i },
+		    'name': function(_, name) { return name.slice(0,-1) + i },
+		    'value': ''               
+		});
+	}).end().appendTo("#datadiv");*/
+	clone.find("input[id!=schema_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("input[id=schema_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'list' : function(_, list) {
+				return list.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("datalist[id=schemas1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
 			}
-			if (!checkLength(upload_type)) {
-				errors[errors.length] = "Upload Type";
+		});
+	}).end().appendTo("#datadiv");
+	clone.find("button[id=del1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
 			}
-			if (upload_type == "ind_load") {
-				var schema = document.getElementById("schema_name").value;
-				if (!checkLength(schema_name)) {
-					errors[errors.length] = "Schema Name";
+		});
+	}).end().appendTo("#datadiv");
+	var clone1 = $("#datdiv1").clone().attr('id', 'datdiv' + i)
+			.insertAfter("#datdiv1");
+	clone1.find("input[id!=table_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("input[id=table_name1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'list' : function(_, list) {
+				return list.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("datalist[id=tables1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			}
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("textarea[id=where_clause1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("select[id=fetch_type1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("select[id=incr_col1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
+	clone1.find("div").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				if (id)
+					return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'name' : function(_, name) {
+				if (name)
+					return (isNaN(name.slice(-2, -1)) ? (name.slice(0, -1)+i) : (name.slice(0, -2)+i))
+			}
+		});
+	}).end().appendTo("#datadiv");
+	$('#schema_name' + i).find('option').remove().end().append(
+			'<option value="">Schema ...</option>').val('');
+	$('#table_name' + i).find('option').remove().end().append(
+			'<option value="">Table ...</option>').val('');
+	$('#col_name' + i).find('option').remove().end().append(
+			'<option value="">Columns ...</option>').val('');
+	$('#avl' + i).empty();
+	$('#sel' + i).empty();
+	$('#tok' + i).empty();
+	document.getElementById('counter').value = i;
+}
+function allowDrop(ev) {
+	ev.preventDefault();
+}
+function drag(ev) {
+	ev.dataTransfer.setData("text", ev.target.id);
+}
+function drop(ev, el) {
+	ev.preventDefault();
+	var data = ev.dataTransfer.getData("text");
+	el.appendChild(document.getElementById(data));
+}
+
+function delblock(id)
+{
+	var i=document.getElementById('counter').value;
+	if(i==1)
+		return false;
+	id = (isNaN(id.slice(-2, -1)) ? (id.slice(-1)) : (id.slice(-2)));
+	$('#schm_div'+id).remove();
+	$('#datdiv'+id).remove();
+	
+	if(id===i);
+	else
+	{	//sort order by element inspection to be maintained
+		$("#schm_div"+i).attr("id","schm_div"+id);
+		$("#schema_name"+i).attr("name","schema_name"+id);
+		$("#schema_name"+i).attr("list","schemas"+id);
+		$("#schema_name"+i).attr("id","schema_name"+id);
+		$("#schemas"+i).attr("id","schemas"+id);
+		$("#del"+i).attr("id","del"+id);
+		$("#datdiv"+i).attr("id","datdiv"+id);
+		$("#ind_load"+i).attr("id","ind_load"+id);
+		$("#tbl_fld"+i).attr("id","tbl_fld"+id);
+		$("#table_name"+i).attr("name","table_name"+id);
+		$("#table_name"+i).attr("list","table_name"+id);
+		$("#table_name"+i).attr("id","table_name"+id);
+		$("#tables"+i).attr("id","tables"+id);
+		$("#fetch_type"+i).attr("name","fetch_type"+id);
+		$("#fetch_type"+i).attr("id","fetch_type"+id);
+		$("#fldd"+i).attr("id","fldd"+id);
+		$("#incc"+i).attr("id","incc"+id);
+		$("#incr_col"+i).attr("name","incr_col"+id);
+		$("#incr_col"+i).attr("id","incr_col"+id);
+		$("#avl"+i).attr("id","avl"+id);
+		$("#sel"+i).attr("id","sel"+id);
+		$("#tok"+i).attr("id","tok"+id);
+		$("#col_name"+i).attr("name","col_name"+id);
+		$("#col_name"+i).attr("id","col_name"+id);
+		$("#columns_name"+i).attr("name","columns_name"+id);
+		$("#columns_name"+i).attr("id","columns_name"+id);
+		$("#token"+i).attr("name","token"+id);
+		$("#token"+i).attr("id","token"+id);
+		$("#where_clause"+i).attr("name","where_clause"+id);
+		$("#where_clause"+i).attr("id","where_clause"+id);
+		$('#avl'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+		$('#sel'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+		$('#tok'+i).find("button").each(function(){
+			$(this).attr('name',   (isNaN($(this).attr('name').slice(-2, -1)) ? ($(this).attr('name').slice(0, -1)+id) : ($(this).attr('name').slice(0, -2)+id)));
+			$(this).attr('id',   (isNaN($(this).attr('id').slice(-2, -1)) ? ($(this).attr('id').slice(0, -1)+id) : ($(this).attr('id').slice(0, -2)+id)));
+		    });
+	}
+	i--;
+	document.getElementById('counter').value=i;
+}
+
+function jsonconstruct() {
+	for (var y = 1; y <= document.getElementById("counter").value; y++) {
+		var col="";
+		var ch = document.querySelectorAll("#sel"+y+" button");
+		for (var i = 0; i<ch.length; i++) {
+			if(ch[i].value==='*') {
+				col="*";
+				break;
+			}
+			else {
+			col=col+","+ch[i].value;
+			}
+		}
+		if(col!="*") {
+			col=col.substring(1);
+		}
+		document.getElementById("col_name"+y).value=col;
+		document.getElementById("columns_name"+y).value=col;
+		var tok="";
+		var ch1 = document.querySelectorAll("#tok"+y+" button");
+		for (var i = 0; i<ch1.length; i++) {
+			if(ch1[i].value==='*') {
+				tok="*";
+				break;
+			}
+			else {
+			tok=tok+","+ch1[i].value;
+			}
+		}
+		if(tok!="*") {
+			tok=tok.substring(1);
+		}
+		document.getElementById("token"+y).value=tok;
+		if (document.getElementById("where_clause" + y).value === "") {
+			document.getElementById("where_clause" + y).value = "1=1";
+		}
+	}
+	
+	var errors = [];
+	var selection = $("input[name='radio']:checked").val();
+	if (selection == 'create') {
+		var feed_id = document.getElementById("feed_id").value;
+		var upload_type = $("input[name='bulk']:checked").val();
+		if (!checkLength(feed_id)) {
+			errors[errors.length] = "Feed Name";
+		}
+		if (!checkLength(upload_type)) {
+			errors[errors.length] = "Upload Type";
+		}
+		if (upload_type == "ind_load") {
+			var ct = document.getElementById("counter").value;
+			for (var i = 1; i <= ct; i++) {
+				var schema = document.getElementById("schema_name" + i).value;
+				if (!checkLength(schema)) {
+					errors[errors.length] = "Schema Name " + i;
 				} else {
-					var ct = document.getElementById("counter").value;
-					for (var i = 1; i <= ct; i++) {
-						var tbl = document.getElementById("table_name" + i).value;
-						if (!checkLength(tbl)) {
-							errors[errors.length] = "Table Name " + i;
-						} else {
-							var col = document.getElementById("col_name" + i).value;
-							if (!checkLength(col)) {
-								errors[errors.length] = "Column Names " + i;
-							}
+					var tbl = document.getElementById("table_name" + i).value;
+					if (!checkLength(tbl)) {
+						errors[errors.length] = "Table Name " + i;
+					} else {
+						var col = document.getElementById("col_name" + i).value;
+						if (!checkLength(col)) {
+							errors[errors.length] = "Column Names " + i;
 						}
 					}
 				}
 			}
-			if (upload_type == "bulk_load") {
-				if (document.getElementById("file").files.length == 0) {
-					errors[errors.length] = "Upload File Details";
-				}
+		}
+		if (upload_type == "bulk_load") {
+			if (document.getElementById("file").files.length == 0) {
+				errors[errors.length] = "Upload File Details";
 			}
-		} else {
-			var feed_id = document.getElementById("feed_id1").value;
-			if (!checkLength(feed_id)) {
-				errors[errors.length] = "Feed Name";
-			}
-			var ct = document.getElementById("counter").value;
-			for (var i = 1; i <= ct; i++) {
+		}
+	} else {
+		var feed_id = document.getElementById("feed_id1").value;
+		if (!checkLength(feed_id)) {
+			errors[errors.length] = "Feed Name";
+		}
+		var ct = document.getElementById("counter").value;
+		for (var i = 1; i <= ct; i++) {
+			var schema = document.getElementById("schema_name" + i).value;
+			if (!checkLength(schema)) {
+				errors[errors.length] = "Schema Name " + i;
+			} else {
 				var tbl = document.getElementById("table_name" + i).value;
 				if (!checkLength(tbl)) {
 					errors[errors.length] = "Table Name " + i;
@@ -97,233 +457,22 @@
 				}
 			}
 		}
-		if (errors.length > 0) {
-			reportErrors(errors);
-			return false;
-		}
-
-		var schema = document.getElementById("schema_name").value;
-		for (var y = 1; y <= document.getElementById("counter").value; y++) {
-			multisel1('col_name' + y, 'columns_name' + y);
-			if (document.getElementById("where_clause" + y).value === "") {
-				document.getElementById("where_clause" + y).value = "1=1";
-			}
-		}
-		var data = {};
-		$(".form-control").serializeArray().map(function(x) {
-			data[x.name] = x.value;
-		});
-		var x = '{"header":{},"body":{"data":' + JSON.stringify(data) + '}}';
-		document.getElementById('x').value = x;
-		//alert(x);
-		//console.log(x);
-		document.getElementById('DataDetails').submit();
 	}
-	var i = 1;
-	function dup_div() {
-		var tbl = document.getElementById('table_name' + i);
-		var col = document.getElementById('col_name' + i);
-		var whr = document.getElementById('where_clause' + i);
-		var fth = document.getElementById('fetch_type' + i);
-		var inc = document.getElementById('incr_col' + i);
-		var tbldiv = tbl.parentNode.cloneNode(true);
-		var coldiv = col.parentNode.cloneNode(true);
-		var whrdiv = whr.parentNode.cloneNode(true);
-		var fthdiv = fth.parentNode.cloneNode(true);
-		var incdiv = inc.parentNode.cloneNode(true);
-		var tbl1 = tbldiv.childNodes[3];
-		var col1 = coldiv.childNodes[3];
-		var whr1 = whrdiv.childNodes[3];
-		var fth1 = fthdiv.childNodes[3];
-		var inc1 = incdiv.childNodes[3];
-
-		var x = ++i;
-		tbl1.id = "table_name" + x;
-		col1.id = "col_name" + x;
-		whr1.id = "where_clause" + x;
-		fth1.id = "fetch_type" + x;
-		inc1.id = "incr_col" + x;
-		tbl1.name = "table_name" + x;
-		col1.name = "col_name" + x;
-		whr1.name = "where_clause" + x;
-		fth1.name = "fetch_type" + x;
-		inc1.name = "incr_col" + x;
-		incdiv.id = "incc" + x;
-
-		var c = document.createElement('div');
-		c.className = "form-group row";
-		var d = document.createElement('div');
-		d.id = "fldd" + i;
-		var del = document.createElement('div');
-		del.id = "delete" + x;
-		del.style.cssFloat = "right";
-		del.innerHTML = '<button id="del'
-				+ x
-				+ '" type="button" class="btn btn-rounded btn-gradient-danger mr-2" onclick="delblock(\''
-				+ x + '\')">X</button>';
-
-		tbl.parentNode.parentNode.parentNode.appendChild(del);
-		tbl.parentNode.parentNode.parentNode.appendChild(c);
-		c.appendChild(tbldiv);
-		c.appendChild(fthdiv);
-		col.parentNode.parentNode.parentNode.appendChild(d);
-		d.appendChild(incdiv);
-		d.appendChild(coldiv);
-		whr.parentNode.parentNode.appendChild(whrdiv);
-
-		var counter = document.getElementById('counter').value;
-		for (var j = 1; j <= counter; j++) {
-			var vl = document.getElementById('table_name' + j).value;
-			var curr = document.getElementById(tbl1.id);
-			for (var k = 0; k < curr.length; k++) {
-				if (curr.options[k].value == vl)
-					curr.remove(k);
-			}
-		}
-
-		document.getElementById('incc' + x).style.display = "none";
-		document.getElementById('counter').value = i;
+	if (errors.length > 0) {
+		reportErrors(errors);
+		return false;
 	}
-	function delblock(val) {
-		document.getElementById('table_name' + val).parentNode.parentNode.id = "del";
-		document.getElementById("del").innerHTML = "";
-		document.getElementById("del").remove();
-		document.getElementById('col_name' + val).parentNode.parentNode.id = "del";
-		document.getElementById("del").innerHTML = "";
-		document.getElementById("del").remove();
-		document.getElementById('where_clause' + val).parentNode.id = "del";
-		document.getElementById("del").innerHTML = "";
-		document.getElementById("del").remove();
-		document.getElementById("delete" + val).remove();
-		if (val < document.getElementById('counter').value) {
-			var p;
-			for (var q = parseInt(val) + 1; q <= document
-					.getElementById('counter').value; q++) {
-				p = parseInt(q) - 1;
-				document.getElementById('table_name' + q).id = 'table_name' + p;
-				document.getElementById('col_name' + q).id = 'col_name' + p;
-				document.getElementById('where_clause' + q).id = 'where_clause'
-						+ p;
-				document.getElementById('fetch_type' + q).id = 'fetch_type' + p;
-				document.getElementById('incr_col' + q).id = 'incr_col' + p;
-				document.getElementById('incc' + q).id = 'incc' + p;
-				document.getElementById('fldd' + q).id = 'fldd' + p;
-				document.getElementById('del' + q).id = 'del' + p;
-				document.getElementById('delete' + q).id = 'delete' + p;
-				document.getElementById('columns_name' + q).id = 'columns_name'
-						+ p;
-				document.getElementById('table_name' + p).name = 'table_name'
-						+ p;
-				document.getElementById('col_name' + p).name = 'col_name' + p;
-				document.getElementById('where_clause' + p).name = 'where_clause'
-						+ p;
-				document.getElementById('fetch_type' + p).name = 'fetch_type'
-						+ p;
-				document.getElementById('incr_col' + p).name = 'incr_col' + p;
-				document.getElementById('columns_name' + p).name = 'columns_name'
-						+ p;
-			}
-		}
-		i = document.getElementById('counter').value;
-		--i;
-		document.getElementById('counter').value = i;
-	}
-	function incr(id, val) {
-		var in1 = id.slice(-1);
-		var in2 = id.slice(-2, -1);
-		if (in2 === "e")
-			;
-		else {
-			in1 = id.slice(-2);
-		}
-		var in3 = 'incc' + in1;
-		if (val == "incr") {
-			document.getElementById(in3).style.display = "block";
-		} else if (val == "full") {
-			document.getElementById(in3).style.display = "none";
-		}
-	}
-	function getcols(id, val) {
-		var in1 = id.slice(-1);
-		var in2 = id.slice(-2, -1);
-		if (in2 === "e")
-			;
-		else {
-			in1 = id.slice(-2);
-		}
-		var id = in1;
-		var table_name = val;
-		var src_val = document.getElementById("src_val").value;
-		var connection_id = document.getElementById("connection_id").value;
-		var schema_name = document.getElementById("schema_name").value;
-		$
-				.post(
-						'${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
-						{
-							id : id,
-							src_val : src_val,
-							table_name : table_name,
-							connection_id : connection_id,
-							schema_name : schema_name
-						}, function(data) {
-							$("#fldd" + id).html(data);
-						});
-	}
-	function funccheck(val) {
-		if (val == 'create') {
-			//window.location.reload();
-			window.location.href = "${pageContext.request.contextPath}/extraction/DataDetails";
-		} else if (val == 'edit') {
-			document.getElementById('datdyn').innerHTML = "";
-			document.getElementById('schdyn').innerHTML = "";
-			document.getElementById('feed_id').style.display = "none";
-			document.getElementById('feed_id1').style.display = "block";
 
-		}
-	}
-	function loadcheck(val) {
-		if (val == 'ind_load') {
-			var selection = $("input[name='radio']:checked").val();
-			if (selection == 'create') {
-				var src_sys_id = document.getElementById("feed_id").value;
-				var src_val = document.getElementById("src_val").value;
-				$
-						.post(
-								'${pageContext.request.contextPath}/extraction/DataDetailsOracle0',
-								{
-									src_sys_id : src_sys_id,
-									src_val : src_val
-								}, function(data) {
-									$('#schdyn').html(data)
-								});
-			} else if (selection == 'edit') {
-				var src_sys_id = document.getElementById("feed_id1").value;
-				var src_val = document.getElementById("src_val").value;
-				$
-						.post(
-								'${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
-								{
-									src_sys_id : src_sys_id,
-									src_val : src_val
-								}, function(data) {
-									$('#datdyn').html(data)
-								});
-			}
-		} else if (val == 'bulk_load') {
-			var selection = $("input[name='radio']:checked").val();
-			var src_sys_id = document.getElementById("feed_id").value;
-			$
-					.post(
-							'${pageContext.request.contextPath}/extraction/BulkLoadTest',
-							{
-								src_sys_id : src_sys_id,
-								src_val : src_val,
-								selection : selection
-							}, function(data) {
-								$('#datdyn').html(data)
-							});
-		}
-	}
+	var data = {};
+	$(".form-control").serializeArray().map(function(x) {
+		data[x.name] = x.value;
+	});
+	var x = '{"header":{},"body":{"data":' + JSON.stringify(data) + '}}';
+	document.getElementById('x').value = x;
+	//alert(x);
+	//console.log(x);
+	document.getElementById('DataDetails').submit();
+}
 </script>
 
 <div class="main-panel">
@@ -364,6 +513,7 @@
 								class="form-control" value="${project}"> <input
 								type="hidden" name="user" id="user" class="form-control"
 								value="${usernm}">
+								<input type="hidden" name="counter" id="counter" class="form-control" value="1">
 
 							<div class="form-group row">
 								<label class="col-sm-3 col-form-label">Data Tables</label>
@@ -426,8 +576,18 @@
 									</div>
 								</div>
 							</div>
-							<div id="schdyn"></div>
-							<div id="datdyn"></div>
+							<fieldset id="bord" class="fs" style="display:none;">
+							<div id="schdiv"></div>
+							<div id="datadiv"></div>
+							</fieldset>
+	<div id="but" style="display:none;">
+	<div class="form-group" style="float: right; margin: 5px;">
+		<button id="add" type="button"
+			class="btn btn-rounded btn-gradient-info mr-2" onclick="return dup_div();">+</button>
+	</div>
+	<button onclick="return jsonconstruct();"
+		class="btn btn-rounded btn-gradient-info mr-2">Save</button>
+	</div>
 						</form>
 					</div>
 				</div>
