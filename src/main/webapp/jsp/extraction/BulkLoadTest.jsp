@@ -25,7 +25,7 @@
 							'${pageContext.request.contextPath}/extraction/CreateBulkLoadDetails')
 					.attr('enctype', "multipart/form-data");
 		} else if (selection == 'edit') {
-			var feed_id = document.getElementById("feed_id").value;
+			var feed_id = document.getElementById("feed_id1").value;
 			var src_val = document.getElementById("src_val").value;
 			var file = document.getElementById("file").value;
 			$('#DataDetails')

@@ -48,6 +48,8 @@ function funccheck(val) {
 	}
 }
 function loadcheck(val) {
+	document.getElementById("schdiv").innerHTML="";
+	document.getElementById("datadiv").innerHTML="";
 	if (val == 'ind_load') {
 		var selection = $("input[name='radio']:checked").val();
 		var src_val = document.getElementById("src_val").value;
@@ -73,6 +75,7 @@ function loadcheck(val) {
 	} else if (val == 'bulk_load') {
 		var selection = $("input[name='radio']:checked").val();
 		var src_sys_id = document.getElementById("feed_id").value;
+		document.getElementById("bord").style.display="block";
 		$.post('${pageContext.request.contextPath}/extraction/BulkLoadTest',
 		{
 			src_sys_id : src_sys_id,

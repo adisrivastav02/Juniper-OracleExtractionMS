@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -14,6 +15,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -37,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iig.gcp.constants.OracleConstants;
 import com.iig.gcp.extraction.oracle.dto.ConnectionMaster;
 import com.iig.gcp.extraction.oracle.dto.CountryMaster;
@@ -48,6 +54,7 @@ import com.iig.gcp.extraction.oracle.dto.SourceSystemDetailBean;
 import com.iig.gcp.extraction.oracle.dto.SourceSystemMaster;
 import com.iig.gcp.extraction.oracle.dto.TargetMaster;
 import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
+import com.iig.gcp.extraction.utils.CSV;
 import com.iig.gcp.extraction.utils.ConnectionUtils;
 import com.iig.gcp.extraction.utils.EncryptionUtil;
 
@@ -1263,109 +1270,71 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public String getJsonFromFile(File file,String user,String project,String src_sys_id) throws Exception {
-		String json_array_str="";
-		if(file!=null) {
-			String[] col_val = new String[20];
-			try {
-				POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
-				HSSFWorkbook wb = new HSSFWorkbook(fs);
-				HSSFSheet sheet1 = wb.getSheetAt(0);
-				HSSFRow row1;
-				HSSFCell cell1;
-
-				int rows;
-				rows = sheet1.getPhysicalNumberOfRows();
-				String counter = String.valueOf(rows -1);
-
-
-				JSONArray array = new JSONArray();
-				JSONObject item = new JSONObject();
-
-				JSONArray array_pre = new JSONArray();
-				JSONObject item_pre = new JSONObject();
-
-				JSONArray array_first = new JSONArray();
-				JSONObject item_first = new JSONObject();
-
-
-				item.put("projects",project);
-				item.put("project",project);
-				item.put("user",user);
-				item.put("feed_id",src_sys_id);
-				item.put("counter",counter);
-				item.put("load_type","bulk_load");
-
-
-				int cols = 0;
-				int tmp = 0;
-
-				for(int i = 0;i < rows; i++) {
-					row1 = sheet1.getRow(i);
-					if(row1 != null) {
-						tmp = sheet1.getRow(i).getPhysicalNumberOfCells();
-						if(tmp > cols) cols = tmp;
-					}
+	public String getJsonFromFile(File file,String user,String project,int src_sys_id) throws Exception {
+		String str="";
+		ConnectionMaster conn=getConnections1("Oracle", src_sys_id);
+		try (InputStream in = new FileInputStream(file)) {
+			CSV csv = new CSV(true, '|', in);
+			List<String> fieldNames = null;
+			if (csv.hasNext())
+				fieldNames = new ArrayList<>(csv.next());
+			List<Map<String, String>> list = new ArrayList<>();
+			int counter = 1;
+			while (csv.hasNext()) {
+				List<String> x = csv.next();
+				while (x.size() <= 9) {
+					x.add("");
 				}
-
-				for(int r = 1; r < rows; r++) {
-					row1 = sheet1.getRow(r);
-					if(row1 != null) {
-						for(int c = 0; c < cols; c++) {
-							cell1 = row1.getCell((short)c);
-							if(cell1 != null) {
-								// Your code here
-								//col_val[c]=cell1;
-								col_val[c]=cell1.toString(); 
-								System.out.println("Col value : "+col_val[c]);
-								String TABLE_NAME="table_name"+r;
-								String COLUMNS="columns_name"+r;
-								String WHERE_CLAUSE="where_clause"+r;
-								String FETCH_TYPE="fetch_type"+r;
-								String INCR_COL="incr_col"+r;
-								String schema_name="schema_name"+r;
-
-								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
-								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
-								if ( c == 1) item.put(COLUMNS,col_val[c] );
-								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
-								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
-								if ( c == 4) item.put(INCR_COL,col_val[c] );
-
-							}else {
-								col_val[c]="";
-								System.out.println("Col value : "+col_val[c]);
-								String TABLE_NAME="table_name"+r;
-								String COLUMNS="columns_name"+r;
-								String WHERE_CLAUSE="where_clause"+r;
-								String FETCH_TYPE="fetch_type"+r;
-								String INCR_COL="incr_col"+r;
-								String schema_name="schema_name"+r;
-
-								if ( c == 0) item.put(TABLE_NAME,col_val[c] );
-								if ( c == 0) item.put(schema_name,col_val[c].substring(col_val[c].indexOf('.')+1 ));
-								if ( c == 1) item.put(COLUMNS,col_val[c] );
-								if ( c == 2) item.put(WHERE_CLAUSE,col_val[c] );
-								if ( c == 3) item.put(FETCH_TYPE,col_val[c] );
-								if ( c == 4) item.put(INCR_COL,col_val[c] );
-
-							}
-						}
-					}
+				Map<String, String> obj = new LinkedHashMap<>();
+				for (int i = 0; i < fieldNames.size(); i++) {
+					obj.put(fieldNames.get(i).toLowerCase() + counter, x.get(i));
 				}
-				array.put(item);
-				item_pre.put("data", array);
-				array_pre.put(item_pre);
-				item_first.put("body", array_pre);
-				array_first.put(item_first);
-				json_array_str = array_first.toString().replace("[", "").replace("]", "");
-				wb.close();
-			}catch(Exception ioe) {
-				System.out.println("Exception occured "+ioe);
-				throw ioe;
+				list.add(obj);
+				counter++;
 			}
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			str = mapper.writeValueAsString(list);
+			str = "{\"header\":{},\"body\":{\"data\":" + str + "}}";
+			JSONObject jsonObject = new JSONObject(str);
+			JSONObject getObject = jsonObject.getJSONObject("body");
+			JSONArray getArray = getObject.getJSONArray("data");
+			JSONObject json = new JSONObject();
+			String schema, table, view, col, where, type, incr, val, err;
+			for (int i = 0; i < getArray.length(); i++) {
+				JSONObject objectInArray = getArray.getJSONObject(i);
+				schema = objectInArray.getString("schema_name"+(i+1));
+				table = objectInArray.getString("table_name"+(i+1));
+				view = objectInArray.getString("is_view"+(i+1));
+				col = objectInArray.getString("columns_name"+(i+1));
+				where = objectInArray.getString("where_clause"+(i+1));
+				type = objectInArray.getString("fetch_type"+(i+1));
+				incr = objectInArray.getString("incr_col"+(i+1));
+				val = objectInArray.getString("validation_flag"+(i+1));
+				err = objectInArray.getString("error_message"+(i+1));
+				//str = "{\"header\":{},\"body\":{\"data\":{" + "\"schema_name"+i+"\":\""+schema+"\"" + "}}";
+				if(where.equalsIgnoreCase(""))
+				{
+					where="1=1";
+				}
+				json.put("schema_name"+(i+1), schema);
+				json.put("table_name"+(i+1), schema+"."+table);
+				json.put("is_view"+(i+1), view);
+				json.put("columns_name"+(i+1), col);
+				json.put("where_clause"+(i+1), where);
+				json.put("fetch_type"+(i+1), type);
+				json.put("incr_col"+(i+1), incr);
+				json.put("validation_flag"+(i+1), val);
+				json.put("error_message"+(i+1), err);
+			}
+			json.put("project", project);
+			json.put("user", user);
+			json.put("counter", counter-1);
+			json.put("feed_id", src_sys_id);
+			json.put("connection_id", conn.getConnection_id());
+			str = "{\"header\":{},\"body\":{\"data\":" + json + "}}";
 		}
-		return json_array_str;
+		return str;
 	}
 	
 	@Override

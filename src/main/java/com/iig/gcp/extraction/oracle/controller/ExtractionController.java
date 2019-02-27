@@ -9,11 +9,15 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iig.gcp.CustomAuthenticationProvider;
 import com.iig.gcp.extraction.oracle.dto.ConnectionMaster;
 import com.iig.gcp.extraction.oracle.dto.CountryMaster;
@@ -45,6 +51,7 @@ import com.iig.gcp.extraction.oracle.dto.SourceSystemMaster;
 import com.iig.gcp.extraction.oracle.dto.TargetMaster;
 import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
 import com.iig.gcp.extraction.oracle.service.ExtractionService;
+import com.iig.gcp.extraction.utils.CSV;
 
 @Controller
 @SessionAttributes(value= {"user_name","project_name","jwt"})
@@ -713,7 +720,7 @@ public class ExtractionController {
 }
 	@RequestMapping(value = "/extraction/CreateBulkLoadDetails", method = RequestMethod.POST)
 	public ModelAndView CreateBulkLoadDetails(@Valid @ModelAttribute("src_val") String src_val, 
-			@Valid @ModelAttribute("feed_id") String src_sys_id, 
+			@Valid @ModelAttribute("feed_id") int src_sys_id, 
 			@RequestParam("file") MultipartFile multiPartFile1,
 			ModelMap model,HttpServletRequest request,
 			Principal principal) throws UnsupportedOperationException, Exception {		
@@ -722,12 +729,15 @@ public class ExtractionController {
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
+		String str = es.getJsonFromFile(file, usernm, project, src_sys_id);	
+//		System.out.println(str);
+		String json_array_metadata_str=es.getJsonFromFeedSequence(project,Integer.toString(src_sys_id));
+		/*String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
 		JSONObject jsonObject= new JSONObject(json_array_str);
 		jsonObject.getJSONObject("body").getJSONObject("data").put("jwt", (String) request.getSession().getAttribute("jwt"));
 		json_array_str=jsonObject.toString();
-		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
-					resp = es.invokeRest(json_array_str, oracle_compute_url+"addTempTableInfo");
+		*/
+					resp = es.invokeRest(str, oracle_compute_url+"addTempTableInfo");
 					String status0[] = resp.toString().split(":");
 					String status1[] = status0[1].split(",");
 					String status = status1[0].replaceAll("\'", "").trim();
@@ -785,7 +795,7 @@ public class ExtractionController {
 		String usernm= (String)request.getSession().getAttribute("user_name");
 		String project=(String)request.getSession().getAttribute("project_name");
 		File file = convert(multiPartFile1);
-		String json_array_str=es.getJsonFromFile(file,usernm,project,src_sys_id);
+		String json_array_str=es.getJsonFromFile(file,usernm,project,Integer.parseInt(src_sys_id));
 		
 		String json_array_metadata_str=es.getJsonFromFeedSequence(project,src_sys_id);
 					resp = es.invokeRest(json_array_str, oracle_compute_url+"editTempTableInfo");

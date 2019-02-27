@@ -59,7 +59,7 @@ public interface ExtractionService {
 	public ArrayList<String> getKafkaTopic() throws Exception;
 	public ArrayList<String> getColList(String table_name) throws Exception;
 	public String getDatabaseData(String src_val, int src_sys_id) throws Exception;
-	public String getJsonFromFile(File file,String user,String project,String src_sys_id) throws Exception;
+	public String getJsonFromFile(File file,String user,String project,int src_sys_id) throws Exception;
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException;
 	
 }
