@@ -58,8 +58,6 @@ import com.iig.gcp.extraction.utils.CSV;
 import com.iig.gcp.extraction.utils.ConnectionUtils;
 import com.iig.gcp.extraction.utils.EncryptionUtil;
 
-
-
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
 
@@ -86,12 +84,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 		return resp;
 	}
 
-
 	@Override
-	public ArrayList<String> getRunFeeds(String project_id) throws Exception  {
+	public ArrayList<String> getRunFeeds(String project_id) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement("SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p"
@@ -103,25 +100,24 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
 		return arr;
 	}
 
-
 	@Override
-	public ArrayList<RunFeedsBean> getLastRunFeeds(String project_id , String feed) throws Exception {
+	public ArrayList<RunFeedsBean> getLastRunFeeds(String project_id, String feed) throws Exception {
 		ArrayList<RunFeedsBean> arr = new ArrayList<RunFeedsBean>();
 		Connection connection = null;
 		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("SELECT n.FEED_UNIQUE_NAME,n.RUN_ID, TO_CHAR(TO_DATE(n.EXTRACTED_DATE,'YYYMMDD'),'DD-MON-YY'),f.EXTRACTION_TYPE|| ' ' ||n.PG_TYPE,n.JOB_START_TIME,n.JOB_END_TIME,UPPER(n.STATUS) FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_EXT_FEED_MASTER f ON n.FEED_UNIQUE_NAME=f.FEED_UNIQUE_NAME and n.PROJECT_SEQUENCE=f.PROJECT_SEQUENCE LEFT JOIN JUNIPER_PROJECT_MASTER p ON f.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=? and n.FEED_UNIQUE_NAME=? ORDER BY n.EXTRACTED_DATE");
+			pstm = connection.prepareStatement(
+					"SELECT n.FEED_UNIQUE_NAME,n.RUN_ID, TO_CHAR(TO_DATE(n.EXTRACTED_DATE,'YYYMMDD'),'DD-MON-YY'),f.EXTRACTION_TYPE|| ' ' ||n.PG_TYPE,n.JOB_START_TIME,n.JOB_END_TIME,UPPER(n.STATUS) FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_EXT_FEED_MASTER f ON n.FEED_UNIQUE_NAME=f.FEED_UNIQUE_NAME and n.PROJECT_SEQUENCE=f.PROJECT_SEQUENCE LEFT JOIN JUNIPER_PROJECT_MASTER p ON f.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=? and n.FEED_UNIQUE_NAME=? ORDER BY n.EXTRACTED_DATE");
 			pstm.setString(1, project_id);
 			pstm.setString(2, feed);
 
@@ -139,10 +135,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -155,11 +150,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 		// TODO Auto-generated method stub
 		Connection connection = null;
 		ConnectionMaster conn = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		ArrayList<ConnectionMaster> arrConnectionMaster = new ArrayList<ConnectionMaster>();
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("SELECT SRC_CONN_SEQUENCE,SRC_CONN_NAME,host_name,port_no,username,password,database_name,service_name,system_sequence,drive_sequence,encrypted_encr_key from JUNIPER_EXT_SRC_CONN_MASTER where SRC_CONN_TYPE=? and project_sequence = (select project_sequence from juniper_project_master where project_id=?)");
+			pstm = connection.prepareStatement(
+					"SELECT SRC_CONN_SEQUENCE,SRC_CONN_NAME,host_name,port_no,username,password,database_name,service_name,system_sequence,drive_sequence,encrypted_encr_key from JUNIPER_EXT_SRC_CONN_MASTER where SRC_CONN_TYPE=? and project_sequence = (select project_sequence from juniper_project_master where project_id=?)");
 			pstm.setString(1, src_val);
 			pstm.setString(2, project_id);
 
@@ -183,10 +179,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrConnectionMaster.add(conn);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -197,24 +192,25 @@ public class ExtractionServiceImpl implements ExtractionService {
 	@Override
 	public ArrayList<TargetMaster> getTargets(String project_id) throws Exception {
 		ArrayList<TargetMaster> arr = new ArrayList<TargetMaster>();
-		TargetMaster tm=null;
+		TargetMaster tm = null;
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select TARGET_CONN_SEQUENCE,target_unique_name from JUNIPER_EXT_TARGET_CONN_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')");
+			pstm = connection.prepareStatement(
+					"select TARGET_CONN_SEQUENCE,target_unique_name from JUNIPER_EXT_TARGET_CONN_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"
+							+ project_id + "')");
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				tm=new TargetMaster();
+				tm = new TargetMaster();
 				tm.setTarget_conn_sequence(rs.getInt(1));
 				tm.setTarget_unique_name(rs.getString(2));
 				arr.add(tm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -225,23 +221,20 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public TargetMaster getTargets1(int tgt) throws Exception {
 		TargetMaster tm = null;
 		Connection connection = null;
-		PreparedStatement pstm =null;
-		PreparedStatement pstm1 =null;
+		PreparedStatement pstm = null;
+		PreparedStatement pstm1 = null;
 		try {
-			String typ=null;
+			String typ = null;
 			connection = ConnectionUtils.getConnection();
-			pstm1 = connection.prepareStatement("select "
-					+ "a.target_type from JUNIPER_EXT_TARGET_CONN_MASTER a where a.TARGET_CONN_SEQUENCE="+tgt);
+			pstm1 = connection.prepareStatement("select " + "a.target_type from JUNIPER_EXT_TARGET_CONN_MASTER a where a.TARGET_CONN_SEQUENCE=" + tgt);
 			ResultSet rs1 = pstm1.executeQuery();
 			while (rs1.next()) {
-				typ=rs1.getString(1);
+				typ = rs1.getString(1);
 			}
 			System.out.println(tgt);
-			if(typ.equalsIgnoreCase("gcs"))
-			{
-				pstm = connection.prepareStatement("select "
-						+ "a.target_unique_name,a.target_type,b.gcp_project,b.service_account_name,b.bucket_name,a.system_sequence"
-						+ " from JUNIPER_EXT_TARGET_CONN_MASTER a, JUNIPER_EXT_GCP_MASTER b where a.gcp_sequence=b.gcp_sequence and a.target_conn_sequence="+tgt);
+			if (typ.equalsIgnoreCase("gcs")) {
+				pstm = connection.prepareStatement("select " + "a.target_unique_name,a.target_type,b.gcp_project,b.service_account_name,b.bucket_name,a.system_sequence"
+						+ " from JUNIPER_EXT_TARGET_CONN_MASTER a, JUNIPER_EXT_GCP_MASTER b where a.gcp_sequence=b.gcp_sequence and a.target_conn_sequence=" + tgt);
 				ResultSet rs = pstm.executeQuery();
 				while (rs.next()) {
 					tm = new TargetMaster();
@@ -252,13 +245,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 					tm.setGcp_bucket(rs.getString(5));
 					tm.setSystem_name(getSystemName(rs.getInt(6)));
 				}
-			}
-			else if(typ.equalsIgnoreCase("hdfs"))
-			{
-				pstm = connection.prepareStatement("select "
-						+ "a.target_unique_name,a.target_type,a.hdp_knox_host,a.hdp_knox_port,a.hdp_user,a.hdp_encrypted_password,a.encrypted_key,"
+			} else if (typ.equalsIgnoreCase("hdfs")) {
+				pstm = connection.prepareStatement("select " + "a.target_unique_name,a.target_type,a.hdp_knox_host,a.hdp_knox_port,a.hdp_user,a.hdp_encrypted_password,a.encrypted_key,"
 						+ "a.hdfs_gateway,a.hdp_hdfs_path,a.materialization_flag,a.partition_flag,a.hive_gateway,a.system_sequence"
-						+ " from JUNIPER_EXT_TARGET_CONN_MASTER a where a.target_conn_sequence="+tgt);
+						+ " from JUNIPER_EXT_TARGET_CONN_MASTER a where a.target_conn_sequence=" + tgt);
 				ResultSet rs = pstm.executeQuery();
 				while (rs.next()) {
 					tm = new TargetMaster();
@@ -278,10 +268,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 				}
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			pstm1.close();
 			connection.close();
@@ -290,24 +279,23 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ConnectionMaster getConnections1(String src_val,int src_sys_id) throws Exception {
+	public ConnectionMaster getConnections1(String src_val, int src_sys_id) throws Exception {
 		// TODO Auto-generated method stub
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		ConnectionMaster conn = new ConnectionMaster();
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select a.SRC_CONN_SEQUENCE from JUNIPER_EXT_FEED_MASTER b,JUNIPER_EXT_FEED_SRC_TGT_LINK a"
-					+ " where a.feed_sequence=b.feed_sequence and a.FEED_SEQUENCE="+src_sys_id);
+			pstm = connection.prepareStatement(
+					"select a.SRC_CONN_SEQUENCE from JUNIPER_EXT_FEED_MASTER b,JUNIPER_EXT_FEED_SRC_TGT_LINK a" + " where a.feed_sequence=b.feed_sequence and a.FEED_SEQUENCE=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				conn.setConnection_id(rs.getInt(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -315,14 +303,16 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ConnectionMaster getConnections2(String src_val,int conn_id, String project_id) throws Exception {
+	public ConnectionMaster getConnections2(String src_val, int conn_id, String project_id) throws Exception {
 		// TODO Auto-generated method stub
 		Connection connection = null;
 		ConnectionMaster conn = new ConnectionMaster();
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select src_conn_sequence,src_conn_name,src_conn_type,host_name,port_no,username,password,database_name,service_name,system_sequence from JUNIPER_EXT_SRC_CONN_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')" + " and src_conn_sequence="+conn_id);
+			pstm = connection.prepareStatement(
+					"select src_conn_sequence,src_conn_name,src_conn_type,host_name,port_no,username,password,database_name,service_name,system_sequence from JUNIPER_EXT_SRC_CONN_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"
+							+ project_id + "')" + " and src_conn_sequence=" + conn_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				conn.setConnection_id(rs.getInt(1));
@@ -338,10 +328,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -350,21 +339,20 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 	@Override
 	public String getExtType(int src_sys_id) throws Exception {
-		String val=null;
+		String val = null;
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select extraction_type from JUNIPER_EXT_FEED_MASTER where feed_sequence="+src_sys_id);
+			pstm = connection.prepareStatement("select extraction_type from JUNIPER_EXT_FEED_MASTER where feed_sequence=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				val=rs.getString(1);
+				val = rs.getString(1);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -373,40 +361,35 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 	@Override
 	public String getExtType1(String src_unique_name) throws Exception {
-		String val=null;
-		Connection connection=null;
-		PreparedStatement pstm =null;
+		String val = null;
+		Connection connection = null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 
-			//Check if job is already scheduled for extraction, if yes we dont need to need to schdule this again.
-			String checkIfJobIsInMasterQuery="select "
-					+ "CASE\r\n" + 
-					"    WHEN master.weekly_flag = 'Y'  THEN concat('Weekly on ', master.week_run_day)\r\n" + 
-					"    WHEN master.daily_flag = 'Y'   THEN concat('Daily at ', substr(master.job_schedule_time, 1, 5))\r\n" + 
-					"    WHEN master.monthly_flag = 'Y' THEN concat('Monthly on ', master.month_run_day)\r\n" + 
-					"    WHEN master.yearly_flag = 'Y'  THEN concat('Yearly on month ', master.month_run_val)\r\n" + 
-					"END AS consolidated_schedule "
-					+ "from "+SCHEDULER_MASTER_TABLE+" master "
-					+ "where batch_id='"+src_unique_name+"'";
+			// Check if job is already scheduled for extraction, if yes we dont need to need
+			// to schdule this again.
+			String checkIfJobIsInMasterQuery = "select " + "CASE\r\n" + "    WHEN master.weekly_flag = 'Y'  THEN concat('Weekly on ', master.week_run_day)\r\n"
+					+ "    WHEN master.daily_flag = 'Y'   THEN concat('Daily at ', substr(master.job_schedule_time, 1, 5))\r\n"
+					+ "    WHEN master.monthly_flag = 'Y' THEN concat('Monthly on ', master.month_run_day)\r\n"
+					+ "    WHEN master.yearly_flag = 'Y'  THEN concat('Yearly on month ', master.month_run_val)\r\n" + "END AS consolidated_schedule " + "from " + SCHEDULER_MASTER_TABLE + " master "
+					+ "where batch_id='" + src_unique_name + "'";
 			pstm = connection.prepareStatement(checkIfJobIsInMasterQuery);
 			ResultSet rs = pstm.executeQuery();
-			if(rs.next()) {
+			if (rs.next()) {
 				return rs.getString(1);
 			}
 
-			String extractionTypeQuery="select extraction_type from JUNIPER_EXT_FEED_MASTER "
-					+ "where feed_unique_name='"+src_unique_name+"'";
+			String extractionTypeQuery = "select extraction_type from JUNIPER_EXT_FEED_MASTER " + "where feed_unique_name='" + src_unique_name + "'";
 			pstm = connection.prepareStatement(extractionTypeQuery);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				val=rs.getString(1);
+				val = rs.getString(1);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -414,11 +397,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getTables(String src_val, int conn_id, String schema_name, String project_id,String db_name) throws Exception {
+	public ArrayList<String> getTables(String src_val, int conn_id, String schema_name, String project_id, String db_name) throws Exception {
 		ArrayList<ConnectionMaster> arrcm = getConnections(src_val, project_id);
 		ArrayList<String> arrTbl = new ArrayList<String>();
 		String query = null, connectionUrl = null, host = null, port = null, username = null, db = null, service = null;
-		byte[] password = null,encrypt = null;
+		byte[] password = null, encrypt = null;
 		Connection serverConnection = null;
 		Statement st = null;
 		for (ConnectionMaster cm : arrcm) {
@@ -432,7 +415,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 		}
 		try {
-			query = "select distinct table_name from all_tables where owner='"+schema_name+"' order by table_name";
+			query = "select distinct table_name from all_tables where owner='" + schema_name + "' order by table_name";
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";
 			String pass = EncryptionUtil.decyptPassword(encrypt, password);
@@ -444,11 +427,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrTbl.add(rs2.getString(1));
 			}
 		} catch (SQLException e1) {
-			System.out.println("Exception occured "+e1);
+			System.out.println("Exception occured " + e1);
 			throw e1;
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			st.close();
@@ -458,11 +441,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getFields(String id, String src_val, String table_name, int conn_id, String schema_name, String project_id,String db_name) throws Exception {
+	public ArrayList<String> getFields(String id, String src_val, String table_name, int conn_id, String schema_name, String project_id, String db_name) throws Exception {
 		ArrayList<ConnectionMaster> arrcm = getConnections(src_val, project_id);
 		ArrayList<String> arrFld = new ArrayList<String>();
 		String query = null, connectionUrl = null, host = null, port = null, username = null, db = null, service = null;
-		byte[] password = null,encrypt=null;
+		byte[] password = null, encrypt = null;
 		Connection serverConnection = null;
 		Statement st = null;
 		for (ConnectionMaster cm : arrcm) {
@@ -475,13 +458,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 				encrypt = cm.getEncrypt();
 			}
 		}
-		
-		
+
 		String tbls[] = table_name.split(",");
 		for (int i = 0; i < tbls.length; i++) {
 			try {
 				String tblsx[] = tbls[i].split("\\.");
-				query = "SELECT column_name FROM all_tab_cols where table_name='" + tblsx[1] + "' and owner='"+schema_name+"' and column_id is not null order by column_name";
+				query = "SELECT column_name FROM all_tab_cols where table_name='" + tblsx[1] + "' and owner='" + schema_name + "' and column_id is not null order by column_name";
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";
 				String pass = EncryptionUtil.decyptPassword(encrypt, password);
@@ -492,10 +474,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 					arrFld.add(rs2.getString(1));
 				}
 			} catch (SQLException e1) {
-				System.out.println("Exception occured "+e1);
+				System.out.println("Exception occured " + e1);
 				throw e1;
 			} catch (ClassNotFoundException e) {
-				System.out.println("Exception occured "+e);
+				System.out.println("Exception occured " + e);
 				throw e;
 			} finally {
 				st.close();
@@ -510,24 +492,15 @@ public class ExtractionServiceImpl implements ExtractionService {
 		SourceSystemMaster ssm = null;
 		ArrayList<SourceSystemMaster> arrssm = new ArrayList<SourceSystemMaster>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			String query="select feed_sequence,feed_unique_name, " + 
-					"listagg(table_sequence, ',' ) within group (order by feed_unique_name) " + 
-					"from " + 
-					"(" + 
-					"select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,c.table_sequence " + 
-					"from " + 
-					"JUNIPER_EXT_FEED_MASTER a " + 
-					"inner join JUNIPER_EXT_FEED_SRC_TGT_LINK b " + 
-					"on a.feed_sequence=b.feed_sequence " + 
-					"left outer join JUNIPER_EXT_TABLE_MASTER c " + 
-					"on a.feed_sequence=c.feed_sequence " + 
-					"where a.project_sequence=(select project_sequence from juniper_project_master where project_id = '"+project_id+"') " + 
-					"and b.src_conn_sequence in (select src_conn_sequence from JUNIPER_EXT_SRC_CONN_MASTER where src_conn_type='"+src_val+"') " + 
-					") " + 
-					"group by feed_sequence,feed_unique_name order by feed_unique_name,feed_sequence";
+			String query = "select feed_sequence,feed_unique_name, " + "listagg(table_sequence, ',' ) within group (order by feed_unique_name) " + "from " + "("
+					+ "select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,c.table_sequence " + "from " + "JUNIPER_EXT_FEED_MASTER a " + "inner join JUNIPER_EXT_FEED_SRC_TGT_LINK b "
+					+ "on a.feed_sequence=b.feed_sequence " + "left outer join JUNIPER_EXT_TABLE_MASTER c " + "on a.feed_sequence=c.feed_sequence "
+					+ "where a.project_sequence=(select project_sequence from juniper_project_master where project_id = '" + project_id + "') "
+					+ "and b.src_conn_sequence in (select src_conn_sequence from JUNIPER_EXT_SRC_CONN_MASTER where src_conn_type='" + src_val + "') " + ") "
+					+ "group by feed_sequence,feed_unique_name order by feed_unique_name,feed_sequence";
 			pstm = connection.prepareStatement(query);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -538,7 +511,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrssm.add(ssm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -548,24 +521,22 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<SourceSystemDetailBean> getSources1(String src_val,int src_sys_id) throws Exception {
+	public ArrayList<SourceSystemDetailBean> getSources1(String src_val, int src_sys_id) throws Exception {
 		SourceSystemDetailBean ssm = null;
 		ArrayList<SourceSystemDetailBean> arrssm = new ArrayList<SourceSystemDetailBean>();
 		Connection connection = null;
-		Statement stat =null;
+		Statement stat = null;
 		ResultSet rs = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			String query = "select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, " + 
-					"listagg(target_unique_name,',') within group (order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence) " + 
-					"from (" + 
-					"select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,a.FEED_DESC,a.COUNTRY_CODE,a.EXTRACTION_TYPE,c.target_unique_name,b.SRC_CONN_SEQUENCE " + 
-					"from " + 
-					"JUNIPER_EXT_FEED_MASTER a inner join JUNIPER_EXT_FEED_SRC_TGT_LINK b on a.feed_sequence=b.feed_sequence " + 
-					"left outer join JUNIPER_EXT_TARGET_CONN_MASTER c on b.target_sequence=c.target_conn_sequence " + 
-					"where a.FEED_SEQUENCE=" +src_sys_id+ ") " + 
-					"group by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence " +
-					"order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence";
+			String query = "select feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence, "
+					+ "listagg(target_unique_name,',') within group (order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence) " + "from ("
+					+ "select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,a.FEED_DESC,a.COUNTRY_CODE,a.EXTRACTION_TYPE,c.target_unique_name,b.SRC_CONN_SEQUENCE " + "from "
+					+ "JUNIPER_EXT_FEED_MASTER a inner join JUNIPER_EXT_FEED_SRC_TGT_LINK b on a.feed_sequence=b.feed_sequence "
+					+ "left outer join JUNIPER_EXT_TARGET_CONN_MASTER c on b.target_sequence=c.target_conn_sequence " + "where a.FEED_SEQUENCE=" + src_sys_id + ") "
+					+ "group by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence "
+					+ "order by feed_sequence,feed_unique_name,feed_desc,country_code,extraction_type,src_conn_sequence";
+			stat = connection.createStatement();
 			rs = stat.executeQuery(query);
 			while (rs.next()) {
 				ssm = new SourceSystemDetailBean();
@@ -580,7 +551,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			stat.close();
@@ -595,7 +566,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		CountryMaster cm = null;
 		ArrayList<CountryMaster> arrcm = new ArrayList<CountryMaster>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement("select country_code,country_name from JUNIPER_REGION_COUNTRY_MASTER order by country_name");
@@ -607,7 +578,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrcm.add(cm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -621,7 +592,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		ReservoirMaster rm = null;
 		ArrayList<ReservoirMaster> arrrm = new ArrayList<ReservoirMaster>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement("select reservoir_id,reservoir_name,reservoir_desc from reservoir_master where reservoir_status='Y' and lower(reservoir_desc) like '%extraction%'");
@@ -634,7 +605,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrrm.add(rm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -644,41 +615,59 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<DataDetailBean> getData(int src_sys_id,String src_val, int conn_id,String project_id,String db_name) throws Exception {
+	public int getRecCount(int src_sys_id) throws Exception {
+		Connection connection = null;
+		PreparedStatement pstm = null;
+		int cnt = 0;
+		try {
+			connection = ConnectionUtils.getConnection();
+			pstm = connection.prepareStatement("select count(1) from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE=" + src_sys_id);
+			ResultSet rs = pstm.executeQuery();
+			while (rs.next()) {
+				cnt = rs.getInt(1);
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			System.out.println("Exception occured " + e);
+			throw e;
+		} finally {
+			pstm.close();
+			connection.close();
+		}
+		return cnt;
+	}
+
+	@Override
+	public ArrayList<DataDetailBean> getData(int src_sys_id, String src_val, int conn_id, String project_id, String db_name) throws Exception {
 		DataDetailBean ddb = null;
 		ArrayList<DataDetailBean> arrddb = new ArrayList<DataDetailBean>();
 		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement(
-					"select regexp_substr(table_name, '[^.]+', 1, 1) as schema_name,regexp_substr(table_name, '[^.]+$', 1, 1) as table_name,"
-					+ "columns,where_clause,fetch_type,incr_col from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_sys_id);
+			pstm = connection.prepareStatement("select regexp_substr(table_name, '[^.]+', 1, 1) as schema_name,regexp_substr(table_name, '[^.]+$', 1, 1) as table_name,"
+					+ "columns,where_clause,fetch_type,incr_col from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				ddb = new DataDetailBean();
 				ddb.setSchema_name(rs.getString(1));
 				ddb.setTable_name(rs.getString(2));
 				ArrayList<String> arrs = new ArrayList<String>();
-				if(rs.getString(3).equalsIgnoreCase("all"))
-				{
-					arrs = getFields("1", src_val, rs.getString(1)+"."+rs.getString(2),conn_id,rs.getString(1),project_id,db_name);
+				if (rs.getString(3).equalsIgnoreCase("all")) {
+					arrs = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn_id, rs.getString(1), project_id, db_name);
 					String fieldString = String.join(",", arrs);
 					ddb.setColumn_name(fieldString);
-				}
-				else
-				{
+				} else {
 					ddb.setColumn_name(rs.getString(3));
 				}
 				ddb.setWhere_clause(rs.getString(4));
 				ddb.setFetch_type(rs.getString(5));
 				ddb.setIncr_column(rs.getString(6));
-				ArrayList<String> agf=getFields("1", src_val, rs.getString(1)+"."+rs.getString(2),conn.getConnection_id(),rs.getString(1),project_id,db_name);
+				ArrayList<String> agf = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn.getConnection_id(), rs.getString(1), project_id, db_name);
 				String cols = agf.toString();
 				cols = cols.substring(1, cols.length() - 1).replace(", ", ",");
 				ddb.setCols(cols);
-				for(String temp : arrs) {
+				for (String temp : arrs) {
 					agf.remove(temp);
 				}
 				String unsel_cols = agf.toString();
@@ -687,7 +676,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrddb.add(ddb);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -697,23 +686,22 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public int checkNames(String sun) throws Exception
-	{
-		Connection connection=null;
-		int stat=0;
-		PreparedStatement pstm =null;
+	public int checkNames(String sun) throws Exception {
+		Connection connection = null;
+		int stat = 0;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select FEED_UNIQUE_NAME from JUNIPER_EXT_FEED_MASTER where FEED_UNIQUE_NAME='"+sun+"'");
+			pstm = connection.prepareStatement("select FEED_UNIQUE_NAME from JUNIPER_EXT_FEED_MASTER where FEED_UNIQUE_NAME='" + sun + "'");
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				stat=1;break;
+				stat = 1;
+				break;
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -721,12 +709,11 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getSchema(String src_val,int conn_id, String project_id,String db_name) throws Exception
-	{
+	public ArrayList<String> getSchema(String src_val, int conn_id, String project_id, String db_name) throws Exception {
 		ArrayList<ConnectionMaster> arrcm = getConnections(src_val, project_id);
 		ArrayList<String> arrTbl = new ArrayList<String>();
 		String query = null, connectionUrl = null, host = null, port = null, username = null, db = null, service = null;
-		byte[] password = null,encrypt=null;
+		byte[] password = null, encrypt = null;
 		Connection serverConnection = null;
 		Statement st = null;
 		for (ConnectionMaster cm : arrcm) {
@@ -743,7 +730,8 @@ public class ExtractionServiceImpl implements ExtractionService {
 		try {
 			query = "select distinct owner from all_tables where upper(owner) not like '%SYS%' and upper(owner) not like '%XDB%'";
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";System.out.println(connectionUrl);
+			connectionUrl = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + service + "";
+			System.out.println(connectionUrl);
 
 			String pass = EncryptionUtil.decyptPassword(encrypt, password);
 			serverConnection = DriverManager.getConnection(connectionUrl, username, pass);
@@ -753,32 +741,30 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrTbl.add(rs2.getString(1));
 			}
 		} catch (Exception e1) {
-			System.out.println("Exception occured "+e1);
+			System.out.println("Exception occured " + e1);
 			throw e1;
-		}
-		finally {
+		} finally {
 			serverConnection.close();
 		}
 		return arrTbl;
 	}
-	public ArrayList<String> getSchemaData(String src_val,int src_sys_id) throws Exception
-	{
-		String sch="";
+
+	public ArrayList<String> getSchemaData(String src_val, int src_sys_id) throws Exception {
+		String sch = "";
 		Connection connection = null;
-		PreparedStatement pstm =null;
-		ArrayList<String> sch1=new ArrayList<String>();
+		PreparedStatement pstm = null;
+		ArrayList<String> sch1 = new ArrayList<String>();
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement(
-					"select table_name from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_sys_id);
+			pstm = connection.prepareStatement("select table_name from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-					sch=rs.getString(1).split("\\.")[0];
-					sch1.add(sch);
+				sch = rs.getString(1).split("\\.")[0];
+				sch1.add(sch);
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -787,22 +773,20 @@ public class ExtractionServiceImpl implements ExtractionService {
 		return sch1;
 	}
 
-	public ArrayList<String> getSystem(String project) throws Exception
-	{
-		ArrayList<String> sys=new ArrayList<String>();
+	public ArrayList<String> getSystem(String project) throws Exception {
+		ArrayList<String> sys = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement(
-					"select a.system_name from JUNIPER_SYSTEM_MASTER a");
+			pstm = connection.prepareStatement("select a.system_name from JUNIPER_SYSTEM_MASTER a");
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				sys.add(rs.getString(1));
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -811,22 +795,20 @@ public class ExtractionServiceImpl implements ExtractionService {
 		return sys;
 	}
 
-	public String getSystemName(int system) throws Exception
-	{
-		String sys=null;
+	public String getSystemName(int system) throws Exception {
+		String sys = null;
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement(
-					"select a.system_name from JUNIPER_SYSTEM_MASTER a where system_sequence="+system);
+			pstm = connection.prepareStatement("select a.system_name from JUNIPER_SYSTEM_MASTER a where system_sequence=" + system);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				sys=rs.getString(1);
+				sys = rs.getString(1);
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -840,13 +822,17 @@ public class ExtractionServiceImpl implements ExtractionService {
 		DriveMaster dm = null;
 		ArrayList<DriveMaster> arrdm = new ArrayList<DriveMaster>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 
-			//PreparedStatement pstm = connection.prepareStatement("select drive_sequence,drive_name,mounted_path,project_sequence from JUNIPER_EXT_DRIVE_MASTER");
+			// PreparedStatement pstm = connection.prepareStatement("select
+			// drive_sequence,drive_name,mounted_path,project_sequence from
+			// JUNIPER_EXT_DRIVE_MASTER");
 
-			pstm = connection.prepareStatement("select drive_sequence,drive_name,mounted_path,project_sequence from JUNIPER_EXT_DRIVE_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')");
+			pstm = connection.prepareStatement(
+					"select drive_sequence,drive_name,mounted_path,project_sequence from JUNIPER_EXT_DRIVE_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"
+							+ project_id + "')");
 
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
@@ -858,7 +844,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrdm.add(dm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -872,10 +858,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 		DriveMaster dm = null;
 		ArrayList<DriveMaster> arrdm = new ArrayList<DriveMaster>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select c.drive_name,c.mounted_path from JUNIPER_EXT_FEED_SRC_TGT_LINK a, JUNIPER_EXT_SRC_CONN_MASTER b, JUNIPER_EXT_DRIVE_MASTER c where a.SRC_CONN_SEQUENCE=b.SRC_CONN_SEQUENCE and b.DRIVE_SEQUENCE=c.DRIVE_SEQUENCE and a.FEED_SEQUENCE="+src_sys_id);
+			pstm = connection.prepareStatement(
+					"select c.drive_name,c.mounted_path from JUNIPER_EXT_FEED_SRC_TGT_LINK a, JUNIPER_EXT_SRC_CONN_MASTER b, JUNIPER_EXT_DRIVE_MASTER c where a.SRC_CONN_SEQUENCE=b.SRC_CONN_SEQUENCE and b.DRIVE_SEQUENCE=c.DRIVE_SEQUENCE and a.FEED_SEQUENCE="
+							+ src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				dm = new DriveMaster();
@@ -884,10 +872,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrdm.add(dm);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -898,10 +885,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public DriveMaster getDrivesDetails(int drive_id) throws Exception {
 		DriveMaster dm = new DriveMaster();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select c.drive_sequence,c.drive_name,c.mounted_path from JUNIPER_EXT_DRIVE_MASTER c where c.DRIVE_SEQUENCE="+drive_id);
+			pstm = connection.prepareStatement("select c.drive_sequence,c.drive_name,c.mounted_path from JUNIPER_EXT_DRIVE_MASTER c where c.DRIVE_SEQUENCE=" + drive_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				dm.setDrive_id(rs.getInt(1));
@@ -909,7 +896,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				dm.setDrive_path(rs.getString(3));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -922,97 +909,85 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public void updateLoggerTable(String src_unique_name) throws Exception {
 
 		// TODO Auto-generated method stub
-		String src_id=null;
+		String src_id = null;
 		Connection connection = null;
-		PreparedStatement pstm=null;
+		PreparedStatement pstm = null;
 		Statement statement;
-		ResultSet rs=null;
-		String query=null;
+		ResultSet rs = null;
+		String query = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 
-			//Delete all the entries for specific Src ID
-			query="DELETE FROM LOGGER_MASTER WHERE FEED_ID='"+src_unique_name+"'";
+			// Delete all the entries for specific Src ID
+			query = "DELETE FROM LOGGER_MASTER WHERE FEED_ID='" + src_unique_name + "'";
 			statement = connection.createStatement();
 			statement.execute(query);
 
-			//Get Source ID from Src Name
-			pstm = connection.prepareStatement("select FEED_SEQUENCE from JUNIPER_EXT_FEED_MASTER where FEED_UNIQUE_NAME='"+src_unique_name+"'");
+			// Get Source ID from Src Name
+			pstm = connection.prepareStatement("select FEED_SEQUENCE from JUNIPER_EXT_FEED_MASTER where FEED_UNIQUE_NAME='" + src_unique_name + "'");
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				src_id=rs.getString(1);
+				src_id = rs.getString(1);
 			}
-			//Get Source Details from Src Id
-			query="SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n" + 
-					"INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.SRC_CONN_SEQUENCE=L.SRC_CONN_SEQUENCE \r\n" + 
-					"INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE="+src_id;
+			// Get Source Details from Src Id
+			query = "SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n"
+					+ "INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.SRC_CONN_SEQUENCE=L.SRC_CONN_SEQUENCE \r\n"
+					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				query="INSERT ALL \r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Source','Name','"+rs.getString(1)+"')\r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Source','Type','"+rs.getString(2)+"')\r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Source','EIM','"+rs.getString(3)+"')\r\n" + 
-						"SELECT * FROM dual";
+				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','Name','" + rs.getString(1) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','Type','" + rs.getString(2) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
 
-			//Get Target Details from Src ID
-			query="SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n" + 
-					"INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.TARGET_CONN_SEQUENCE=L.TARGET_SEQUENCE \r\n" + 
-					"INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
+			// Get Target Details from Src ID
+			query = "SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n"
+					+ "INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.TARGET_CONN_SEQUENCE=L.TARGET_SEQUENCE \r\n"
+					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				query="INSERT ALL \r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Target','Name','"+rs.getString(1)+"')\r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Target','Type','"+rs.getString(2)+"')\r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Target','EIM','"+rs.getString(3)+"')\r\n" + 
-						"SELECT * FROM dual";
+				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','Name','" + rs.getString(1) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','Type','" + rs.getString(2) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
-			//Get Scheduling Information
-			query="SELECT DISTINCT \r\n" + 
-					"					CASE WHEN SCHEDULE_TYPE = 'R' AND DAILY_FLAG = 'Y' THEN 'DAILY'\r\n" + 
-					"					WHEN SCHEDULE_TYPE = 'R' AND  WEEKLY_FLAG = 'Y' THEN 'WEEKLY'\r\n" + 
-					"					WHEN SCHEDULE_TYPE = 'R' AND  MONTHLY_FLAG = 'Y' THEN 'MONTHLY' \r\n" + 
-					"					WHEN SCHEDULE_TYPE = 'R' AND  YEARLY_FLAG = 'Y' THEN 'YEARLY'\r\n" + 
-					"                    WHEN SCHEDULE_TYPE = 'O' THEN 'AD-HOC'\r\n" + 
-					"                    WHEN SCHEDULE_TYPE = 'F' THEN 'FILE-WATCHER'\r\n" + 
-					"                    WHEN SCHEDULE_TYPE = 'K' THEN 'KAFKA-WATCHER' \r\n" + 
-					"                    WHEN SCHEDULE_TYPE = 'A' THEN 'API-WATCHER'\r\n" + 
-					"					ELSE ''\r\n" + 
-					"					END AS \"FREQUENCY\",\r\n" + 
-					"					JOB_SCHEDULE_TIME \r\n" + 
-					"					from JUNIPER_SCH_MASTER_JOB_DETAIL where LOWER(BATCH_ID)='"+src_unique_name.toLowerCase()+"'";
+			// Get Scheduling Information
+			query = "SELECT DISTINCT \r\n" + "					CASE WHEN SCHEDULE_TYPE = 'R' AND DAILY_FLAG = 'Y' THEN 'DAILY'\r\n"
+					+ "					WHEN SCHEDULE_TYPE = 'R' AND  WEEKLY_FLAG = 'Y' THEN 'WEEKLY'\r\n" + "					WHEN SCHEDULE_TYPE = 'R' AND  MONTHLY_FLAG = 'Y' THEN 'MONTHLY' \r\n"
+					+ "					WHEN SCHEDULE_TYPE = 'R' AND  YEARLY_FLAG = 'Y' THEN 'YEARLY'\r\n" + "                    WHEN SCHEDULE_TYPE = 'O' THEN 'AD-HOC'\r\n"
+					+ "                    WHEN SCHEDULE_TYPE = 'F' THEN 'FILE-WATCHER'\r\n" + "                    WHEN SCHEDULE_TYPE = 'K' THEN 'KAFKA-WATCHER' \r\n"
+					+ "                    WHEN SCHEDULE_TYPE = 'A' THEN 'API-WATCHER'\r\n" + "					ELSE ''\r\n" + "					END AS \"FREQUENCY\",\r\n"
+					+ "					JOB_SCHEDULE_TIME \r\n" + "					from JUNIPER_SCH_MASTER_JOB_DETAIL where LOWER(BATCH_ID)='" + src_unique_name.toLowerCase() + "'";
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				query="INSERT ALL \r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Scheduling','Frequency','"+rs.getString(1)+"')\r\n" + 
-						" INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Scheduling','Time','"+rs.getString(2)+"')\r\n" + 
-						"SELECT * FROM dual";
-				System.out.println("6: "+query);
+				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Scheduling','Frequency','" + rs.getString(1)
+						+ "')\r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Scheduling','Time','" + rs.getString(2) + "')\r\n"
+						+ "SELECT * FROM dual";
+				System.out.println("6: " + query);
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
-			//Get Table List Information
-			query="select TABLE_NAME from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_id+" UNION ALL select FILE_NAME from JUNIPER_EXT_FILE_MASTER where FEED_SEQUENCE="+src_id ;
+			// Get Table List Information
+			query = "select TABLE_NAME from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE=" + src_id + " UNION ALL select FILE_NAME from JUNIPER_EXT_FILE_MASTER where FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			while (rs.next()) {
-				query="INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Table','Name','"+rs.getString(1)+"')";
+				query = "INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Table','Name','" + rs.getString(1) + "')";
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
-			//Insert Platform Information
-			query="INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('"+src_unique_name+"','Transfer','Platform','JUNIPER')";
+			// Insert Platform Information
+			query = "INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Transfer','Platform','JUNIPER')";
 			statement = connection.createStatement();
 			statement.execute(query);
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -1021,20 +996,20 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getGoogleProject(String project_id) throws Exception
-	{
+	public ArrayList<String> getGoogleProject(String project_id) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select gcp_project from JUNIPER_EXT_GCP_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')");
+			pstm = connection.prepareStatement(
+					"select gcp_project from JUNIPER_EXT_GCP_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='" + project_id + "')");
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -1044,20 +1019,21 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getServiceBucket(String project, String project_id) throws Exception
-	{
+	public ArrayList<String> getServiceBucket(String project, String project_id) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("select bucket_name,service_account_name from JUNIPER_EXT_GCP_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='"+project_id+"')" + "and gcp_project='"+project+"'" );
+			pstm = connection.prepareStatement(
+					"select bucket_name,service_account_name from JUNIPER_EXT_GCP_MASTER where project_sequence=(select project_sequence from juniper_project_master where project_id='" + project_id
+							+ "')" + "and gcp_project='" + project + "'");
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				arr.add(rs.getString(1)+"|"+rs.getString(2));
+				arr.add(rs.getString(1) + "|" + rs.getString(2));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
 			pstm.close();
@@ -1069,15 +1045,16 @@ public class ExtractionServiceImpl implements ExtractionService {
 	@Override
 	public String getBulkDataTemplate(int src_sys_id) throws Exception {
 		// TODO Auto-generated method stub
-		String val=null;
+		String val = null;
 		Connection connection = null;
 		String yemi = "field.xls";
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 
-			pstm = connection.prepareStatement("select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER where feed_sequence="+src_sys_id
-					+" union select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,VALIDATION_FLAG,ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence="+src_sys_id);
+			pstm = connection.prepareStatement(
+					"select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER where feed_sequence=" + src_sys_id
+							+ " union select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,VALIDATION_FLAG,ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 
 			HSSFWorkbook workbook = new HSSFWorkbook();
@@ -1092,7 +1069,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			rowhead.createCell((short) 6).setCellValue("ERROR_MESSAGE");
 
 			int i = 1;
-			while (rs.next()){
+			while (rs.next()) {
 				HSSFRow row = sheet.createRow((short) i);
 				row.createCell((short) 0).setCellValue(rs.getString("TABLE_NAME"));
 				row.createCell((short) 1).setCellValue(rs.getString("COLUMNS"));
@@ -1107,11 +1084,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 
 			FileOutputStream fileOut = new FileOutputStream(yemi);
 			workbook.write(fileOut);
-		} catch (ClassNotFoundException |SQLException | IOException e1) {
-			System.out.println("Exception occured "+e1);
+		} catch (ClassNotFoundException | SQLException | IOException e1) {
+			System.out.println("Exception occured " + e1);
 			throw e1;
-		} finally
-		{
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -1119,18 +1095,17 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id,String src_val, int conn_id, String project_id) throws Exception {
+	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id, String src_val, int conn_id, String project_id) throws Exception {
 		TempDataDetailBean ddb = null;
-		String db_name=null;
+		String db_name = null;
 		ArrayList<TempDataDetailBean> arrddb = new ArrayList<TempDataDetailBean>();
 		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			String query="select table_name, columns, where_clause, fetch_type, incr_col,validation_flag,error_message from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence="+src_sys_id
-					+" union "
-					+"select table_name, columns, where_clause, fetch_type, incr_col,'Y','null' from JUNIPER_EXT_TABLE_MASTER where feed_sequence="+src_sys_id;
+			String query = "select table_name, columns, where_clause, fetch_type, incr_col,validation_flag,error_message from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence=" + src_sys_id
+					+ " union " + "select table_name, columns, where_clause, fetch_type, incr_col,'Y','null' from JUNIPER_EXT_TABLE_MASTER where feed_sequence=" + src_sys_id;
 			System.out.println(query);
 			pstm = connection.prepareStatement(query);
 			ResultSet rs = pstm.executeQuery();
@@ -1139,16 +1114,12 @@ public class ExtractionServiceImpl implements ExtractionService {
 				ddb.setTable_name(rs.getString(1));
 				ddb.setSchema(rs.getString(1).split("\\.")[0]);
 
-
-				if(rs.getString(2).equalsIgnoreCase("all"))
-				{
+				if (rs.getString(2).equalsIgnoreCase("all")) {
 					ArrayList<String> arrs = new ArrayList<String>();
-					arrs = getFields("1", src_val, rs.getString(1), conn_id, rs.getString(1).split("\\.")[0], project_id,db_name);
+					arrs = getFields("1", src_val, rs.getString(1), conn_id, rs.getString(1).split("\\.")[0], project_id, db_name);
 					String fieldString = String.join(",", arrs);
 					ddb.setColumn_name(fieldString);
-				}
-				else
-				{
+				} else {
 					ddb.setColumn_name(rs.getString(2));
 				}
 				ddb.setWhere_clause(rs.getString(3));
@@ -1161,10 +1132,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 			connection.close();
 			System.out.println("Extracted the complete data");
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -1173,11 +1143,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getHivedbList(String project_id) throws Exception
-	{
+	public ArrayList<String> getHivedbList(String project_id) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement("SELECT DISTINCT db_name FROM  juniper_ext_hive_table_list");
@@ -1186,10 +1155,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -1197,11 +1165,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<String> getKafkaTopic() throws Exception
-	{
+	public ArrayList<String> getKafkaTopic() throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
 			pstm = connection.prepareStatement("SELECT kafka_topic FROM  juniper_ext_kafka_topic_master");
@@ -1210,10 +1177,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -1224,45 +1190,42 @@ public class ExtractionServiceImpl implements ExtractionService {
 	public ArrayList<String> getColList(String table_name) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement("SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p ON n.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=?");
+			pstm = connection.prepareStatement(
+					"SELECT DISTINCT n.FEED_UNIQUE_NAME FROM  JUNIPER_EXT_NIFI_STATUS n LEFT JOIN JUNIPER_PROJECT_MASTER p ON n.PROJECT_SEQUENCE=p.PROJECT_SEQUENCE WHERE p.PROJECT_ID=?");
 			pstm.setString(1, table_name);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
 		return arr;
 	}
 
-	public String getDatabaseData(String src_val,int src_sys_id) throws Exception
-	{
-		String sch="";
+	public String getDatabaseData(String src_val, int src_sys_id) throws Exception {
+		String sch = "";
 		Connection connection = null;
-		PreparedStatement pstm =null;
+		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			pstm = connection.prepareStatement(
-					"select table_name from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE="+src_sys_id);
+			pstm = connection.prepareStatement("select table_name from JUNIPER_EXT_TABLE_MASTER where FEED_SEQUENCE=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
 			while (rs.next()) {
-				sch=rs.getString(1).split("\\.")[0];
+				sch = rs.getString(1).split("\\.")[0];
 			}
 			connection.close();
 		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured "+e);
+			System.out.println("Exception occured " + e);
 			throw e;
-		}
-		finally {
+		} finally {
 			pstm.close();
 			connection.close();
 		}
@@ -1270,9 +1233,9 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public String getJsonFromFile(File file,String user,String project,int src_sys_id) throws Exception {
-		String str="";
-		ConnectionMaster conn=getConnections1("Oracle", src_sys_id);
+	public String getJsonFromFile(File file, String user, String project, int src_sys_id) throws Exception {
+		String str = "";
+		ConnectionMaster conn = getConnections1("Oracle", src_sys_id);
 		try (InputStream in = new FileInputStream(file)) {
 			CSV csv = new CSV(true, '|', in);
 			List<String> fieldNames = null;
@@ -1303,42 +1266,46 @@ public class ExtractionServiceImpl implements ExtractionService {
 			String schema, table, view, col, where, type, incr, val, err;
 			for (int i = 0; i < getArray.length(); i++) {
 				JSONObject objectInArray = getArray.getJSONObject(i);
-				schema = objectInArray.getString("schema_name"+(i+1));
-				table = objectInArray.getString("table_name"+(i+1));
-				view = objectInArray.getString("is_view"+(i+1));
-				col = objectInArray.getString("columns_name"+(i+1));
-				where = objectInArray.getString("where_clause"+(i+1));
-				type = objectInArray.getString("fetch_type"+(i+1));
-				incr = objectInArray.getString("incr_col"+(i+1));
-				val = objectInArray.getString("validation_flag"+(i+1));
-				err = objectInArray.getString("error_message"+(i+1));
-				//str = "{\"header\":{},\"body\":{\"data\":{" + "\"schema_name"+i+"\":\""+schema+"\"" + "}}";
-				if(where.equalsIgnoreCase(""))
-				{
-					where="1=1";
+				schema = objectInArray.getString("schema_name" + (i + 1));
+				table = objectInArray.getString("table_name" + (i + 1));
+				view = objectInArray.getString("is_view" + (i + 1));
+				col = objectInArray.getString("columns_name" + (i + 1));
+				where = objectInArray.getString("where_clause" + (i + 1));
+				type = objectInArray.getString("fetch_type" + (i + 1));
+				incr = objectInArray.getString("incr_col" + (i + 1));
+				val = objectInArray.getString("validation_flag" + (i + 1));
+				err = objectInArray.getString("error_message" + (i + 1));
+				// str = "{\"header\":{},\"body\":{\"data\":{" +
+				// "\"schema_name"+i+"\":\""+schema+"\"" + "}}";
+				if (where.equalsIgnoreCase("")) {
+					where = "1=1";
 				}
-				json.put("schema_name"+(i+1), schema);
-				json.put("table_name"+(i+1), schema+"."+table);
-				json.put("is_view"+(i+1), view);
-				json.put("columns_name"+(i+1), col);
-				json.put("where_clause"+(i+1), where);
-				json.put("fetch_type"+(i+1), type);
-				json.put("incr_col"+(i+1), incr);
-				json.put("validation_flag"+(i+1), val);
-				json.put("error_message"+(i+1), err);
+				else
+				{
+					where = where.replace("'","''");
+				}
+				json.put("schema_name" + (i + 1), schema);
+				json.put("table_name" + (i + 1), schema + "." + table);
+				json.put("is_view" + (i + 1), view);
+				json.put("columns_name" + (i + 1), col);
+				json.put("where_clause" + (i + 1), where);
+				json.put("fetch_type" + (i + 1), type);
+				json.put("incr_col" + (i + 1), incr);
+				json.put("validation_flag" + (i + 1), val);
+				json.put("error_message" + (i + 1), err);
 			}
 			json.put("project", project);
 			json.put("user", user);
-			json.put("counter", counter-1);
+			json.put("counter", counter - 1);
 			json.put("feed_id", src_sys_id);
 			json.put("connection_id", conn.getConnection_id());
 			str = "{\"header\":{},\"body\":{\"data\":" + json + "}}";
 		}
 		return str;
 	}
-	
+
 	@Override
-	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException {
+	public String getJsonFromFeedSequence(String project, String src_sys_id) throws JSONException {
 		JSONArray array_metadata = new JSONArray();
 		JSONObject item_metadata = new JSONObject();
 
@@ -1348,7 +1315,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		JSONArray array_metadata_first = new JSONArray();
 		JSONObject item_metadata_first = new JSONObject();
 		item_metadata.put("feed_sequence", src_sys_id);
-		item_metadata.put("project_id",project);
+		item_metadata.put("project_id", project);
 		array_metadata.put(item_metadata);
 		item_metadata_pre.put("data", array_metadata);
 		array_metadata_pre.put(item_metadata_pre);

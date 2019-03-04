@@ -61,5 +61,5 @@ public interface ExtractionService {
 	public String getDatabaseData(String src_val, int src_sys_id) throws Exception;
 	public String getJsonFromFile(File file,String user,String project,int src_sys_id) throws Exception;
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException;
-	
+	public int getRecCount(int src_sys_id) throws Exception;
 }

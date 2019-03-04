@@ -2,8 +2,7 @@
 
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
-<input type="hidden" name="counter" id="counter" class="form-control"
-	value="1">
+
 
 <script>
 	function bulkjsonconstruct() {
@@ -37,7 +36,7 @@
 </script>
 <div id="bulk_load">
 	<div class="form-group">
-		<a href='${pageContext.request.contextPath}/${href1}' target="_blank">Download
+		<a href='${href1}' target="_blank">Download
 			the Bulk Upload Details Template here!</a> <input type="file" id="file"
 			name="file" enctype="multipart/form-data" class="file-upload-default">
 		<div class="input-group col-xs-12">
