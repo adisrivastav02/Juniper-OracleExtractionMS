@@ -880,8 +880,7 @@ public class ExtractionController {
 	@RequestMapping(value = { "/extraction/FeedValidationDashboard" }, method = RequestMethod.POST)
 	public ModelAndView FeedValidationDashboard(@Valid @ModelAttribute("src_sys_id") int src_sys_id, @ModelAttribute("src_val") String src_val, ModelMap model, HttpServletRequest request)
 			throws Exception {
-		ConnectionMaster conn_val = es.getConnections1(src_val, src_sys_id);
-		ArrayList<TempDataDetailBean> arrddb = es.getTempData(src_sys_id, src_val, conn_val.getConnection_id(), (String) request.getSession().getAttribute("project_name"));
+		ArrayList<TempDataDetailBean> arrddb = es.getTempData(src_sys_id, src_val, (String) request.getSession().getAttribute("project_name"));
 		model.addAttribute("arrddb", arrddb);
 		// model.addAttribute("schem", schema_name);
 

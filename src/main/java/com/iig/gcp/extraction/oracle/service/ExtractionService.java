@@ -54,7 +54,7 @@ public interface ExtractionService {
 	public ArrayList<String> getRunFeeds(String project_id) throws Exception;
 	public ArrayList<RunFeedsBean> getLastRunFeeds(String project_id , String feed) throws Exception;
 	public ArrayList<String> getHivedbList(String project_id) throws Exception;
-	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id,String src_val, int conn_id, String project_id) throws Exception;
+	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id,String src_val,String project_id) throws Exception;
 	public String getBulkDataTemplate(int src_sys_id) throws Exception;		
 	public ArrayList<String> getKafkaTopic() throws Exception;
 	public ArrayList<String> getColList(String table_name) throws Exception;

@@ -495,7 +495,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-			String query = "select feed_sequence,feed_unique_name, " + "listagg(table_sequence, ',' ) within group (order by feed_unique_name) " + "from " + "("
+			String query = "select feed_sequence,feed_unique_name, " + "rtrim(xmlagg(XMLELEMENT(e,table_sequence,',').EXTRACT('//text()')).GetClobVal(),',') tbl_seq " + "from " + "("
 					+ "select a.FEED_SEQUENCE,a.FEED_UNIQUE_NAME,c.table_sequence " + "from " + "JUNIPER_EXT_FEED_MASTER a " + "inner join JUNIPER_EXT_FEED_SRC_TGT_LINK b "
 					+ "on a.feed_sequence=b.feed_sequence " + "left outer join JUNIPER_EXT_TABLE_MASTER c " + "on a.feed_sequence=c.feed_sequence "
 					+ "where a.project_sequence=(select project_sequence from juniper_project_master where project_id = '" + project_id + "') "
@@ -1095,7 +1095,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 	}
 
 	@Override
-	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id, String src_val, int conn_id, String project_id) throws Exception {
+	public ArrayList<TempDataDetailBean> getTempData(int src_sys_id, String src_val, String project_id) throws Exception {
 		TempDataDetailBean ddb = null;
 		String db_name = null;
 		ArrayList<TempDataDetailBean> arrddb = new ArrayList<TempDataDetailBean>();
@@ -1113,15 +1113,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				ddb = new TempDataDetailBean();
 				ddb.setTable_name(rs.getString(1));
 				ddb.setSchema(rs.getString(1).split("\\.")[0]);
-
-				if (rs.getString(2).equalsIgnoreCase("all")) {
-					ArrayList<String> arrs = new ArrayList<String>();
-					arrs = getFields("1", src_val, rs.getString(1), conn_id, rs.getString(1).split("\\.")[0], project_id, db_name);
-					String fieldString = String.join(",", arrs);
-					ddb.setColumn_name(fieldString);
-				} else {
-					ddb.setColumn_name(rs.getString(2));
-				}
+				ddb.setColumn_name(rs.getString(2));
 				ddb.setWhere_clause(rs.getString(3));
 				ddb.setFetch_type(rs.getString(4));
 				ddb.setIncremental_column(rs.getString(5));
