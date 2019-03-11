@@ -419,7 +419,9 @@ public class ExtractionController {
 			ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 			ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 			for (SourceSystemMaster ssm : src_sys_val) {
-				if (ssm.getFile_list() == null && ssm.getTable_list() == null) {
+				if ((ssm.getFile_list() == null || ssm.getFile_list().isEmpty()) && (ssm.getTable_list() == null || ssm.getTable_list().isEmpty())
+						&& (ssm.getDb_name()==null || ssm.getFile_list().isEmpty())) // 3rd Added for Hive 
+					{
 					src_sys_val1.add(ssm);
 				} else {
 					src_sys_val2.add(ssm);
@@ -531,7 +533,9 @@ public class ExtractionController {
 		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		for (SourceSystemMaster ssm : src_sys_val) {
-			if (ssm.getFile_list() == null && ssm.getTable_list() == null) {
+			if ((ssm.getFile_list() == null || ssm.getFile_list().isEmpty()) && (ssm.getTable_list() == null || ssm.getTable_list().isEmpty())
+					&& (ssm.getDb_name()==null || ssm.getFile_list().isEmpty())) // 3rd Added for Hive 
+				{
 				src_sys_val1.add(ssm);
 			} else {
 				src_sys_val2.add(ssm);
@@ -588,7 +592,8 @@ public class ExtractionController {
 			src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 
 			for (SourceSystemMaster ssm : src_sys_val) {
-				if (ssm.getFile_list() == null && ssm.getTable_list() == null && ssm.getDb_name() == null)
+				if ((ssm.getFile_list() == null || ssm.getFile_list().isEmpty()) && (ssm.getTable_list() == null || ssm.getTable_list().isEmpty())
+						&& (ssm.getDb_name()==null || ssm.getFile_list().isEmpty())) // 3rd Added for Hive 
 					; // 3rd Added for Hive
 				else {
 					src_sys_val1.add(ssm);
@@ -772,7 +777,8 @@ public class ExtractionController {
 		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		for (SourceSystemMaster ssm : src_sys_val) {
-			if (ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) // 3rd Added for Hive
+			if ((ssm.getFile_list() == null || ssm.getFile_list().isEmpty()) && (ssm.getTable_list() == null || ssm.getTable_list().isEmpty())
+					&& (ssm.getDb_name()==null || ssm.getFile_list().isEmpty())) // 3rd Added for Hive 
 			{
 				src_sys_val1.add(ssm);
 			} else {
@@ -834,7 +840,8 @@ public class ExtractionController {
 		ArrayList<SourceSystemMaster> src_sys_val2 = new ArrayList<SourceSystemMaster>();
 		ArrayList<SourceSystemMaster> src_sys_val = es.getSources(src_val, (String) request.getSession().getAttribute("project_name"));
 		for (SourceSystemMaster ssm : src_sys_val) {
-			if (ssm.getFile_list() == null && ssm.getTable_list() == null & ssm.getDb_name() == null) // 3rd Added for Hive
+			if ((ssm.getFile_list() == null || ssm.getFile_list().isEmpty()) && (ssm.getTable_list() == null || ssm.getTable_list().isEmpty())
+					&& (ssm.getDb_name()==null || ssm.getFile_list().isEmpty())) // 3rd Added for Hive 
 			{
 				src_sys_val1.add(ssm);
 			} else {
