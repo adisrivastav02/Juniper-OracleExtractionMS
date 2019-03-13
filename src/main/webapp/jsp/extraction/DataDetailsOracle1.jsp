@@ -6,10 +6,10 @@
 <div id="ind_load${id}">
 	<div id="tbl_fld${id}">
 		<div class="form-group row">
-			<div class="col-sm-6">
+			<div class="col-sm-4">
 				<label>Select Table *</label> 
 				
-				<input list="tables${id}" name="table_name${id}" id="table_name${id}" class="form-control" onchange="getcols(this.id,this.value)">
+				<input list="tables${id}" name="table_name${id}" id="table_name${id}" class="form-control" onchange="getcols(this.id)">
 			  	<datalist id="tables${id}">
 			    	<c:forEach items="${tables}" var="tables">
 						<option value="${schema_name}.${tables}">
@@ -25,17 +25,23 @@
 					</c:forEach>
 				</select>-->
 			</div>
-			<div class="col-sm-6">
+			<div class="col-sm-4">
+				<label>Select Columns *</label> <select class="form-control"
+					id="cole${id}" name="cole${id}" onchange="getcols(this.id)">
+							<option value="all" selected>Select All</option>
+							<option value="custom">Custom</option>
+				</select>
+			</div>
+			<div class="col-sm-4">
 				<label>Load Type *</label> <select class="form-control"
 					id="fetch_type${id}" name="fetch_type${id}"
-					onchange="incr(this.id,this.value)">
+					onchange="getcols(this.id)">
 					<c:choose>
 						<c:when test="${ext_type=='Real'}">
 							<option value="full" selected>Full Load</option>
 						</c:when>
 						<c:otherwise>
-							<option value="" selected disabled>Load Type ...</option>
-							<option value="full">Full Load</option>
+							<option value="full" selected>Full Load</option>
 							<option value="incr">Incremental Load</option>
 						</c:otherwise>
 					</c:choose>

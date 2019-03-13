@@ -51,6 +51,7 @@ function loadcheck(val) {
 	document.getElementById("schdiv").innerHTML="";
 	document.getElementById("datadiv").innerHTML="";
 	if (val == 'ind_load') {
+		document.getElementById("schdiv").style.display="block";
 		var selection = $("input[name='radio']:checked").val();
 		var src_val = document.getElementById("src_val").value;
 		if (selection == 'create') {
@@ -73,6 +74,7 @@ function loadcheck(val) {
 			});
 		}
 	} else if (val == 'bulk_load') {
+		document.getElementById("schdiv").style.display="none";
 		var selection = $("input[name='radio']:checked").val();
 		if(document.getElementById("feed_id1").style.display==="none")
 		{
@@ -134,7 +136,7 @@ function getsch(id, val) {
 						}
 					});
 }
-function getcols(id, val) {
+function getcols(id) {
 	var in1 = id.slice(-1);
 	var in2 = id.slice(-2, -1);
 	if (in2 === "e")
@@ -143,34 +145,36 @@ function getcols(id, val) {
 		in1 = id.slice(-2);
 	}
 	var id = in1;
-	var table_name = val;
+	var table_name = document.getElementById("table_name"+id).value;
 	var src_val = document.getElementById("src_val").value;
 	var connection_id = document.getElementById("connection_id").value;
 	var schema_name = document.getElementById("schema_name"+id).value;
-	$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
+	var fetch_type = document.getElementById("fetch_type"+id).value;
+	var cols = document.getElementById("cole"+id).value;
+	if(fetch_type == "full" && cols == "all")
 	{
-		id : id,
-		src_val : src_val,
-		table_name : table_name,
-		connection_id : connection_id,
-		schema_name : schema_name
-	}, function(data) {
-		$("#fldd"+id).html(data);
-	});
-}
-function incr(id, val) {
-	var in1 = id.slice(-1);
-	var in2 = id.slice(-2, -1);
-	if (in2 === "e")
-		;
-	else {
-		in1 = id.slice(-2);
-	}
-	var in3 = 'incc' + in1;
-	if (val == "incr") {
-		document.getElementById(in3).style.display = "block";
-	} else if (val == "full") {
-		document.getElementById(in3).style.display = "none";
+		$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle22',
+		{
+			id : id
+		}, function(data) {
+			$("#fldd"+id).html(data);
+		});
+	} else {
+		$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
+		{
+			id : id,
+			src_val : src_val,
+			table_name : table_name,
+			connection_id : connection_id,
+			schema_name : schema_name
+		}, function(data) {
+			$("#fldd"+id).html(data);
+		});
+		if (fetch_type == "incr") {
+			document.getElementById("incc"+id).style.display = "block";
+		} else if (fetch_type == "full") {
+			document.getElementById("incc"+id).style.display = "none";
+		} 
 	}
 }
 
@@ -284,6 +288,17 @@ function dup_div() {
 			'value' : ''
 		});
 	}).end().appendTo("#datadiv");
+	clone1.find("select[id=cole1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return id.slice(0, -1) + i
+			},
+			'name' : function(_, name) {
+				return name.slice(0, -1) + i
+			},
+			'value' : ''
+		});
+	}).end().appendTo("#datadiv");
 	clone1.find("select[id=incr_col1]").each(function() {
 		$(this).attr({
 			'id' : function(_, id) {
@@ -307,8 +322,8 @@ function dup_div() {
 			}
 		});
 	}).end().appendTo("#datadiv");
-	$('#schema_name' + i).find('option').remove().end().append(
-			'<option value="">Schema ...</option>').val('');
+	//$('#schema_name' + i).find('option').remove().end().append(
+	//		'<option value="">Schema ...</option>').val('');
 	$('#table_name' + i).find('option').remove().end().append(
 			'<option value="">Table ...</option>').val('');
 	$('#col_name' + i).find('option').remove().end().append(
@@ -355,6 +370,8 @@ function delblock(id)
 		$("#table_name"+i).attr("list","table_name"+id);
 		$("#table_name"+i).attr("id","table_name"+id);
 		$("#tables"+i).attr("id","tables"+id);
+		$("#cole"+i).attr("name","cole"+id);
+		$("#cole"+i).attr("id","cole"+id);
 		$("#fetch_type"+i).attr("name","fetch_type"+id);
 		$("#fetch_type"+i).attr("id","fetch_type"+id);
 		$("#fldd"+i).attr("id","fldd"+id);

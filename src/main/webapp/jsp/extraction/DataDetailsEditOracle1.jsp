@@ -32,20 +32,27 @@ document.getElementById('bord').style.display = "block";
 		<div id="ind_load${theCount.count}">
 			<div id="tbl_fld${theCount.count}">
 				<div class="form-group row">
-					<div class="col-sm-6">
+					<div class="col-sm-4">
 						<label>Select Table *</label> <input
 							list="tables${theCount.count}" name="table_name${theCount.count}" 
 							id="table_name${theCount.count}" value="${arrddb.schema_name}.${arrddb.table_name}" class="form-control"
-							onchange="getcols(this.id,this.value)">
+							onchange="getcols(this.id)">
 						<datalist id="tables${theCount.count}">
 							<option value="${arrddb.schema_name}.${arrddb.table_name}">
 						</datalist>
 					</div>
-					<div class="col-sm-6">
+					<div class="col-sm-4">
+						<label>Select Columns *</label> <select class="form-control"
+							id="cole${theCount.count}" name="cole${theCount.count}" onchange="getcols(this.id)">
+									<option value="all">Select All</option>
+									<option value="custom" selected>Custom</option>
+						</select>
+					</div>
+					<div class="col-sm-4">
 						<label>Load Type *</label> <select class="form-control"
 							id="fetch_type${theCount.count}"
 							name="fetch_type${theCount.count}"
-							onchange="incr(this.id,this.value)">
+							onchange="getcols(this.id)">
 							<c:choose>
 								<c:when test="${ext_type=='Real'}">
 									<option value="full" selected>Full Load</option>

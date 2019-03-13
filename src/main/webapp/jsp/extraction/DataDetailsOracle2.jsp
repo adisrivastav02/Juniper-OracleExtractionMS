@@ -24,20 +24,34 @@
 	<div
 		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
 		id="avl${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)">
-		<button id="but${id}" name="but${id}" value="*" class="btn btn-dark"
-			draggable="true" ondragstart="drag(event)"
-			style="width: 90%; margin: 5px; padding: 10px 0px;"
-			onclick="return false;">Select All</button>
-		<c:forEach var="fields" items="${fields}">
-			<button id="${fields}${id}" name="${fields}${id}" value="${fields}"
-				class="btn btn-dark" draggable="true" ondragstart="drag(event)"
+		<c:choose>
+			<c:when test="${fields==''}">
+				
+			</c:when>
+			<c:otherwise>
+			<button id="but${id}" name="but${id}" value="*" class="btn btn-dark"
+				draggable="true" ondragstart="drag(event)"
 				style="width: 90%; margin: 5px; padding: 10px 0px;"
-				onclick="return false;">${fields}</button>
-		</c:forEach>
+				onclick="return false;">Select All</button>
+			<c:forEach var="fields" items="${fields}">
+				<button id="${fields}${id}" name="${fields}${id}" value="${fields}"
+					class="btn btn-dark" draggable="true" ondragstart="drag(event)"
+					style="width: 90%; margin: 5px; padding: 10px 0px;"
+					onclick="return false;">${fields}</button>
+			</c:forEach>	
+			</c:otherwise>
+		</c:choose>
 	</div>
 	<div
 		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
-		id="sel${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)"></div>
+		id="sel${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)">
+		<c:if test="${fields==''}">
+			<button id="but${id}" name="but${id}" value="*" class="btn btn-dark"
+			draggable="true" ondragstart="drag(event)"
+			style="width: 90%; margin: 5px; padding: 10px 0px;"
+			onclick="return false;">Select All</button>
+		</c:if>
+		</div>
 	<div
 		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
 		id="tok${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)"></div>

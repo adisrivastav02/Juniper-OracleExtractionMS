@@ -484,6 +484,14 @@ public class ExtractionController {
 
 		return new ModelAndView("extraction/DataDetailsOracle2");
 	}
+	
+	@RequestMapping(value = "/extraction/DataDetailsOracle22", method = RequestMethod.POST)
+	public ModelAndView DataDetails22(@Valid @ModelAttribute("id") String id, ModelMap model, HttpServletRequest request)
+			throws UnsupportedOperationException, Exception {
+		model.addAttribute("fields", "");
+		model.addAttribute("id", id);
+		return new ModelAndView("extraction/DataDetailsOracle2");
+	}
 
 	@RequestMapping(value = "/extraction/DataDetailsOracle3", method = RequestMethod.POST)
 	public ModelAndView DataDetails3(@Valid @ModelAttribute("src_val") String src_val, @ModelAttribute("x") String x, ModelMap model, HttpServletRequest request)
