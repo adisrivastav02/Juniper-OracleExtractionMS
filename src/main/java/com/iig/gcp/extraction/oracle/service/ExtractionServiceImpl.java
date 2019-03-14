@@ -653,26 +653,29 @@ public class ExtractionServiceImpl implements ExtractionService {
 				ddb.setSchema_name(rs.getString(1));
 				ddb.setTable_name(rs.getString(2));
 				ArrayList<String> arrs = new ArrayList<String>();
-				if (rs.getString(3).equalsIgnoreCase("all")) {
-					arrs = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn_id, rs.getString(1), project_id, db_name);
-					String fieldString = String.join(",", arrs);
-					ddb.setColumn_name(fieldString);
-				} else {
+				//if (rs.getString(3).equalsIgnoreCase("all")) {
+					//arrs = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn_id, rs.getString(1), project_id, db_name);
+					//String fieldString = String.join(",", arrs);
+					//ddb.setColumn_name(fieldString);
+				//} else {
 					ddb.setColumn_name(rs.getString(3));
-				}
+				//}
 				ddb.setWhere_clause(rs.getString(4));
 				ddb.setFetch_type(rs.getString(5));
 				ddb.setIncr_column(rs.getString(6));
-				ArrayList<String> agf = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn.getConnection_id(), rs.getString(1), project_id, db_name);
-				String cols = agf.toString();
-				cols = cols.substring(1, cols.length() - 1).replace(", ", ",");
-				ddb.setCols(cols);
-				for (String temp : arrs) {
-					agf.remove(temp);
+				if (rs.getString(3).equalsIgnoreCase("all") && rs.getString(5).equalsIgnoreCase("full"));
+				else {
+					ArrayList<String> agf = getFields("1", src_val, rs.getString(1) + "." + rs.getString(2), conn.getConnection_id(), rs.getString(1), project_id, db_name);
+					String cols = agf.toString();
+					cols = cols.substring(1, cols.length() - 1).replace(", ", ",");
+					ddb.setCols(cols);
+					for (String temp : arrs) {
+						agf.remove(temp);
+					}
+					String unsel_cols = agf.toString();
+					unsel_cols = unsel_cols.substring(1, unsel_cols.length() - 1).replace(", ", ",");
+					ddb.setUnsel_cols(unsel_cols);
 				}
-				String unsel_cols = agf.toString();
-				unsel_cols = unsel_cols.substring(1, unsel_cols.length() - 1).replace(", ", ",");
-				ddb.setUnsel_cols(unsel_cols);
 				arrddb.add(ddb);
 			}
 		} catch (ClassNotFoundException | SQLException e) {

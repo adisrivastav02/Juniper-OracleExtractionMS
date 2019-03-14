@@ -10,6 +10,7 @@ $(document).ready(function() {
 	$("#feed_id1").change(function() {
 		$("#loading").show();
 		document.getElementById('load_type').style.display = "none";
+		document.getElementById('but').style.display = "none";
 		document.getElementById('schdiv').innerHTML = "";
 		document.getElementById('datadiv').innerHTML = "";
 		var src_sys_id = document.getElementById("feed_id1").value;
@@ -43,6 +44,7 @@ function funccheck(val) {
 		window.location.href = "${pageContext.request.contextPath}/extraction/DataDetails";
 	} else if (val == 'edit') {
 		document.getElementById('feed_id').style.display = "none";
+		document.getElementById('but').style.display = "none";
 		document.getElementById('feed_id1').style.display = "block";
 		document.getElementById('load_type').style.display = "none";
 		document.getElementById('bord').style.display = "none";
@@ -85,6 +87,7 @@ function loadcheck(val) {
 	} else if (val == 'bulk_load') {
 		$("#loading").show();
 		document.getElementById("schdiv").style.display="none";
+		document.getElementById('but').style.display = "none";
 		var selection = $("input[name='radio']:checked").val();
 		if(document.getElementById("feed_id1").style.display==="none")
 		{
@@ -213,6 +216,15 @@ function dup_div() {
 		    'value': ''               
 		});
 	}).end().appendTo("#datadiv");*/
+	clone.find("div[id=countt1]").each(function() {
+		$(this).attr({
+			'id' : function(_, id) {
+				return (isNaN(id.slice(-2, -1)) ? (id.slice(0, -1)+i) : (id.slice(0, -2)+i))
+			},
+			'value' : ''
+		});
+		$(this).html("<b>"+i+".</b>");
+	}).end().appendTo("#datadiv");
 	clone.find("input[id!=schema_name1]").each(function() {
 		$(this).attr({
 			'id' : function(_, id) {
@@ -378,6 +390,8 @@ function delblock(id)
 	else
 	{	//sort order by element inspection to be maintained
 		$("#schm_div"+i).attr("id","schm_div"+id);
+		$("#countt"+i).html("<b>"+id+".</b>");
+		$("#countt"+i).attr("id","countt"+id);
 		$("#schema_name"+i).attr("name","schema_name"+id);
 		$("#schema_name"+i).attr("list","schemas"+id);
 		$("#schema_name"+i).attr("id","schema_name"+id);

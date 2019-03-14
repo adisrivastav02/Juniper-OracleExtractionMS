@@ -10,8 +10,12 @@ document.getElementById('bord').style.display = "block";
 <input type="hidden" name="connection_id" id="connection_id"
 	class="form-control" value="${conn_val.connection_id}">
 <c:forEach items="${arrddb}" var="arrddb" varStatus="theCount">
+<hr />
 	<div class="form-group row" id="schm_div${theCount.count}">
-		<div class="col-sm-10">
+	<div id="countt${theCount.count}" class="col-sm-1">
+		<b>${theCount.count}.</b>
+	</div>
+		<div class="col-sm-9">
 			<label>Schema Name *</label> <input list="schemas${theCount.count}"
 				name="schema_name${theCount.count}" value="${arrddb.schema_name}"
 				id="schema_name${theCount.count}" class="form-control"
@@ -44,8 +48,16 @@ document.getElementById('bord').style.display = "block";
 					<div class="col-sm-4">
 						<label>Select Columns *</label> <select class="form-control"
 							id="cole${theCount.count}" name="cole${theCount.count}" onchange="disableForm(DataDetails);getcols(this.id)">
-									<option value="all">Select All</option>
+							<c:choose>
+							<c:when test="${arrddb.column_name=='all'}">
+									<option value="all" selected>Select All</option>
+									<option value="custom">Custom</option>
+							</c:when>
+							<c:otherwise>
 									<option value="custom" selected>Custom</option>
+									<option value="all">Select All</option>
+							</c:otherwise>
+							</c:choose>
 						</select>
 					</div>
 					<div class="col-sm-4">
@@ -133,6 +145,10 @@ document.getElementById('bord').style.display = "block";
 							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
 							id="avl${theCount.count}" ondrop="drop(event,this)"
 							ondragover="allowDrop(event)">
+							<c:choose>
+							<c:when test="${arrddb.column_name=='all'}">
+							</c:when>
+							<c:otherwise>
 							<button id="but${theCount.count}" name="but${theCount.count}"
 								value="*" class="btn btn-dark" draggable="true"
 								ondragstart="drag(event)"
@@ -144,17 +160,30 @@ document.getElementById('bord').style.display = "block";
 									style="width: 90%; margin: 5px; padding: 10px 0px;"
 									onclick="return false;">${mySplit}</button>
 							</c:forTokens>
+							</c:otherwise>
+							</c:choose>
 						</div>
 						<div
 							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
 							id="sel${theCount.count}" ondrop="drop(event,this)"
 							ondragover="allowDrop(event)">
+							<c:choose>
+							<c:when test="${arrddb.column_name=='all'}">
+							<button id="but${theCount.count}" name="but${theCount.count}"
+								value="*" class="btn btn-dark" draggable="true"
+								ondragstart="drag(event)"
+								style="width: 90%; margin: 5px; padding: 10px 0px;"
+								onclick="return false;">Select All</button>
+							</c:when>
+							<c:otherwise>
 							<c:forTokens items="${arrddb.column_name}" delims="," var="mySplit">
 								<button id="${mySplit}${theCount.count}" name="${mySplit}${theCount.count}" value="${mySplit}"
 									class="btn btn-dark" draggable="true" ondragstart="drag(event)"
 									style="width: 90%; margin: 5px; padding: 10px 0px;"
 									onclick="return false;">${mySplit}</button>
 							</c:forTokens>
+							</c:otherwise>
+							</c:choose>
 							</div>
 						<div
 							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"

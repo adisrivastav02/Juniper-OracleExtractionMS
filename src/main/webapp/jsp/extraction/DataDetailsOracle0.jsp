@@ -4,7 +4,10 @@ document.getElementById('bord').style.display = "block";
 </script>
 
 <div class="form-group row" id="schm_div1">
-	<div class="col-sm-10">
+<div id="countt1" class="col-sm-1">
+		<b>1.</b>
+	</div>
+	<div class="col-sm-9">
 		<label>Schema Name *</label> <input list="schemas1"
 			name="schema_name1" id="schema_name1" class="form-control"
 			onchange="disableForm(DataDetails);getsch(this.id,this.value)">
