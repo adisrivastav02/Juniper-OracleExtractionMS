@@ -95,7 +95,27 @@
 		document.getElementById(tgt_id).value=result;
   } 
   
+  function disableForm(theform) {
+      if (document.all || document.getElementById) {
+          for (i = 0; i < theform.length; i++) {
+          var formElement = theform.elements[i];
+              if (true) {
+                  formElement.disabled = true;
+              }
+          }
+      }
+  }
 
+function enableForm(theform) {
+      if (document.all || document.getElementById) {
+          for (i = 0; i < theform.length; i++) {
+          var formElement = theform.elements[i];
+              if (true) {
+                  formElement.disabled = false;
+              }
+          }
+      }
+  }
   </script>
    <style>
 .cust {
@@ -169,19 +189,43 @@
   font-size:0.8em;
   font-weight:bold;
 }
+
+#loading {
+   width: 100%;
+   height: 100%;
+   top: 0;
+   left: 0;
+   position: static;
+   display: block;
+   opacity: 1;
+   z-index: 99;
+   text-align: center;
+}
+
+#loading-image {
+  position: absolute;
+  top: 250px;
+  left: 700px;
+  z-index: 99;
+}
+
 </style>
 </head>
 <body>
-  <div class="container-scroller">
+  <div class="container-scroller" >
+  <div id="loading" style="display:none" >
+		<img id="loading-image" src="${pageContext.request.contextPath}/assets/img/load.gif" alt="Loading..." />
+	</div>
     <!-- partial:partials/_navbar.html -->
     <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-       <a class="navbar-brand brand-logo" href="/parent"><img src="${pageContext.request.contextPath}/assets/img/juniper.jpg" alt="logo"/></a>
-        <a class="navbar-brand brand-logo-mini" href="${pageContext.request.contextPath}/"><img src="${pageContext.request.contextPath}/assets/img/junipersmall.jpg" alt="logo"/></a>
-      </div>
+	      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+	       <a class="navbar-brand brand-logo" href="/parent"><img src="${pageContext.request.contextPath}/assets/img/juniper.jpg" alt="logo"/></a>
+	        <a class="navbar-brand brand-logo-mini" href="${pageContext.request.contextPath}/"><img src="${pageContext.request.contextPath}/assets/img/junipersmall.jpg" alt="logo"/></a>
+	      </div>
+    
       <div class="navbar-menu-wrapper d-flex align-items-stretch">
       	<div class="navbar-nav navbar-nav-left">
-			
+			<font color="black"><b>${project}</b></font>&nbsp<font size="2" color="red"><b>(ORACLE)</b></font>
         </div>
         <ul class="navbar-nav navbar-nav-right">
           <li class="nav-item nav-profile dropdown">
@@ -213,6 +257,11 @@
                 Logout
               </a>
             </div>
+          </li>
+           <li class="nav-item nav-logout d-none d-lg-block">
+           <a class="nav-link" href="${pageContext.request.contextPath}/parent">
+              <i class=" mdi mdi-home"></i>
+            </a> 
           </li>
           <li class="nav-item d-none d-lg-block full-screen-link">
             <a class="nav-link">

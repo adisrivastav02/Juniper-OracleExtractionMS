@@ -32,7 +32,7 @@
 			reportErrors(errors);
 			return false;
 		}
-		
+		$("#loading").show();
 		multisel('targetx', 'target');
 		var data = {};
 		document.getElementById('button_type').value = val;
@@ -72,6 +72,8 @@
 			return false;
 		});
 		$("#src_sys").change(function() {
+			$("#cud").show();
+			$("#loading").show();
 			if (document.getElementById("src_sys").value == "") {
 				window.location.reload();
 			} else {
@@ -81,7 +83,9 @@
 					src_sys : src_sys,
 					src_val : src_val
 				}, function(data) {
-					$('#cud').html(data)
+					$("#loading").hide();
+					$('#cud').html(data);
+					enableForm(ExtractData);
 				});
 			}
 		});
@@ -104,8 +108,12 @@
 	function funccheck(val) {
 		if (val == 'create') {
 			//window.location.reload();
+			$("#loading").show();
+			$("#sysfunc").hide();
+			$("#cud").hide();
 			window.location.href="${pageContext.request.contextPath}/extraction/SystemDetails";
 		} else {
+			$("#cud").hide();
 			document.getElementById('sysfunc').style.display = "block";
 		}
 	}
@@ -175,7 +183,7 @@
 							</div>
 							<div class="form-group" id="sysfunc" style="display: none;">
 								<label>Select Source Feed</label> <select name="src_sys" id="src_sys"
-									class="form-control">
+									class="form-control" onchange="disableForm(ExtractData)">
 									<option value="" selected disabled>Select Source Feed ...</option>
 									<c:forEach items="${src_sys_val}" var="src_sys_val">
 										<option value="${src_sys_val.src_sys_id}">${src_sys_val.src_unique_name}</option>

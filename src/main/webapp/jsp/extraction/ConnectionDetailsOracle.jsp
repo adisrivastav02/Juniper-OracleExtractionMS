@@ -37,7 +37,7 @@
 			reportErrors(errors);
 			return false;
 		}
-
+		$("#loading").show();
 		var data = {};
 		document.getElementById('button_type').value = val;
 		$(".form-control").serializeArray().map(function(x) {
@@ -55,6 +55,7 @@
 						$("#conn")
 								.change(
 										function() {
+											$("#loading").show();
 											var conn = $(this).val();
 											var src_val = document
 													.getElementById("src_val").value;
@@ -65,8 +66,9 @@
 																conn : conn,
 																src_val : src_val
 															}, function(data) {
-																$('#cud').html(
-																		data)
+																$("#loading").hide();
+																$('#cud').html(data);
+																enableForm(ConnectionDetails);
 															});
 										});
 						$("#success-alert").hide();
@@ -162,7 +164,7 @@
 
 							<div class="form-group" id="connfunc" style="display: none;">
 								<label>Select Connection</label> <select name="conn" id="conn"
-									class="form-control">
+									class="form-control" onchange="disableForm(ConnectionDetails)">
 									<option value="" selected disabled>Select Connection
 										...</option>
 									<c:forEach items="${conn_val}" var="conn_val">

@@ -60,7 +60,7 @@
 			reportErrors(errors);
 			return false;
 		}
-
+		$("#loading").show();
 		var data = {};
 		if (document.getElementById("materialization_flag").value == "")
 			document.getElementById("materialization_flag").value = 'N';
@@ -130,6 +130,8 @@
 	}
 
 	function chg() {
+		$("#cud").show();
+		$("#loading").show();
 		if (document.getElementById("tgt").value == "") {
 			window.location.reload();
 		} else {
@@ -140,7 +142,9 @@
 							{
 								tgt : tgt
 							}, function(data) {
-								$('#cud').html(data)
+								$("#loading").hide();
+								$('#cud').html(data);
+								enableForm(TargetDetails);
 							});
 		}
 	}
@@ -148,8 +152,12 @@
 	function funccheck(val) {
 		if (val == 'create') {
 			//window.location.reload();
+			$("#loading").show();
+			$("#tgtfunc").hide();
+			$("#cud").hide();
 			window.location.href = "${pageContext.request.contextPath}/extraction/TargetDetails";
 		} else {
+			$("#cud").hide();
 			document.getElementById('tgtfunc').style.display = "block";
 		}
 	}
@@ -172,6 +180,7 @@
 						$("#target_project")
 								.change(
 										function() {
+											$("#loading").show();
 											var project1 = document
 													.getElementById('target_project').value;
 											$
@@ -181,9 +190,9 @@
 																project1 : project1
 															},
 															function(data) {
-																$('#gdyn')
-																		.html(
-																				data)
+																$("#loading").hide();
+																$('#gdyn').html(data);
+																enableForm(TargetDetails);
 															});
 										});
 						$("#success-alert").hide();
@@ -246,7 +255,7 @@
 										<label class="form-check-label"> <input type="radio"
 											class="form-check-input" name="radio" id="radio1"
 											checked="checked" value="create"
-											onclick="funccheck(this.value)"> Create
+											onclick="disableForm(TargetDetails);funccheck(this.value)"> Create
 										</label>
 									</div>
 								</div>
@@ -262,7 +271,7 @@
 							</div>
 							<div class="form-group" id="tgtfunc" style="display: none;">
 								<label>Select Target</label> <select name="tgt" id="tgt"
-									class="form-control" onchange="chg()">
+									class="form-control" onchange="disableForm(TargetDetails);chg()">
 									<option value="" selected disabled>Select Target ...</option>
 									<c:forEach items="${tgt_val}" var="tgt_val">
 										<option value="${tgt_val.target_conn_sequence}">${tgt_val.target_unique_name}</option>
@@ -297,7 +306,7 @@
 													<div class="col-sm-12">
 														<label>Target Project *</label> <select
 															name="target_project" id="target_project"
-															class="form-control">
+															class="form-control" onchange="disableForm(TargetDetails)">
 															<option value="" selected disabled>Select Target
 																Project...</option>
 															<c:forEach items="${tproj}" var="tproj">
