@@ -203,7 +203,7 @@ function enableForm(theform) {
 }
 
 #loading-image {
-  position: absolute;
+  position: fixed;
   top: 250px;
   left: 700px;
   z-index: 99;

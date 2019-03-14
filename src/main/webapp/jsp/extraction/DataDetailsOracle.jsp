@@ -8,6 +8,7 @@ $(document).ready(function() {
 		document.getElementById('datadiv').innerHTML = "";
 	});
 	$("#feed_id1").change(function() {
+		$("#loading").show();
 		document.getElementById('load_type').style.display = "none";
 		document.getElementById('schdiv').innerHTML = "";
 		document.getElementById('datadiv').innerHTML = "";
@@ -19,8 +20,10 @@ $(document).ready(function() {
 			src_val : src_val
 		},
 		function(data) {
+			$("#loading").hide();
 			document.getElementById('bord').style.display = "block";
-			$('#datadiv').html(data)
+			$('#datadiv').html(data);
+			enableForm(DataDetails);
 		});
 	});
 	$("#success-alert").hide();
@@ -55,25 +58,32 @@ function loadcheck(val) {
 		var selection = $("input[name='radio']:checked").val();
 		var src_val = document.getElementById("src_val").value;
 		if (selection == 'create') {
+			$("#loading").show();
 			var src_sys_id = document.getElementById("feed_id").value;
 			$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle0',
 			{
 				src_sys_id : src_sys_id,
 				src_val : src_val
 			}, function(data) {
-				$('#schdiv').html(data)
+				$("#loading").hide();
+				$('#schdiv').html(data);
+				enableForm(DataDetails);
 			});
 		} else if (selection == 'edit') {
+			$("#loading").show();
 			var src_sys_id = document.getElementById("feed_id1").value;
 			$.post('${pageContext.request.contextPath}/extraction/DataDetailsEditOracle',
 			{
 				src_sys_id : src_sys_id,
 				src_val : src_val
 			}, function(data) {
-				$('#datadiv').html(data)
+				$("#loading").hide();
+				$('#datadiv').html(data);
+				enableForm(DataDetails);
 			});
 		}
 	} else if (val == 'bulk_load') {
+		$("#loading").show();
 		document.getElementById("schdiv").style.display="none";
 		var selection = $("input[name='radio']:checked").val();
 		if(document.getElementById("feed_id1").style.display==="none")
@@ -91,11 +101,14 @@ function loadcheck(val) {
 			src_val : src_val,
 			selection : selection
 		}, function(data) {
-			$('#datadiv').html(data)
+			$("#loading").hide();
+			$('#datadiv').html(data);
+			enableForm(DataDetails);
 		});
 	}
 }
 function getsch(id, val) {
+	$("#loading").show();
 	var in1 = id.slice(-1);
 	var in2 = id.slice(-2, -1);
 	if (in2 === "e")
@@ -123,6 +136,7 @@ function getsch(id, val) {
 						src_val : src_val,
 						schema_name : schema_name
 					}, function(data) {
+						$("#loading").hide();
 						$('#datdiv' + id).html(data);
 						for (var j = 1; j < id; j++) {
 							var vl = document.getElementById('table_name' + j).value;
@@ -134,9 +148,11 @@ function getsch(id, val) {
 								}
 							}
 						}
+						enableForm(DataDetails);
 					});
 }
 function getcols(id) {
+	$("#loading").show();
 	var in1 = id.slice(-1);
 	var in2 = id.slice(-2, -1);
 	if (in2 === "e")
@@ -157,7 +173,9 @@ function getcols(id) {
 		{
 			id : id
 		}, function(data) {
+			$("#loading").hide();
 			$("#fldd"+id).html(data);
+			enableForm(DataDetails);
 		});
 	} else {
 		$.post('${pageContext.request.contextPath}/extraction/DataDetailsOracle2',
@@ -168,7 +186,9 @@ function getcols(id) {
 			connection_id : connection_id,
 			schema_name : schema_name
 		}, function(data) {
+			$("#loading").hide();
 			$("#fldd"+id).html(data);
+			enableForm(DataDetails);
 		});
 		if (fetch_type == "incr") {
 			document.getElementById("incc"+id).style.display = "block";
@@ -511,6 +531,8 @@ function jsonconstruct() {
 		reportErrors(errors);
 		return false;
 	}
+	
+	$("#loading").show();
 
 	var data = {};
 	$(".form-control").serializeArray().map(function(x) {
@@ -594,7 +616,7 @@ function jsonconstruct() {
 									<c:forEach items="${src_sys_val1}" var="src_sys_val1">
 										<option value="${src_sys_val1.src_sys_id}">${src_sys_val1.src_unique_name}</option>
 									</c:forEach>
-								</select> <select name="feed_id1" id="feed_id1" class="form-control"
+								</select> <select name="feed_id1" id="feed_id1" class="form-control" onchange="disableForm(DataDetails);"
 									style="display: none;">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
@@ -610,7 +632,7 @@ function jsonconstruct() {
 									<div class="form-check form-check-info">
 										<label class="form-check-label"> <input type="radio"
 											class="form-check-input" name="bulk" id="bulk1"
-											value="ind_load" onclick="loadcheck(this.value)">
+											value="ind_load" onclick="disableForm(DataDetails);loadcheck(this.value)">
 											Individual Load Type
 										</label>
 									</div>
@@ -619,7 +641,7 @@ function jsonconstruct() {
 									<div class="form-check form-check-info">
 										<label class="form-check-label"> <input type="radio"
 											class="form-check-input" name="bulk" id="bulk2"
-											value="bulk_load" onclick="loadcheck(this.value)">
+											value="bulk_load" onclick="disableForm(DataDetails);loadcheck(this.value)">
 											Bulk Load Type
 										</label>
 									</div>

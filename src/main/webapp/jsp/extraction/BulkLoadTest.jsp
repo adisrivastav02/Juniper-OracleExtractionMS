@@ -19,6 +19,7 @@
 				reportErrors(errors);
 				return false;
 			}
+			$("#loading").show();
 			$('#DataDetails')
 					.attr('action',
 							'${pageContext.request.contextPath}/extraction/CreateBulkLoadDetails')
@@ -27,6 +28,7 @@
 			var feed_id = document.getElementById("feed_id1").value;
 			var src_val = document.getElementById("src_val").value;
 			var file = document.getElementById("file").value;
+			$("#loading").show();
 			$('#DataDetails')
 					.attr('action',
 							'${pageContext.request.contextPath}/extraction/EditBulkLoadDetails')

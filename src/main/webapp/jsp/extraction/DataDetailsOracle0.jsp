@@ -7,7 +7,7 @@ document.getElementById('bord').style.display = "block";
 	<div class="col-sm-10">
 		<label>Schema Name *</label> <input list="schemas1"
 			name="schema_name1" id="schema_name1" class="form-control"
-			onchange="getsch(this.id,this.value)">
+			onchange="disableForm(DataDetails);getsch(this.id,this.value)">
 		<datalist id="schemas1">
 			<c:forEach items="${schema_name}" var="schema_name">
 				<option value="${schema_name}">

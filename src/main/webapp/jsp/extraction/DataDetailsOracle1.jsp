@@ -9,7 +9,7 @@
 			<div class="col-sm-4">
 				<label>Select Table *</label> 
 				
-				<input list="tables${id}" name="table_name${id}" id="table_name${id}" class="form-control" onchange="getcols(this.id)">
+				<input list="tables${id}" name="table_name${id}" id="table_name${id}" class="form-control" onchange="disableForm(DataDetails);getcols(this.id)">
 			  	<datalist id="tables${id}">
 			    	<c:forEach items="${tables}" var="tables">
 						<option value="${schema_name}.${tables}">
@@ -27,7 +27,7 @@
 			</div>
 			<div class="col-sm-4">
 				<label>Select Columns *</label> <select class="form-control"
-					id="cole${id}" name="cole${id}" onchange="getcols(this.id)">
+					id="cole${id}" name="cole${id}" onchange="disableForm(DataDetails);getcols(this.id)">
 							<option value="all" selected>Select All</option>
 							<option value="custom">Custom</option>
 				</select>
@@ -35,7 +35,7 @@
 			<div class="col-sm-4">
 				<label>Load Type *</label> <select class="form-control"
 					id="fetch_type${id}" name="fetch_type${id}"
-					onchange="getcols(this.id)">
+					onchange="disableForm(DataDetails);getcols(this.id)">
 					<c:choose>
 						<c:when test="${ext_type=='Real'}">
 							<option value="full" selected>Full Load</option>

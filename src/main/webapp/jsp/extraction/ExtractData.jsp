@@ -39,6 +39,7 @@
 						$("#feed_name")
 								.change(
 										function() {
+											$("#loading").show();
 											var feed_name = $(this).val();
 											//alert("feed_name "+feed_name)
 											var src_val = document
@@ -55,9 +56,11 @@
 																src_val : src_val
 															},
 															function(data) {
+																$("#loading").hide();
 																$('#datdyn1')
 																		.html(
-																				data)
+																				data);
+																enableForm(ExtractData);
 															});
 										});
 						$("#success-alert").hide();
@@ -125,7 +128,7 @@
 								value="${usernm}">
 							<div class="form-group">
 								<label>Source Feed Name *</label> <select name="feed_name"
-									id="feed_name" class="form-control">
+									id="feed_name" class="form-control" onchange="disableForm(ExtractData)">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
 									<c:forEach items="${src_sys_val}" var="src_sys_val">

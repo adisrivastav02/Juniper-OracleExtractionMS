@@ -10,6 +10,7 @@ $(document).ready(function() {
 		document.getElementById("schdiv").innerHTML = "";
 		document.getElementById("datadivx").innerHTML = "";
 		if (val == 'ind_loadx') {
+			$("#loading").show();
 			document.getElementById("sh").style.display="none";
 			var src_val = document.getElementById("src_val").value;
 			var src_sys_id = document.getElementById("feed_id1").value;
@@ -20,7 +21,9 @@ $(document).ready(function() {
 								src_sys_id : src_sys_id,
 								src_val : src_val
 							}, function(data) {
-								$('#datadivx').html(data)
+								$("#loading").hide();
+								$('#datadivx').html(data);
+								enableForm(DataDetails);
 							});
 		} else if (val == 'bulk_loadx') {
 			document.getElementById("sh").style.display="block";
@@ -37,7 +40,7 @@ $(document).ready(function() {
 				<div class="form-check form-check-info">
 					<label class="form-check-label"> <input type="radio"
 						class="form-check-input" name="bulkx" id="bulkx1"
-						value="ind_loadx" onclick="loadcheck1(this.value)">
+						value="ind_loadx" onclick="disableForm(DataDetails);loadcheck1(this.value)">
 						Individual Load Type<i class="input-helper"></i>
 					</label>
 				</div>
@@ -46,7 +49,7 @@ $(document).ready(function() {
 				<div class="form-check form-check-info">
 					<label class="form-check-label"> <input type="radio"
 						class="form-check-input" name="bulkx" id="bulkx2"
-						value="bulk_loadx" onclick="loadcheck1(this.value)"> Bulk
+						value="bulk_loadx" onclick="disableForm(DataDetails);loadcheck1(this.value)"> Bulk
 						Load Type<i class="input-helper"></i>
 					</label>
 				</div>
@@ -70,6 +73,7 @@ $(document).ready(function() {
 				reportErrors(errors);
 				return false;
 			}
+			$("#loading").show();			
 			$('#DataDetails')
 					.attr('action',
 							'${pageContext.request.contextPath}/extraction/CreateBulkLoadDetails')
@@ -78,6 +82,7 @@ $(document).ready(function() {
 			var feed_id = document.getElementById("feed_id1").value;
 			var src_val = document.getElementById("src_val").value;
 			var file = document.getElementById("file").value;
+			$("#loading").show();
 			$('#DataDetails')
 					.attr('action',
 							'${pageContext.request.contextPath}/extraction/EditBulkLoadDetails')

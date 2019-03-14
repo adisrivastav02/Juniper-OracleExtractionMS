@@ -15,7 +15,7 @@ document.getElementById('bord').style.display = "block";
 			<label>Schema Name *</label> <input list="schemas${theCount.count}"
 				name="schema_name${theCount.count}" value="${arrddb.schema_name}"
 				id="schema_name${theCount.count}" class="form-control"
-				onchange="getsch(this.id,this.value)">
+				onchange="disableForm(DataDetails);getsch(this.id,this.value)">
 			<datalist id="schemas${theCount.count}">
 			<c:forEach items="${schema_name}" var="schema_name">
 				<option value="${schema_name}">
@@ -36,14 +36,14 @@ document.getElementById('bord').style.display = "block";
 						<label>Select Table *</label> <input
 							list="tables${theCount.count}" name="table_name${theCount.count}" 
 							id="table_name${theCount.count}" value="${arrddb.schema_name}.${arrddb.table_name}" class="form-control"
-							onchange="getcols(this.id)">
+							onchange="disableForm(DataDetails);getcols(this.id)">
 						<datalist id="tables${theCount.count}">
 							<option value="${arrddb.schema_name}.${arrddb.table_name}">
 						</datalist>
 					</div>
 					<div class="col-sm-4">
 						<label>Select Columns *</label> <select class="form-control"
-							id="cole${theCount.count}" name="cole${theCount.count}" onchange="getcols(this.id)">
+							id="cole${theCount.count}" name="cole${theCount.count}" onchange="disableForm(DataDetails);getcols(this.id)">
 									<option value="all">Select All</option>
 									<option value="custom" selected>Custom</option>
 						</select>
@@ -52,7 +52,7 @@ document.getElementById('bord').style.display = "block";
 						<label>Load Type *</label> <select class="form-control"
 							id="fetch_type${theCount.count}"
 							name="fetch_type${theCount.count}"
-							onchange="getcols(this.id)">
+							onchange="disableForm(DataDetails);getcols(this.id)">
 							<c:choose>
 								<c:when test="${ext_type=='Real'}">
 									<option value="full" selected>Full Load</option>
