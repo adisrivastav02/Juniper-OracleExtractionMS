@@ -49,7 +49,7 @@ $(document).ready(function() {
 				<div class="form-check form-check-info">
 					<label class="form-check-label"> <input type="radio"
 						class="form-check-input" name="bulkx" id="bulkx2"
-						value="bulk_loadx" onclick="disableForm(DataDetails);loadcheck1(this.value)"> Bulk
+						value="bulk_loadx" onclick="loadcheck1(this.value)"> Bulk
 						Load Type<i class="input-helper"></i>
 					</label>
 				</div>

@@ -658,7 +658,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 					//String fieldString = String.join(",", arrs);
 					//ddb.setColumn_name(fieldString);
 				//} else {
-					ddb.setColumn_name(rs.getString(3));
+					ddb.setColumn_name(rs.getString(3).toLowerCase());
 				//}
 				ddb.setWhere_clause(rs.getString(4));
 				ddb.setFetch_type(rs.getString(5));
@@ -933,7 +933,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				src_id = rs.getString(1);
 			}
 			// Get Source Details from Src Id
-			query = "SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n"
+			query = "SELECT SRC_CONN_NAME,SRC_CONN_TYPE,S.SYSTEM_EIM, HOST_NAME FROM JUNIPER_EXT_SRC_CONN_MASTER C\r\n"
 					+ "INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.SRC_CONN_SEQUENCE=L.SRC_CONN_SEQUENCE \r\n"
 					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
@@ -941,23 +941,27 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','Name','" + rs.getString(1) + "')\r\n"
 						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','Type','" + rs.getString(2) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','Host','" + rs.getString(4) + "')\r\n"
 						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Source','EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
 				statement = connection.createStatement();
 				statement.execute(query);
 			}
 
 			// Get Target Details from Src ID
-			query = "SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_SEQUENCE FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n"
+			query = "SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_EIM,case when UPPER(target_type)='HDFS' then hdp_knox_host else gcp_project end as target_host FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n"
 					+ "INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.TARGET_CONN_SEQUENCE=L.TARGET_SEQUENCE \r\n"
-					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence WHERE l.FEED_SEQUENCE=" + src_id;
+					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence left outer join juniper_ext_gcp_master G on G.gcp_sequence  = C.gcp_sequence WHERE l.FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
+			int target_num=1;
 			while (rs.next()) {
-				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','Name','" + rs.getString(1) + "')\r\n"
-						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','Type','" + rs.getString(2) + "')\r\n"
-						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target','EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
+				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'Name','" + rs.getString(1) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num",'Type','" + rs.getString(2) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'Host','" + rs.getString(4) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
 				statement = connection.createStatement();
 				statement.execute(query);
+				target_num++;
 			}
 			// Get Scheduling Information
 			query = "SELECT DISTINCT \r\n" + "					CASE WHEN SCHEDULE_TYPE = 'R' AND DAILY_FLAG = 'Y' THEN 'DAILY'\r\n"

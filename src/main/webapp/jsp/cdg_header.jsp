@@ -225,7 +225,7 @@ function enableForm(theform) {
     
       <div class="navbar-menu-wrapper d-flex align-items-stretch">
       	<div class="navbar-nav navbar-nav-left">
-			<font color="black"><b>${project}</b></font>&nbsp<font size="2" color="red"><b>(ORACLE)</b></font>
+			<font color="black"><b>${project_name}</b></font>&nbsp<font size="2" color="red"><b>(ORACLE)</b></font>
         </div>
         <ul class="navbar-nav navbar-nav-right">
           <li class="nav-item nav-profile dropdown">

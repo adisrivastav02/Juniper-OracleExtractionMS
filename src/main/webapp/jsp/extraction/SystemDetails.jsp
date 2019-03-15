@@ -72,7 +72,7 @@
 			return false;
 		});
 		$("#src_sys").change(function() {
-			$("#cud").show();
+			document.getElementById("cud").style.display="block";
 			$("#loading").show();
 			if (document.getElementById("src_sys").value == "") {
 				window.location.reload();

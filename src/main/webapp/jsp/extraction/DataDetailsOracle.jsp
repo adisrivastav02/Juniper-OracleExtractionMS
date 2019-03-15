@@ -479,7 +479,7 @@ function jsonconstruct() {
 		else
 		{
 			var str=document.getElementById("where_clause"+y).value;
-			document.getElementById("where_clause"+y).value=str.replace(/'/g,"''");
+			document.getElementById("where_clause"+y).value=str.replace(/'/g,"'");
 		}
 	}
 	
@@ -655,7 +655,7 @@ function jsonconstruct() {
 									<div class="form-check form-check-info">
 										<label class="form-check-label"> <input type="radio"
 											class="form-check-input" name="bulk" id="bulk2"
-											value="bulk_load" onclick="disableForm(DataDetails);loadcheck(this.value)">
+											value="bulk_load" onclick="loadcheck(this.value)">
 											Bulk Load Type
 										</label>
 									</div>
