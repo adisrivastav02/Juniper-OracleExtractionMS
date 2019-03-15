@@ -955,10 +955,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 			rs = pstm.executeQuery();
 			int target_num=1;
 			while (rs.next()) {
-				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'Name','" + rs.getString(1) + "')\r\n"
-						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num",'Type','" + rs.getString(2) + "')\r\n"
-						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'Host','" + rs.getString(4) + "')\r\n"
-						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target'"+target_num+",'EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
+				query = "INSERT ALL \r\n" + " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target"+target_num+"','Name','" + rs.getString(1) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target"+target_num+"','Type','" + rs.getString(2) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target"+target_num+"','Host','" + rs.getString(4) + "')\r\n"
+						+ " INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Target"+target_num+"','EIM','" + rs.getString(3) + "')\r\n" + "SELECT * FROM dual";
 				statement = connection.createStatement();
 				statement.execute(query);
 				target_num++;
