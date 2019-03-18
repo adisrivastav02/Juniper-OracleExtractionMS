@@ -630,8 +630,8 @@ public class ExtractionController {
 		 * String ext_type = es.getExtType1(feed_name); model.addAttribute("ext_type",
 		 * ext_type);
 		 */
-		ArrayList<String> kafka_topic = es.getKafkaTopic();
-		model.addAttribute("kafka_topic", kafka_topic);
+		//ArrayList<String> kafka_topic = es.getKafkaTopic();
+		//model.addAttribute("kafka_topic", kafka_topic);
 		return new ModelAndView("extraction/ExtractData1");
 	}
 
