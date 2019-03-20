@@ -1281,7 +1281,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				}
 				else
 				{
-					where = where.replace("'","''");
+					where = where.replace("'","'");
 				}
 				json.put("schema_name" + (i + 1), schema);
 				json.put("table_name" + (i + 1), schema + "." + table);
