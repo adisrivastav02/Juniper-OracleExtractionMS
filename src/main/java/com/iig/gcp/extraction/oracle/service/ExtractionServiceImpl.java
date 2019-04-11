@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
@@ -16,8 +17,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -28,6 +32,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -57,6 +63,7 @@ import com.iig.gcp.extraction.oracle.dto.TempDataDetailBean;
 import com.iig.gcp.extraction.utils.CSV;
 import com.iig.gcp.extraction.utils.ConnectionUtils;
 import com.iig.gcp.extraction.utils.EncryptionUtil;
+import com.opencsv.CSVWriter;
 
 @Service
 public class ExtractionServiceImpl implements ExtractionService {
@@ -83,7 +90,33 @@ public class ExtractionServiceImpl implements ExtractionService {
 		}
 		return resp;
 	}
-
+	
+	@Override
+	public String invokeRestAsyncronous(String json, String url) throws UnsupportedOperationException, Exception {
+		String resp = null;
+		CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
+		try{
+			
+				// Start the client 
+			httpclient.start();
+		// Execute request
+			final HttpPost request1 = new HttpPost(url);
+			request1.setHeader("Content-type", "application/json");
+			StringEntity input = new StringEntity(json);
+			request1.setEntity(input);
+			Future<HttpResponse> future = httpclient.execute(request1, null);
+			long number = 2L;
+			HttpResponse response1 = future.get(number, TimeUnit.SECONDS );
+			resp="Started";
+		}catch(Exception e){
+			resp="Started";
+		}finally {
+			httpclient.close();
+		}
+		return resp;
+	}	
+		
+				
 	@Override
 	public ArrayList<String> getRunFeeds(String project_id) throws Exception {
 		ArrayList<String> arr = new ArrayList<String>();
@@ -99,8 +132,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(rs.getString(1));
 			}
 
-		} catch (ClassNotFoundException | SQLException e) {
-			System.out.println("Exception occured " + e);
+		} catch (SQLException e) {
 			throw e;
 		} finally {
 			pstm.close();
@@ -134,7 +166,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arr.add(runf);
 			}
 
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -178,7 +210,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				conn.setEncrypt(rs.getBytes(11));
 				arrConnectionMaster.add(conn);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -207,7 +239,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				tm.setTarget_unique_name(rs.getString(2));
 				arr.add(tm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -292,7 +324,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				conn.setConnection_id(rs.getInt(1));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -349,7 +381,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				val = rs.getString(1);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -386,7 +418,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				val = rs.getString(1);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -510,7 +542,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				ssm.setTable_list(rs.getString(3));
 				arrssm.add(ssm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -550,7 +582,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				arrssm.add(ssm);
 			}
 			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -577,7 +609,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				cm.setCountry_name(rs.getString(2));
 				arrcm.add(cm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -604,7 +636,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				rm.setReservoir_desc(rs.getString(3));
 				arrrm.add(rm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -626,7 +658,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				cnt = rs.getInt(1);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -701,7 +733,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				stat = 1;
 				break;
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -766,7 +798,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				sch1.add(sch);
 			}
 			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -788,7 +820,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				sys.add(rs.getString(1));
 			}
 			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -810,7 +842,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				sys = rs.getString(1);
 			}
 			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -846,7 +878,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				dm.setProject_id(rs.getString(4));
 				arrdm.add(dm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -874,7 +906,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				dm.setDrive_path(rs.getString(2));
 				arrdm.add(dm);
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -898,7 +930,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				dm.setDrive_name(rs.getString(2));
 				dm.setDrive_path(rs.getString(3));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -948,9 +980,10 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 
 			// Get Target Details from Src ID
-			query = "SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_EIM,case when UPPER(target_type)='HDFS' then hdp_knox_host else gcp_project end as target_host FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n"
+			query = "SELECT TARGET_UNIQUE_NAME,TARGET_TYPE,S.SYSTEM_EIM,case when UPPER(TRIM((target_type))='HDFS' then hdp_knox_host else gcp_project end as target_host FROM JUNIPER_EXT_TARGET_CONN_MASTER C\r\n"
 					+ "INNER JOIN  JUNIPER_EXT_FEED_SRC_TGT_LINK L ON C.TARGET_CONN_SEQUENCE=L.TARGET_SEQUENCE \r\n"
-					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence left outer join juniper_ext_gcp_master G on G.gcp_sequence  = C.gcp_sequence WHERE l.FEED_SEQUENCE=" + src_id;
+					+ "INNER JOIN JUNIPER_SYSTEM_MASTER S ON C.system_sequence=S.system_sequence\r\n"
+					+ "left outer join juniper_ext_gcp_master G on G.gcp_sequence  = C.gcp_sequence WHERE l.FEED_SEQUENCE=" + src_id;
 			pstm = connection.prepareStatement(query);
 			rs = pstm.executeQuery();
 			int target_num=1;
@@ -993,7 +1026,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			query = "INSERT INTO LOGGER_MASTER (FEED_ID,CLASSIFICATION,SUBCLASSIFICATION,VALUE)  values('" + src_unique_name + "','Transfer','Platform','JUNIPER')";
 			statement = connection.createStatement();
 			statement.execute(query);
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1015,7 +1048,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1039,7 +1072,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				arr.add(rs.getString(1) + "|" + rs.getString(2));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1054,49 +1087,38 @@ public class ExtractionServiceImpl implements ExtractionService {
 		// TODO Auto-generated method stub
 		String val = null;
 		Connection connection = null;
-		String yemi = "field.xls";
+		String yemi = "Bulk_Upload_Sample.psv";
 		PreparedStatement pstm = null;
 		try {
 			connection = ConnectionUtils.getConnection();
-
+			PreparedStatement feed_seq = null;
+			
 			pstm = connection.prepareStatement(
-					"select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER where feed_sequence=" + src_sys_id
-							+ " union select TABLE_NAME,COLUMNS,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,VALIDATION_FLAG,ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence=" + src_sys_id);
+					"select SUBSTR(TABLE_NAME,1,INSTR(TABLE_NAME,'.')-1) AS SCHEMA_NAME, SUBSTR(TABLE_NAME,INSTR(TABLE_NAME,'.')+1) AS TABLE_NAME, VIEW_FLAG AS IS_VIEW, COLUMNS AS COLUMNS_NAME,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER where feed_sequence=" + src_sys_id
+					+ " union select SUBSTR(TABLE_NAME,1,INSTR(TABLE_NAME,'.')-1) AS SCHEMA_NAME, SUBSTR(TABLE_NAME,INSTR(TABLE_NAME,'.')+1) AS TABLE_NAME, VIEW_FLAG AS IS_VIEW, COLUMNS AS COLUMNS_NAME,WHERE_CLAUSE,FETCH_TYPE,INCR_COL,'Y' as VALIDATION_FLAG,'NA' as ERROR_MESSAGE from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence=" + src_sys_id);
 			ResultSet rs = pstm.executeQuery();
-
-			HSSFWorkbook workbook = new HSSFWorkbook();
-			HSSFSheet sheet = workbook.createSheet("lawix10");
-			HSSFRow rowhead = sheet.createRow((short) 0);
-			rowhead.createCell((short) 0).setCellValue("TABLE_NAME");
-			rowhead.createCell((short) 1).setCellValue("COLUMNS");
-			rowhead.createCell((short) 2).setCellValue("WHERE_CLAUSE");
-			rowhead.createCell((short) 3).setCellValue("FETCH_TYPE");
-			rowhead.createCell((short) 4).setCellValue("INCR_COL");
-			rowhead.createCell((short) 5).setCellValue("VALIDATION_FLAG");
-			rowhead.createCell((short) 6).setCellValue("ERROR_MESSAGE");
+			@SuppressWarnings("deprecation")
+			CSVWriter csvWriter = new CSVWriter(new FileWriter(yemi),'|',
+			CSVWriter.NO_QUOTE_CHARACTER,
+			CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+			"\r\n");
+			
+			List<String[]> rows = new LinkedList<String[]>();
+			csvWriter.writeNext(new String[] {"ROW_NO","SCHEMA_NAME","TABLE_NAME","IS_VIEW","COLUMNS_NAME","WHERE_CLAUSE","FETCH_TYPE","INCR_COL","VALIDATION_FLAG","ERROR_MESSAGE"});
 
 			int i = 1;
 			while (rs.next()) {
-				HSSFRow row = sheet.createRow((short) i);
-				row.createCell((short) 0).setCellValue(rs.getString("TABLE_NAME"));
-				row.createCell((short) 1).setCellValue(rs.getString("COLUMNS"));
-				row.createCell((short) 2).setCellValue(rs.getString("WHERE_CLAUSE"));
-				row.createCell((short) 3).setCellValue(rs.getString("FETCH_TYPE"));
-				row.createCell((short) 4).setCellValue(rs.getString("INCR_COL"));
-				row.createCell((short) 5).setCellValue(rs.getString("VALIDATION_FLAG"));
-				row.createCell((short) 6).setCellValue(rs.getString("ERROR_MESSAGE"));
-
+					csvWriter.writeNext(new String[]{Integer.toString(i),rs.getString("SCHEMA_NAME"),rs.getString("TABLE_NAME"),rs.getString("IS_VIEW"),
+					               rs.getString("COLUMNS_NAME"),rs.getString("WHERE_CLAUSE"),rs.getString("FETCH_TYPE"),
+					rs.getString("INCR_COL"),rs.getString("VALIDATION_FLAG"),rs.getString("ERROR_MESSAGE")});
 				i++;
 			}
-
-			FileOutputStream fileOut = new FileOutputStream(yemi);
-			workbook.write(fileOut);
-		} catch (ClassNotFoundException | SQLException | IOException e1) {
-			System.out.println("Exception occured " + e1);
+			csvWriter.close();
+		} catch (SQLException | IOException e1) {
 			throw e1;
 		} finally {
-			pstm.close();
 			connection.close();
+			pstm.close();
 		}
 		return yemi;
 	}
@@ -1130,7 +1152,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			}
 			connection.close();
 			System.out.println("Extracted the complete data");
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1153,7 +1175,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1175,7 +1197,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1199,7 +1221,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			while (rs.next()) {
 				arr.add(rs.getString(1));
 			}
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1221,7 +1243,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 				sch = rs.getString(1).split("\\.")[0];
 			}
 			connection.close();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			System.out.println("Exception occured " + e);
 			throw e;
 		} finally {
@@ -1244,7 +1266,7 @@ public class ExtractionServiceImpl implements ExtractionService {
 			int counter = 1;
 			while (csv.hasNext()) {
 				List<String> x = csv.next();
-				while (x.size() <= 9) {
+				while (x.size() <= 10) {
 					x.add("");
 				}
 				Map<String, String> obj = new LinkedHashMap<>();
@@ -1323,5 +1345,98 @@ public class ExtractionServiceImpl implements ExtractionService {
 		String json_array_metadata_str = array_metadata_first.toString().replace("[", "").replace("]", "");
 		return json_array_metadata_str;
 	}
+	
+	@Override
+	public String getFeedName (int src_sys_id) throws Exception{
+		     String sch = "";
+			 Connection connection = null;
+			 PreparedStatement pstm = null;
+			 try { 
+						connection = ConnectionUtils.getConnection();
+						pstm = connection.prepareStatement("select feed_unique_name from JUNIPER_EXT_FEED_MASTER where FEED_SEQUENCE="+ src_sys_id);
+						ResultSet rs = pstm.executeQuery();
+						while (rs.next()) { 
+								sch = rs.getString(1);
+						}connection.close();
+			 } catch (SQLException e) {
+						throw e;
+			 } finally {
+							pstm.close();
+							connection.close();
+			 }
+			return sch;
+	}
 
+	@Override
+	public ArrayList<TempDataDetailBean> getInProgressTempData(int src_sys_id, String src_val, String project_id) throws Exception {
+		TempDataDetailBean ddb = null;
+		String db_name = null;
+		ArrayList<TempDataDetailBean> arrddb = new ArrayList<TempDataDetailBean>();
+		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
+		Connection connection = null;
+		PreparedStatement pstm = null;
+		try { 
+					connection = ConnectionUtils.getConnection();
+					String query = "select table_name,columns,where_clause,fetch_type,incr_col,validation_flag,error_message from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence =" + src_sys_id
+																+ " and validation_flag='N' and error_message IS NULL";
+					pstm = connection.prepareStatement(query);
+					ResultSet rs = pstm.executeQuery();
+					while (rs.next()) {
+									ddb = new TempDataDetailBean();
+									ddb.setTable_name(rs.getString(1));
+									ddb.setSchema(rs.getString(1).split("\\.")[0]);
+									ddb.setColumn_name(rs.getString(2));
+									ddb.setWhere_clause(rs.getString(3));	
+									ddb.setFetch_type(rs.getString(4));
+									ddb.setIncremental_column(rs.getString(5));	
+									ddb.setValidation_flag(rs.getString(6));
+									ddb.setError_message(rs.getString(7));	
+									arrddb.add(ddb);
+					}				
+					connection.close();
+		} catch (SQLException e) {
+					throw e;
+		} finally {
+					pstm.close();
+					connection.close();
+		}
+		return arrddb;
+	}	
+	
+
+	@Override
+	public ArrayList<TempDataDetailBean> getValidatedTempData(int src_sys_id, String src_val, String project_id) throws Exception{
+		TempDataDetailBean ddb = null;
+		String db_name = null;
+		ArrayList<TempDataDetailBean> arrddb = new ArrayList<TempDataDetailBean>();
+		ConnectionMaster conn = getConnections1(src_val, src_sys_id);
+		Connection connection = null;
+		PreparedStatement pstm = null;
+		try {
+					connection = ConnectionUtils.getConnection();
+					String query = "select table_name, columns, where_clause, fetch_type, incr_col, validation_flag,error_message from JUNIPER_EXT_TABLE_MASTER_TEMP where feed_sequence =" + src_sys_id
+													+ " and validation_flag='N' and error_message IS NOT NULL";
+					pstm = connection.prepareStatement(query);
+					ResultSet rs = pstm.executeQuery();
+					while (rs.next()) {
+									ddb = new TempDataDetailBean();
+									ddb.setTable_name(rs.getString(1));
+									ddb.setSchema(rs.getString(1).split("\\.")[0]);
+									ddb.setColumn_name(rs.getString(2));
+									ddb.setWhere_clause(rs.getString(3));	
+									ddb.setFetch_type(rs.getString(4));
+									ddb.setIncremental_column(rs.getString(5));	
+									ddb.setValidation_flag(rs.getString(6));
+									ddb.setError_message(rs.getString(7));	
+									arrddb.add(ddb);
+					}				
+					connection.close();
+		} catch (SQLException e) {
+					throw e;
+		} finally {
+					pstm.close();
+					connection.close();
+		}
+		return arrddb;
+	}	
 }

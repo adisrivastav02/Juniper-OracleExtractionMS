@@ -85,9 +85,9 @@ function loadcheck(val) {
 			});
 		}
 	} else if (val == 'bulk_load') {
-		$("#loading").show();
+		
 		document.getElementById("schdiv").style.display="none";
-		document.getElementById('but').style.display = "none";
+		
 		var selection = $("input[name='radio']:checked").val();
 		if(document.getElementById("feed_id1").style.display==="none")
 		{
@@ -98,15 +98,16 @@ function loadcheck(val) {
 			var src_sys_id = document.getElementById("feed_id1").value;
 		}
 		document.getElementById("bord").style.display="block";
+		document.getElementById("Schdiv").innerHTML="";
+		document.getElementById("but").style.display="none";
 		$.post('${pageContext.request.contextPath}/extraction/BulkLoadTest',
 		{
 			src_sys_id : src_sys_id,
 			src_val : src_val,
 			selection : selection
 		}, function(data) {
-			$("#loading").hide();
-			$('#datadiv').html(data);
-			enableForm(DataDetails);
+			
+			$('#datadiv').html(data)
 		});
 	}
 }
@@ -141,14 +142,14 @@ function getsch(id, val) {
 					}, function(data) {
 						$("#loading").hide();
 						$('#datdiv' + id).html(data);
-						for (var j = 1; j < id; j++) {
+						for (var j = 1; j <=id; j++) {
 							var vl = document.getElementById('table_name' + j).value;
 							var curr = document.getElementById('tables'+id);
 							for (var k = 0; k < curr.options.length; k++) {
 								if (curr.options[k].value === vl)
-								{
+								
 									curr.options[k].remove();
-								}
+								
 							}
 						}
 						enableForm(DataDetails);
@@ -630,8 +631,8 @@ function jsonconstruct() {
 									<c:forEach items="${src_sys_val1}" var="src_sys_val1">
 										<option value="${src_sys_val1.src_sys_id}">${src_sys_val1.src_unique_name}</option>
 									</c:forEach>
-								</select> <select name="feed_id1" id="feed_id1" class="form-control" onchange="disableForm(DataDetails);"
-									style="display: none;">
+								</select> <select name="feed_id1" id="feed_id1" class="form-control" 
+									style="display: none;"onchange="disableForm(DataDetails);">
 									<option value="" selected disabled>Source Feed Name
 										...</option>
 									<c:forEach items="${src_sys_val2}" var="src_sys_val2">

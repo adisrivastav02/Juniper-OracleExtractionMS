@@ -131,18 +131,18 @@ document.getElementById('bord').style.display = "block";
 
 					<div>
 						<div
-							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Available
+							style="float: left; width: 50%; height: 25px; font-weight: bold; text-align: center;">Available
 							Fields</div>
 						<div
-							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Selected
+							style="float: left; width: 50%; height: 25px; font-weight: bold; text-align: center;">Selected
 							Fields</div>
 						<div
-							style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Tokenized
+							style="float: left; width: 0%; height: 25px; font-weight: bold; text-align: center;display:none;">Tokenized
 							Fields</div>
 					</div>
 					<div>
 						<div
-							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							style="float: left; width: 50%; height: 300px; overflow-y: scroll;"
 							id="avl${theCount.count}" ondrop="drop(event,this)"
 							ondragover="allowDrop(event)">
 							<c:choose>
@@ -164,7 +164,7 @@ document.getElementById('bord').style.display = "block";
 							</c:choose>
 						</div>
 						<div
-							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							style="float: left; width: 50%; height: 300px; overflow-y: scroll;"
 							id="sel${theCount.count}" ondrop="drop(event,this)"
 							ondragover="allowDrop(event)">
 							<c:choose>
@@ -186,7 +186,7 @@ document.getElementById('bord').style.display = "block";
 							</c:choose>
 							</div>
 						<div
-							style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+							style="float: left; width: 0%; height: 300px; overflow-y: scroll;"
 							id="tok${theCount.count}" ondrop="drop(event,this)"
 							ondragover="allowDrop(event)"></div>
 					</div>

@@ -11,18 +11,18 @@
 
 <div>
 	<div
-		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Available
+		style="float: left; width: 50%; height: 25px; font-weight: bold; text-align: center;">Available
 		Fields</div>
 	<div
-		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Selected
+		style="float: left; width: 50%; height: 25px; font-weight: bold; text-align: center;">Selected
 		Fields</div>
 	<div
-		style="float: left; width: 33%; height: 25px; font-weight: bold; text-align: center;">Tokenized
+		style="float: left; width: 0%; height: 25px; font-weight: bold; text-align: center;display:none;">Tokenized
 		Fields</div>
 </div>
 <div>
 	<div
-		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		style="float: left; width: 50%; height: 300px; overflow-y: scroll;"
 		id="avl${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)">
 		<c:choose>
 			<c:when test="${fields==''}">
@@ -43,7 +43,7 @@
 		</c:choose>
 	</div>
 	<div
-		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		style="float: left; width: 50%; height: 300px; overflow-y: scroll;"
 		id="sel${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)">
 		<c:if test="${fields==''}">
 			<button id="but${id}" name="but${id}" value="*" class="btn btn-dark"
@@ -53,7 +53,7 @@
 		</c:if>
 		</div>
 	<div
-		style="float: left; width: 33%; height: 300px; overflow-y: scroll;"
+		style="float: left; width: 0%; height: 300px; overflow-y: scroll;display:none"
 		id="tok${id}" ondrop="drop(event,this)" ondragover="allowDrop(event)"></div>
 </div>
 

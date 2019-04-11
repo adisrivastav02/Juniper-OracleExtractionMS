@@ -62,4 +62,8 @@ public interface ExtractionService {
 	public String getJsonFromFile(File file,String user,String project,int src_sys_id) throws Exception;
 	public String getJsonFromFeedSequence(String project,String src_sys_id) throws JSONException;
 	public int getRecCount(int src_sys_id) throws Exception;
+	public String invokeRestAsyncronous(String json, String url) throws UnsupportedOperationException, Exception;
+	public String getFeedName (int src_sys_id) throws Exception;
+	public ArrayList<TempDataDetailBean> getInProgressTempData(int src_sys_id, String src_val, String project_id) throws Exception;
+	public ArrayList<TempDataDetailBean> getValidatedTempData(int src_sys_id, String src_val, String project_id) throws Exception;
 }
